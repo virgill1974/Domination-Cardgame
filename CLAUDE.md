@@ -65,6 +65,10 @@ npx pwa-assets-generator         # regenerate app icons in public/ui/ from publi
 **Asset fallbacks (drop-in, no code change):**
 - Images: `public/cards/<cardTypeId>.png`, generated SVG placeholder if missing (`src/ui/cardArt.ts`). The printer page resolves images with base `../cards/`.
 - Sounds: `public/sounds/<name>.mp3`, else synthesized via Web Audio (`src/ui/sound.ts`).
+- Music: `public/sounds/music.mp3` loops during the game (`src/ui/music.ts`), else a generated ambient pad.
+  - It is routed through a `MediaElementAudioSourceNode` into the music bus, because iOS ignores `<audio>.volume`.
+  - `sound.ts` has two gain buses (`sfx`, `music`) with volumes persisted in localStorage. The UI is `VolumeControl.tsx`, rendered via portal because `backdrop-filter` on `.dialog` would trap a fixed overlay.
+  - Browsers may reject `play()` without a gesture. `kickMusic()` runs on every pointerdown to retry.
 - Design graphics: `public/ui/background.svg`, `glass-sheen.svg`, `logo.svg`, referenced as CSS variables at the top of `theme.css`. Use absolute `/ui/...` URLs in CSS; Vite rewrites them relative for `base: './'`.
 - 404s for these files in the console are expected. Don't download third-party assets without asking: original C&C sounds and images are EA-copyrighted.
 

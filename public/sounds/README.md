@@ -22,3 +22,11 @@ Originalsounds aus Command & Conquer sind urheberrechtlich geschützt.
 | `explosion.mp3` | Karte im Kampf zerstört |
 | `superweapon.mp3` | Superwaffe feuert (inkl. Einschlag) |
 | `victory.mp3` | Siegesfanfare |
+
+## Hintergrundmusik
+
+`music.mp3` läuft während der Partie in Schleife, auf dem Startbildschirm und beim Sieg nicht.
+Fehlt die Datei, spielt die App eine selbst erzeugte, ruhige Sci-Fi-Klangfläche.
+Die Datei darf bis 20 MB groß sein und wird für das Offline-Spiel mit auf dem Handy gespeichert. Für einen sauberen Übergang am Schleifenende sollte der Anfang nahtlos an das Ende passen.
+
+Effekte und Musik haben getrennte Regler im Dialog **Lautstärke** (Startbildschirm und Spielmenü ☰).

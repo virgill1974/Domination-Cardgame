@@ -10,8 +10,10 @@ import { loadGame, saveGame } from '../storage';
 import { MessageDialog, type Msg } from './components';
 import { errorMsg, eventMessages } from './eventMessages';
 import { AttackFlow, BuyFlow, InfoFlow, RepairFlow, type FlowProps } from './flows';
-import { Handoff, Home, Hud, Inventory, Setup, SoundToggle, Winner, type Action } from './screens';
+import { Handoff, Home, Hud, Inventory, Setup, Winner, type Action } from './screens';
 import { play, unlockAudio } from './sound';
+import { kickMusic, setMusicActive } from './music';
+import { VolumeButton } from './VolumeControl';
 import { UpdatePrompt } from './UpdatePrompt';
 
 type View = 'home' | 'setup' | 'game';
@@ -38,7 +40,10 @@ function useWakeLock(active: boolean) {
 
 function useUiSounds(current: Msg | undefined) {
   useEffect(() => {
-    const onPointer = () => unlockAudio();
+    const onPointer = () => {
+      unlockAudio();
+      kickMusic();
+    };
     const onClick = (e: MouseEvent) => {
       if ((e.target as Element).closest('button, a.btn, .list-item')) play('click');
     };
@@ -63,6 +68,9 @@ export function App() {
   const [dialog, setDialog] = useState<'menu' | 'end' | 'quit' | null>(null);
   useWakeLock(view === 'game');
   useUiSounds(queue[0]);
+  // Musik während der Partie; beim Sieg blendet sie aus, damit die Fanfare frei steht
+  const musicOn = view === 'game' && !!game && game.winner === null;
+  useEffect(() => setMusicActive(musicOn), [musicOn]);
 
   const replace = (next: GameState | null) => {
     gameRef.current = next;
@@ -137,7 +145,7 @@ export function App() {
           <div class="dialog">
             <h3>Menü</h3>
             <button class="btn primary block" onClick={() => setDialog(null)}>Weiterspielen</button>
-            <SoundToggle />
+            <VolumeButton />
             <button class="btn block" onClick={() => { setDialog(null); setView('home'); }}>Zum Startbildschirm</button>
             <button class="btn danger block" onClick={() => setDialog('quit')}>Spiel abbrechen</button>
           </div>

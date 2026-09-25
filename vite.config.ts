@@ -34,7 +34,8 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         // Alles für ein Spiel ohne Netz: App, ZXing-WASM, Schriften, Design, Kartenbilder, Sounds
         globPatterns: ['**/*.{js,css,html,wasm,woff2,svg,png,jpg,webp,ico,mp3,webmanifest}'],
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        // Musik (sounds/music.mp3) darf groß sein; sie muss für das Offline-Spiel mit in den Cache
+        maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
         navigateFallback: 'index.html',
         cleanupOutdatedCaches: true,
         // Seite schon beim ersten Besuch steuern, sonst gibt es beim Update kein controllerchange zum Neuladen

@@ -7,45 +7,61 @@ export const SOUND_NAMES = [
 export type SoundName = (typeof SOUND_NAMES)[number];
 
 type Synth = (c: BaseAudioContext, out: AudioNode, t: number) => void;
+export type Channel = 'sfx' | 'music';
 
-const STORAGE_KEY = 'cnc-kartenspiel-sound';
-let enabled = readEnabled();
+const STORAGE_KEY = 'cnc-kartenspiel-volume';
+const LEGACY_KEY = 'cnc-kartenspiel-sound';
+const MAX_GAIN = 1.2;
+const volumes = readVolumes();
 let ctx: AudioContext | null = null;
-let master: GainNode | null = null;
+let buses: Record<Channel, GainNode> | null = null;
 const samples = new Map<SoundName, AudioBuffer | null>();
 
-function readEnabled(): boolean {
+function readVolumes(): Record<Channel, number> {
   try {
-    return localStorage.getItem(STORAGE_KEY) !== 'off';
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
+    if (typeof saved?.sfx === 'number' && typeof saved?.music === 'number') return saved;
+    if (localStorage.getItem(LEGACY_KEY) === 'off') return { sfx: 0, music: 0 };
   } catch {
-    return true;
+    // ohne Speicher gelten die Standardwerte
   }
+  return { sfx: 0.8, music: 0.5 };
 }
 
-export const soundEnabled = () => enabled;
+/** Quadratisch, damit der Regler sich gehörrichtig anfühlt. */
+const gainFor = (volume: number) => volume * volume * MAX_GAIN;
 
-export function setSoundEnabled(on: boolean) {
-  enabled = on;
+export const getVolume = (channel: Channel) => volumes[channel];
+
+export function setVolume(channel: Channel, volume: number) {
+  volumes[channel] = volume;
+  if (ctx && buses) buses[channel].gain.setTargetAtTime(gainFor(volume), ctx.currentTime, 0.05);
   try {
-    localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off');
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(volumes));
   } catch {
     // Einstellung gilt dann nur bis zum Neuladen
   }
 }
 
-function audio(): AudioContext | null {
+export function audio(): AudioContext | null {
   if (!ctx) {
     try {
       ctx = new AudioContext();
     } catch {
       return null;
     }
-    master = ctx.createGain();
-    master.gain.value = 0.8;
     const limiter = ctx.createDynamicsCompressor();
     limiter.threshold.value = -10;
     limiter.ratio.value = 8;
-    master.connect(limiter).connect(ctx.destination);
+    limiter.connect(ctx.destination);
+    const c = ctx;
+    const makeBus = (channel: Channel) => {
+      const gain = c.createGain();
+      gain.gain.value = gainFor(volumes[channel]);
+      gain.connect(limiter);
+      return gain;
+    };
+    buses = { sfx: makeBus('sfx'), music: makeBus('music') };
     for (const name of SOUND_NAMES) {
       fetch(`sounds/${name}.mp3`)
         .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject()))
@@ -61,20 +77,22 @@ function audio(): AudioContext | null {
 /** Muss aus einer Nutzerinteraktion heraus aufgerufen werden (iOS gibt Audio sonst nicht frei). */
 export const unlockAudio = () => void audio();
 
+export const bus = (channel: Channel): GainNode | null => (audio() ? buses![channel] : null);
+
 export function play(name: SoundName, delay = 0) {
-  if (!enabled) return;
+  if (volumes.sfx === 0) return;
   const c = audio();
-  if (!c || !master) return;
+  if (!c || !buses) return;
   const t = c.currentTime + delay;
   const sample = samples.get(name);
   if (sample) {
     const src = c.createBufferSource();
     src.buffer = sample;
-    src.connect(master);
+    src.connect(buses.sfx);
     src.start(t);
     return;
   }
-  SYNTHS[name](c, master, t);
+  SYNTHS[name](c, buses.sfx, t);
 }
 
 // ---------- Bausteine ----------

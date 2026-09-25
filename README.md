@@ -15,6 +15,7 @@ Die App läuft im Browser und wird über **Cloudflare Pages** gehostet. Jeder Pu
 - **Offline:** Nach dem ersten Öffnen liegen App, Barcode-Leser, Schriften, Design, Kartenbilder und Sounds auf dem Handy. Gespielt werden kann dann auch ohne Internet.
 - **Updates:** Gibt es eine neue Version, erscheint unten der Hinweis „Neue Version verfügbar“. Erst beim Tippen auf „Aktualisieren“ wird neu geladen, der Spielstand bleibt erhalten.
 - Die Kamera funktioniert, weil die Seite über HTTPS kommt.
+- **Ton:** Effekte und Hintergrundmusik haben getrennte Regler (**Lautstärke** auf dem Startbildschirm und im Spielmenü ☰). Eigene Musik: `public/sounds/music.mp3`, Details in [`public/sounds/README.md`](public/sounds/README.md).
 
 ### Einmalige Einrichtung von Cloudflare Pages
 

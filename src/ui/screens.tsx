@@ -5,16 +5,8 @@ import { cardIdOfEan, factionOfEan, kindOfEan } from '../engine/cards';
 import { currentFaction, currentPlayer, ownedSlots, type GameState } from '../engine/state';
 import { Scanner } from '../scanner/Scanner';
 import { CardArt, DefBar, Icon, factionStyle } from './components';
-import { play, setSoundEnabled, soundEnabled } from './sound';
-
-export function SoundToggle() {
-  const [on, setOn] = useState(soundEnabled);
-  return (
-    <button class="btn ghost block" onClick={() => { setSoundEnabled(!on); setOn(!on); }}>
-      Ton: {on ? 'an' : 'aus'}
-    </button>
-  );
-}
+import { play } from './sound';
+import { VolumeButton } from './VolumeControl';
 
 export type Action = 'buy' | 'attack' | 'repair' | 'info' | 'inventory' | 'end';
 
@@ -31,7 +23,7 @@ export function Home({ canResume, onNew, onResume }: { canResume: boolean; onNew
         {canResume && <button class="btn primary block" onClick={onResume}>Spiel fortsetzen</button>}
         <button class={`btn block ${canResume ? '' : 'primary'}`} onClick={onNew}>Neues Spiel</button>
         <a class="btn ghost block" href="Tools/generate_barcodes.html" style={{ textDecoration: 'none' }}>Kartendrucker</a>
-        <SoundToggle />
+        <VolumeButton />
       </div>
     </div>
   );
