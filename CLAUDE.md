@@ -50,6 +50,7 @@ npx pwa-assets-generator         # regenerate app icons in public/ui/ from publi
 - Flows in `flows.tsx` follow the terminal: scan → confirm card → execute.
 - Design "Holografisches Glas" lives in `theme.css` (tokens on `:root`). Only large surfaces (`.panel`, `.dialog`, `.glass`) use `backdrop-filter`, for phone performance. Buttons and tiles use plain translucent gradients.
 - Faction color arrives as `--fc` and `--tint` via `factionStyle()`. `App.tsx` also puts it on the `display: contents` root, so dialogs and the scanner are tinted during a turn.
+  - Primary buttons, the dialog top stroke and the scanner frame use `--accent-grad`/`--accent-ink`/`--accent-glow`/`--accent-line`. These are cyan→violet on neutral screens and the faction color (white text) inside tinted elements. Only error (red) and warning (orange) dialogs keep signal colors.
   - Custom properties resolve where they are declared. So anything derived from `--tint`/`--fc` (e.g. `--glass`) is re-declared under `:root, [style*='--tint']`. Don't define such derived variables on `:root` alone, or they stay cyan.
 - Fonts as in the ModZart_Web project, self-hosted via fontsource (offline):
   - Silkscreen (pixel, `--font-display`): headings, labels, faction names
