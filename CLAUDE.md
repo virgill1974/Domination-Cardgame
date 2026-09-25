@@ -48,13 +48,22 @@ npx pwa-assets-generator         # regenerate app icons in public/ui/ from publi
 - `App.tsx` holds the state machine (home → setup → handoff → HUD/flows → winner). `commit(fn)` structuredClones state, applies the engine call and persists to localStorage.
 - Engine events become queued `Msg` dialogs (`eventMessages.tsx`), optionally with a `sound`.
 - Flows in `flows.tsx` follow the terminal: scan → confirm card → execute.
-- Design "Holografisches Glas" lives in `theme.css` (tokens on `:root`). Only large surfaces (`.panel`, `.dialog`, `.glass`) use `backdrop-filter`, for phone performance. Buttons and tiles use plain translucent gradients. Faction color arrives as `--fc` via `factionStyle()`.
-- Fonts are self-hosted via `@fontsource-variable` (Exo 2 for display, Inter for body), so they work offline.
+- Design "Holografisches Glas" lives in `theme.css` (tokens on `:root`). Only large surfaces (`.panel`, `.dialog`, `.glass`) use `backdrop-filter`, for phone performance. Buttons and tiles use plain translucent gradients.
+- Faction color arrives as `--fc` and `--tint` via `factionStyle()`. `App.tsx` also puts it on the `display: contents` root, so dialogs and the scanner are tinted during a turn.
+  - Custom properties resolve where they are declared. So anything derived from `--tint`/`--fc` (e.g. `--glass`) is re-declared under `:root, [style*='--tint']`. Don't define such derived variables on `:root` alone, or they stay cyan.
+- Fonts as in the ModZart_Web project, self-hosted via fontsource (offline):
+  - Silkscreen (pixel, `--font-display`): headings, labels, faction names
+  - Space Grotesk (`--font-body`): text, buttons
+  - JetBrains Mono (`--font-mono`): numbers
+  - Silkscreen/JetBrains are imported as latin-only subsets; German umlauts are included.
+- `Guide.tsx` is the in-app Kurzanleitung, reachable only from the home screen. Rule values in it follow the code, not the manual.
 
 **`src/scanner/`:**
 - Uses native `BarcodeDetector` if it supports `ean_8`, otherwise the `barcode-detector` ponyfill with zxing-wasm. The `.wasm` is bundled via `?url`, no CDN.
 - A code is accepted only after two identical consecutive reads.
-- The manual picker only lists cards by faction and never reveals ownership (enemy buildings are face-down on the table).
+- The manual picker is a testing aid; the user plans to remove it later.
+  - Each flow passes `available(ean)`, built from the engine's pure checks: `buyCheck`, `repairCheck`, `attackScan*`/`attackConfirm*`, `infoScan`/`info`. The picker shows only those cards by default, plus an "Alle Karten zeigen" toggle for testing error messages.
+  - For the defender step this reveals which enemy cards are in play; that is accepted for testing.
 
 **Barcodes:**
 - EAN-8 = `0000` + 3-digit index + GS1 check digit (`src/engine/ean.ts`).

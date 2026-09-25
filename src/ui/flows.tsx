@@ -3,11 +3,11 @@ import { useState } from 'preact/hooks';
 import { CARDS, type Faction } from '../engine/data';
 import { cardIdOfEan, kindOfEan } from '../engine/cards';
 import { currentFaction, currentPlayer, findSlot, type GameState } from '../engine/state';
-import { buy, buyScan } from '../engine/buy';
+import { buy, buyCheck, buyScan } from '../engine/buy';
 import {
   attack, attackConfirmAttacker, attackConfirmDefender, attackScanAttacker, attackScanDefender, type CombatResult,
 } from '../engine/combat';
-import { info, infoScan, ownCardScan, repair } from '../engine/actions';
+import { info, infoScan, ownCardScan, repair, repairCheck } from '../engine/actions';
 import type { ErrorCode } from '../engine/messages';
 import { Scanner } from '../scanner/Scanner';
 import { CardView, DefBar, KV, type Msg } from './components';
@@ -68,6 +68,7 @@ export function BuyFlow(props: FlowProps) {
     return (
       <Scanner
         title="Kaufen" hint="Karte scannen" manualFactions={[currentFaction(game)]} onCancel={close}
+        available={(e) => buyCheck(game, e) === null}
         onCard={(e) => { const err = buyScan(game, e); if (err) fail(err); else setEan(e); }}
       />
     );
@@ -110,6 +111,7 @@ export function AttackFlow(props: FlowProps) {
       return (
         <Scanner
           title="Angriff" hint="Angreifer scannen" manualFactions={[currentFaction(game)]} onCancel={close}
+          available={(e) => attackScanAttacker(game, e) === null && !attackConfirmAttacker(game, e).error}
           onCard={(e) => { const err = attackScanAttacker(game, e); if (err) fail(err); else setState({ step: 'confirmAttacker', attacker: e }); }}
         />
       );
@@ -131,6 +133,7 @@ export function AttackFlow(props: FlowProps) {
         <Scanner
           title={state.free ? 'Angriff kostenlos!' : 'Angriff · 200 Credits'} hint="Gegner scannen"
           manualFactions={enemies} onCancel={close}
+          available={(e) => attackScanDefender(game, e) === null && attackConfirmDefender(game, e) === null}
           onCard={(e) => {
             const err = attackScanDefender(game, e);
             if (err) fail(err);
@@ -164,6 +167,7 @@ export function RepairFlow(props: FlowProps) {
     return (
       <Scanner
         title="Reparatur" hint="Karte scannen" manualFactions={[currentFaction(game)]} onCancel={close}
+        available={(e) => repairCheck(game, e) === null}
         onCard={(e) => { const err = ownCardScan(game, e); if (err) fail(err); else setEan(e); }}
       />
     );
@@ -191,6 +195,7 @@ export function InfoFlow(props: FlowProps) {
     return (
       <Scanner
         title="Info" hint="Eigene Karte scannen" manualFactions={[currentFaction(game)]} onCancel={close}
+        available={(e) => infoScan(game, e) === null && !info(game, e).error}
         onCard={(e) => {
           const err = infoScan(game, e) ?? info(game, e).error;
           if (err) fail(err);

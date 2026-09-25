@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { BIOTEC, CHINA, GBA, USA } from './data';
 import { newGame, currentFaction, findSlot } from './state';
 import { beginTurn } from './turn';
-import { buy, buyPrecheck } from './buy';
+import { buy, buyCheck, buyPrecheck } from './buy';
 import { attack, attackConfirmAttacker } from './combat';
-import { info, repair } from './actions';
+import { info, repair, repairCheck } from './actions';
 import { mainCheck } from './victory';
 import { dice, give, noDice, started } from './testutil';
 
@@ -390,6 +390,34 @@ describe('Kampf', () => {
     attack(s, 13, 48, noDice);
     expect(s.players[CHINA].energy).toBe(1);
     expect(findSlot(s.players[CHINA], 48)).toBe(-1);
+  });
+});
+
+describe('Prüffunktionen für die Kartenauswahl', () => {
+  it('buyCheck liefert für jede Karte denselben Fehler wie buy und ändert nichts', () => {
+    const s = started([USA, CHINA]);
+    give(s, USA, 12);
+    s.players[USA].energy = 0;
+    for (let ean = 0; ean < 160; ean++) {
+      const before = JSON.stringify(s);
+      const check = buyCheck(s, ean);
+      expect(JSON.stringify(s)).toBe(before);
+      const copy = structuredClone(s);
+      expect(buy(copy, ean).error ?? null, `Karte ${ean}`).toBe(check);
+    }
+  });
+
+  it('repairCheck liefert denselben Fehler wie repair und ändert nichts', () => {
+    const s = started([USA, CHINA]);
+    s.players[USA].slots[37]!.def = 5;
+    give(s, USA, 14, false);
+    for (const ean of [0, 1, 14, 34, 41, 99]) {
+      const before = JSON.stringify(s);
+      const check = repairCheck(s, ean);
+      expect(JSON.stringify(s)).toBe(before);
+      expect(repair(structuredClone(s), ean).error ?? null, `Karte ${ean}`).toBe(check);
+    }
+    expect(repairCheck(s, 0)).toBeNull();
   });
 });
 

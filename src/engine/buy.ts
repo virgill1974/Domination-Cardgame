@@ -14,35 +14,42 @@ export interface BuyResult {
   events: GameEvent[];
 }
 
+const consumesEnergy = (ean: number) => kindOfEan(ean) === 'building' && !isReactor(cardIdOfEan(ean));
+
+/** Alle Kauf-Prüfungen in Originalreihenfolge, ohne den Zustand zu ändern. */
+export function buyCheck(s: GameState, ean: number): ErrorCode | null {
+  const pre = buyPrecheck(s) ?? buyScan(s, ean);
+  if (pre) return pre;
+  const p = currentPlayer(s);
+  const card = CARDS[cardIdOfEan(ean)];
+  if (findSlot(p, ean) >= 0) return 'alreadyOwned';
+  const unlocked = card.requires === NO_REQUIREMENT
+    || ownedSlots(p).some((slot) => slot.active && slotCardId(slot) === card.requires);
+  if (!unlocked) return 'locked';
+  if (p.credits < card.price) return 'noCredits';
+  // Korrektur 4: Energie <= 0 statt == 0
+  if (p.faction !== GBA && consumesEnergy(ean) && p.energy <= 0) return 'noEnergy';
+  // Korrektur 6: volles Inventar statt Speicherüberlauf
+  if (!p.slots.includes(null)) return 'notPossible';
+  return null;
+}
+
 /** kaufen (Z. 1498–1857), nach Bestätigung mit OK */
 export function buy(s: GameState, ean: number): BuyResult {
-  const pre = buyPrecheck(s) ?? buyScan(s, ean);
-  if (pre) return { error: pre, events: [] };
+  const error = buyCheck(s, ean);
+  if (error) return { error, events: [] };
 
   const p = currentPlayer(s);
   const id = cardIdOfEan(ean);
   const card = CARDS[id];
-  const kind = kindOfEan(ean);
-
-  if (findSlot(p, ean) >= 0) return { error: 'alreadyOwned', events: [] };
-  const unlocked = card.requires === NO_REQUIREMENT
-    || ownedSlots(p).some((slot) => slot.active && slotCardId(slot) === card.requires);
-  if (!unlocked) return { error: 'locked', events: [] };
-  if (p.credits < card.price) return { error: 'noCredits', events: [] };
-  const consumesEnergy = kind === 'building' && !isReactor(id);
-  // Korrektur 4: Energie <= 0 statt == 0
-  if (p.faction !== GBA && consumesEnergy && p.energy <= 0) return { error: 'noEnergy', events: [] };
-  // Korrektur 6: volles Inventar statt Speicherüberlauf
   const free = p.slots.lastIndexOf(null);
-  if (free < 0) return { error: 'notPossible', events: [] };
-
-  const upgrade = kind === 'upgrade';
+  const upgrade = kindOfEan(ean) === 'upgrade';
   p.slots[free] = {
     ean, def: s.stats[id].def, remaining: s.stats[id].rounds, active: upgrade, attacked: false, counted: upgrade,
   };
   s.buys++;
   p.credits -= card.price;
-  if (consumesEnergy) p.energy--;
+  if (consumesEnergy(ean)) p.energy--;
   if (!upgrade) return { events: [] };
   p.upgrades++;
   return { events: applyUpgrade(s, p, id) };

@@ -9,11 +9,13 @@ interface Props {
   hint: string;
   /** Fraktionen, deren Karten in der manuellen Auswahl erscheinen */
   manualFactions: Faction[];
+  /** Nur diese Karten zeigt die manuelle Auswahl standardmäßig (Test-Hilfe) */
+  available?: (ean: number) => boolean;
   onCard: (ean: number) => void;
   onCancel: () => void;
 }
 
-export function Scanner({ title, hint, manualFactions, onCard, onCancel }: Props) {
+export function Scanner({ title, hint, manualFactions, available, onCard, onCancel }: Props) {
   const video = useRef<HTMLVideoElement>(null);
   const [status, setStatus] = useState('Kamera wird gestartet …');
   const [cameraFailed, setCameraFailed] = useState(false);
@@ -49,7 +51,7 @@ export function Scanner({ title, hint, manualFactions, onCard, onCancel }: Props
   }, [manual]);
 
   if (manual) {
-    return <ManualPicker title={title} factions={manualFactions} onPick={onCard} onBack={() => setManual(false)} />;
+    return <ManualPicker title={title} factions={manualFactions} available={available} onPick={onCard} onBack={() => setManual(false)} />;
   }
 
   return (
@@ -76,16 +78,18 @@ export function Scanner({ title, hint, manualFactions, onCard, onCancel }: Props
   );
 }
 
-function ManualPicker({ title, factions, onPick, onBack }: {
-  title: string; factions: Faction[]; onPick: (ean: number) => void; onBack: () => void;
+function ManualPicker({ title, factions, available, onPick, onBack }: {
+  title: string; factions: Faction[]; available?: (ean: number) => boolean; onPick: (ean: number) => void; onBack: () => void;
 }) {
   const [query, setQuery] = useState('');
+  const [showAll, setShowAll] = useState(false);
   const cards = useMemo(
     () => Array.from({ length: PHYSICAL_CARDS }, (_, ean) => ean).filter((ean) => factions.includes(factionOfEan(ean))),
     [factions],
   );
+  const pool = available && !showAll ? cards.filter(available) : cards;
   const q = query.trim().toLowerCase();
-  const shown = cards.filter((ean) => !q || CARDS[CARD_OF_EAN[ean]].name.toLowerCase().includes(q) || eanForIndex(ean).includes(q));
+  const shown = pool.filter((ean) => !q || CARDS[CARD_OF_EAN[ean]].name.toLowerCase().includes(q) || eanForIndex(ean).includes(q));
   return (
     <div class="manual">
       <div class="screen">
@@ -97,9 +101,17 @@ function ManualPicker({ title, factions, onPick, onBack }: {
           <button class="btn" onClick={onBack}>Kamera</button>
         </div>
         <input class="search" placeholder="Name oder Nummer suchen" value={query} onInput={(e) => setQuery(e.currentTarget.value)} />
+        {available && (
+          <label class="check small">
+            <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.currentTarget.checked)} />
+            Alle Karten zeigen (auch nicht verfügbare)
+          </label>
+        )}
+        {shown.length === 0 && <div class="panel small muted">Gerade ist keine passende Karte verfügbar.</div>}
         <div class="list">
           {shown.map((ean) => (
-            <button key={ean} class="list-item" style={{ '--fc': FACTION_COLORS[factionOfEan(ean)] }} onClick={() => onPick(ean)}>
+            <button key={ean} class="list-item" style={{ '--fc': FACTION_COLORS[factionOfEan(ean)] }} onClick={() => onPick(ean)}
+              data-unavailable={available && !available(ean) ? '' : undefined}>
               <span class="dot" />
               <span>{CARDS[CARD_OF_EAN[ean]].name}</span>
               <span class="code">{eanForIndex(ean)}</span>

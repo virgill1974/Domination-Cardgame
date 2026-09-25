@@ -6,7 +6,8 @@ import { cardArtUrl, placeholderDataUri } from './cardArt';
 import { requirementName, typeLabel, upgradeEffect } from './cardText';
 import type { SoundName } from './sound';
 
-export const factionStyle = (f: Faction) => ({ '--fc': FACTION_COLORS[f] }) as Record<string, string>;
+/** --tint färbt das Glas (siehe theme.css, abgeleitete Variablen werden pro Element neu aufgelöst). */
+export const factionStyle = (f: Faction) => ({ '--fc': FACTION_COLORS[f], '--tint': FACTION_COLORS[f] }) as Record<string, string>;
 
 export function CardArt({ id, class: cls = 'art' }: { id: number; class?: string }) {
   return (

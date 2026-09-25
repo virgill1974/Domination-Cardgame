@@ -18,17 +18,25 @@ function usableSlot(s: GameState, ean: number): { error?: ErrorCode; slot?: Slot
   return { slot };
 }
 
+/** Alle Reparatur-Prüfungen in Originalreihenfolge, ohne den Zustand zu ändern. */
+export function repairCheck(s: GameState, ean: number): ErrorCode | null {
+  const pre = repairPrecheck(s) ?? ownCardScan(s, ean);
+  if (pre) return pre;
+  if (kindOfEan(ean) === 'upgrade') return 'nothingToRepair';
+  const { error, slot } = usableSlot(s, ean);
+  if (error) return error;
+  if (slot!.def >= s.stats[cardIdOfEan(ean)].def) return 'nothingToRepair';
+  if (currentPlayer(s).credits < REPAIR_PRICE) return 'noCredits';
+  return null;
+}
+
 /** reparieren (Z. 2492–2583), nach Bestätigung mit OK */
 export function repair(s: GameState, ean: number): { error?: ErrorCode; amount?: 1 | 2 } {
-  const pre = repairPrecheck(s) ?? ownCardScan(s, ean);
-  if (pre) return { error: pre };
-  if (kindOfEan(ean) === 'upgrade') return { error: 'nothingToRepair' };
-  const { error, slot } = usableSlot(s, ean);
+  const error = repairCheck(s, ean);
   if (error) return { error };
+  const slot = usableSlot(s, ean).slot;
   const max = s.stats[cardIdOfEan(ean)].def;
-  if (slot!.def >= max) return { error: 'nothingToRepair' };
   const p = currentPlayer(s);
-  if (p.credits < REPAIR_PRICE) return { error: 'noCredits' };
 
   p.credits -= REPAIR_PRICE;
   s.repairs++;

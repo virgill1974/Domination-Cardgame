@@ -4,8 +4,6 @@
   --bg-image: url('/ui/background.svg');
   --sheen-image: url('/ui/glass-sheen.svg');
 
-  --glass: linear-gradient(160deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.035));
-  --glass-flat: rgba(255, 255, 255, 0.055);
   --glass-line: rgba(255, 255, 255, 0.15);
   --glass-hi: rgba(255, 255, 255, 0.3);
   --glass-solid: rgba(16, 21, 44, 0.9);
@@ -22,13 +20,23 @@
   --err: #ff5d7a;
   --warn: #ffb24a;
   --fc: var(--accent-a);
-  --fc-grad: linear-gradient(120deg, var(--fc), color-mix(in oklab, var(--fc) 45%, white));
+  --tint: transparent;
 
   --r: 20px;
   --r-sm: 14px;
-  --font-display: 'Exo 2 Variable', 'Exo 2', system-ui, sans-serif;
-  --font-body: 'Inter Variable', Inter, system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Silkscreen', ui-monospace, monospace;
+  --font-body: 'Space Grotesk Variable', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', monospace;
   color-scheme: dark;
+}
+
+/* Von --tint abgeleitete Werte: Custom Properties werden dort aufgelöst, wo sie deklariert sind,
+   deshalb auf jedem Element neu deklarieren, das per factionStyle() eine Fraktion setzt. */
+:root, [style*='--tint'] {
+  --glass: linear-gradient(160deg,
+    color-mix(in oklab, var(--tint) 16%, rgba(255, 255, 255, 0.11)),
+    color-mix(in oklab, var(--tint) 9%, rgba(255, 255, 255, 0.035)));
+  --glass-flat: color-mix(in oklab, var(--tint) 10%, rgba(255, 255, 255, 0.055));
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -62,18 +70,21 @@ body::after {
 button, input { font: inherit; color: inherit; }
 
 #app { max-width: 560px; min-height: 100%; margin: 0 auto; display: flex; flex-direction: column; }
+.app-root { display: contents; }
 
 .screen { flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 16px; padding-top: calc(16px + env(safe-area-inset-top)); padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
 .screen.center { justify-content: center; }
 
-h1, h2, h3, .title, .btn, .stat .v, .kv .v, .card-name, .faction-name { font-family: var(--font-display); }
-.title { font-size: 12px; font-weight: 600; letter-spacing: 3.5px; text-transform: uppercase; color: var(--muted); }
+h1, h2, h3, .title, .faction-name, .versus .vs { font-family: var(--font-display); font-weight: 400; }
+.btn, .card-name, .fighter .n { font-family: var(--font-body); }
+.stat .v, .kv .v, .counters b, .code, .slider b, .mono { font-family: var(--font-mono); }
+.title { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
 h1.logo {
-  font-size: 34px; line-height: 1.05; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+  font-size: clamp(22px, 7.2vw, 32px); line-height: 1.1; letter-spacing: 0; text-transform: uppercase;
   background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
   filter: drop-shadow(0 0 18px rgba(139, 123, 255, 0.45));
 }
-h2 { font-size: 21px; font-weight: 700; letter-spacing: 0.5px; }
+h2 { font-size: 19px; letter-spacing: 0; }
 .muted { color: var(--muted); }
 .small { font-size: 13px; }
 
@@ -133,9 +144,8 @@ a.btn { color: var(--text); text-decoration: none; }
 
 .faction-bar { border-left: 4px solid var(--fc); border-radius: 2px; box-shadow: -6px 0 14px -8px var(--fc); }
 .faction-name {
-  font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
-  background: var(--fc-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
-  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--fc) 60%, transparent));
+  letter-spacing: 1px; text-transform: uppercase; color: color-mix(in oklab, var(--fc) 88%, white);
+  text-shadow: 0 0 16px color-mix(in oklab, var(--fc) 75%, transparent);
 }
 
 /* Startbildschirm */
@@ -147,19 +157,20 @@ a.btn { color: var(--text); text-decoration: none; }
 .hud-top { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: end; }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .stat { background: var(--glass-flat); border: 1px solid var(--glass-line); border-radius: var(--r-sm); padding: 10px 6px; text-align: center; }
-.stat .v { font-size: 25px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.stat .v { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; }
 .stat .k { font-size: 10px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--muted); }
-.stat.credits .v { color: var(--gold); text-shadow: 0 0 16px rgba(255, 215, 106, 0.45); }
 .counters { display: flex; justify-content: space-around; font-size: 13px; color: var(--muted); }
-.counters b { color: var(--text); font-family: var(--font-display); }
+.counters b { color: var(--text); }
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .action { min-height: 92px; flex-direction: column; gap: 6px; font-size: 16px; }
 .action svg {
-  width: 30px; height: 30px; fill: none; stroke: var(--fc); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  width: 30px; height: 30px; fill: none; stroke: color-mix(in oklab, var(--fc) 88%, white); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
   filter: drop-shadow(0 0 8px color-mix(in oklab, var(--fc) 70%, transparent));
 }
-.action.attack { border-color: rgba(255, 93, 122, 0.45); }
-.action.attack svg { stroke: var(--err); filter: drop-shadow(0 0 8px rgba(255, 93, 122, 0.7)); }
+.action.attack {
+  border-color: color-mix(in oklab, var(--fc) 65%, var(--glass-line));
+  box-shadow: inset 0 1px 0 var(--glass-hi), 0 0 22px -6px color-mix(in oklab, var(--fc) 70%, transparent);
+}
 .action small { font-family: var(--font-body); font-weight: 400; font-size: 12px; color: var(--muted); }
 
 /* Übergabe */
@@ -192,9 +203,12 @@ a.btn { color: var(--text); text-decoration: none; }
   display: flex; align-items: center; gap: 10px; padding: 10px 12px; width: 100%; text-align: left; cursor: pointer;
   background: var(--glass-flat); border: 1px solid var(--glass-line); border-radius: var(--r-sm);
 }
-.list-item .code { margin-left: auto; font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--muted); }
+.list-item .code { margin-left: auto; font-size: 12px; color: var(--muted); }
 .list.inventory .list-item { cursor: default; }
 .list.inventory .art { width: 72px; flex: 0 0 72px; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; border: 1px solid color-mix(in oklab, var(--fc) 60%, white); }
+.list-item[data-unavailable] { opacity: 0.45; }
+.check { display: flex; align-items: center; gap: 10px; color: var(--muted); cursor: pointer; }
+.check input { width: 20px; height: 20px; accent-color: var(--accent-a); }
 .list-item .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--fc); box-shadow: 0 0 8px var(--fc); flex: 0 0 10px; }
 
 /* Meldungen */
@@ -251,7 +265,7 @@ a.btn { color: var(--text); text-decoration: none; }
   box-shadow: 0 8px 30px -8px color-mix(in oklab, var(--fc) 60%, transparent);
 }
 .fighter.dead .art { filter: grayscale(1) brightness(0.45); box-shadow: none; }
-.fighter .n { font-family: var(--font-display); font-weight: 700; font-size: 14px; }
+.fighter .n { font-weight: 700; font-size: 14px; }
 .log { display: flex; flex-direction: column; gap: 6px; }
 .log-line { display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: var(--r-sm); background: var(--glass-flat); border: 1px solid var(--glass-line); animation: pop 0.2s ease-out; }
 .log-line.hit { border-left: 3px solid var(--err); box-shadow: -6px 0 16px -10px var(--err); }
@@ -270,10 +284,23 @@ a.btn { color: var(--text); text-decoration: none; }
 .badge.gold { color: #1a1300; background: linear-gradient(120deg, var(--gold), #ffb24a); border-color: transparent; box-shadow: 0 0 14px rgba(255, 215, 106, 0.45); }
 .divider { height: 1px; background: var(--glass-line); }
 
+/* Kurzanleitung */
+.guide details { padding: 0; }
+.guide summary {
+  list-style: none; cursor: pointer; padding: 15px 16px; display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-display); font-size: 14px;
+}
+.guide summary::-webkit-details-marker { display: none; }
+.guide summary::after { content: '+'; font-family: var(--font-mono); font-size: 20px; color: var(--accent-a); transition: transform 0.2s; }
+.guide details[open] summary::after { transform: rotate(45deg); }
+.guide-body { padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px; line-height: 1.5; font-size: 15px; }
+.guide-body ul, .guide-body ol { padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.guide-body b { color: #fff; }
+
 /* Lautstärke-Regler */
 .slider { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; align-items: center; }
-.slider span { font-family: var(--font-display); font-weight: 600; }
-.slider b { font-family: var(--font-display); font-variant-numeric: tabular-nums; color: var(--accent-a); }
+.slider span { font-family: var(--font-display); }
+.slider b { font-variant-numeric: tabular-nums; color: var(--accent-a); }
 .slider input {
   grid-column: 1 / -1; width: 100%; height: 30px; background: transparent; cursor: pointer;
   -webkit-appearance: none; appearance: none; outline: none;

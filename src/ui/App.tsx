@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import type { Faction } from '../engine/data';
-import { newGame, type GameState } from '../engine/state';
+import { currentFaction, newGame, type GameState } from '../engine/state';
 import { beginTurn } from '../engine/turn';
 import { mainCheck } from '../engine/victory';
 import { buyPrecheck } from '../engine/buy';
 import { attackPrecheck } from '../engine/combat';
 import { repairPrecheck } from '../engine/actions';
 import { loadGame, saveGame } from '../storage';
-import { MessageDialog, type Msg } from './components';
+import { MessageDialog, factionStyle, type Msg } from './components';
+import { Guide } from './Guide';
 import { errorMsg, eventMessages } from './eventMessages';
 import { AttackFlow, BuyFlow, InfoFlow, RepairFlow, type FlowProps } from './flows';
 import { Handoff, Home, Hud, Inventory, Setup, Winner, type Action } from './screens';
@@ -16,7 +17,7 @@ import { kickMusic, setMusicActive } from './music';
 import { VolumeButton } from './VolumeControl';
 import { UpdatePrompt } from './UpdatePrompt';
 
-type View = 'home' | 'setup' | 'game';
+type View = 'home' | 'setup' | 'guide' | 'game';
 type Flow = Exclude<Action, 'end'>;
 
 const FLOWS = { buy: BuyFlow, attack: AttackFlow, repair: RepairFlow, info: InfoFlow } as const;
@@ -108,10 +109,12 @@ export function App() {
   };
 
   let screen;
-  if (view === 'home' || !game) {
+  if (view === 'guide') {
+    screen = <Guide onClose={() => setView('home')} />;
+  } else if (view === 'home' || view === 'setup' || !game) {
     screen = view === 'setup'
       ? <Setup onStart={start} onBack={() => setView('home')} />
-      : <Home canResume={!!game} onNew={() => setView('setup')} onResume={() => setView('game')} />;
+      : <Home canResume={!!game} onNew={() => setView('setup')} onResume={() => setView('game')} onGuide={() => setView('guide')} />;
   } else if (game.winner !== null) {
     screen = <Winner game={game} onNew={() => { replace(null); setView('setup'); }} />;
   } else if (!game.turnActive) {
@@ -126,8 +129,11 @@ export function App() {
     screen = <Hud game={game} onAction={onAction} onMenu={() => setDialog('menu')} />;
   }
 
+  // Fraktion am Zug färbt auch Dialoge und Scanner-Overlay ein
+  const tint = view === 'game' && game?.turnActive && game.winner === null ? factionStyle(currentFaction(game)) : undefined;
+
   return (
-    <>
+    <div class="app-root" style={tint}>
       {screen}
       {dialog === 'end' && (
         <div class="overlay">
@@ -165,6 +171,6 @@ export function App() {
       )}
       {queue.length > 0 && <MessageDialog key={queue.length} msg={queue[0]} onClose={() => setQueue((q) => q.slice(1))} />}
       <UpdatePrompt />
-    </>
+    </div>
   );
 }

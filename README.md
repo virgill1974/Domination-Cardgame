@@ -40,7 +40,11 @@ npm run dev
 - `npm test` führt die Engine-Tests aus (Regeln, alle 160 Barcodes mit ZXing dekodiert, Zufallspartien).
 - `npm run build` erzeugt die statische Seite in `dist/`.
 
-**Design:** „Holografisches Glas“. Hintergrund, Glanz-Overlay und Logo liegen als austauschbare Grafiken in [`public/ui/`](public/ui/README.md). Die App-Icons werden mit `npx pwa-assets-generator` aus `public/ui/logo.svg` erzeugt.
+**Design:** „Holografisches Glas“, leicht in der Farbe der Fraktion am Zug getönt. Schriften wie im Projekt ModZart_Web: Silkscreen, Space Grotesk, JetBrains Mono. Hintergrund, Glanz-Overlay und Logo liegen als austauschbare Grafiken in [`public/ui/`](public/ui/README.md). Die App-Icons werden mit `npx pwa-assets-generator` aus `public/ui/logo.svg` erzeugt.
+
+**Kurzanleitung:** in der App auf dem Startbildschirm, aufklappbar nach Themen (`src/ui/Guide.tsx`).
+
+**Manuelle Kartenauswahl** (nur zum Testen): Sie zeigt standardmäßig nur Karten, die im aktuellen Schritt gültig sind. Mit „Alle Karten zeigen“ lassen sich die Fehlermeldungen testen.
 
 **Kartendrucker:** `Tools/generate_barcodes.html` (im Dev-Server unter `/Tools/generate_barcodes.html` oder über den Startbildschirm).
 Er druckt alle 160 Karten im Pokerformat 63×88 mm (9 pro A4-Seite) oder nur die Barcodes als Etiketten (38×21 mm, 65 pro Bogen, z. B. Avery L7651) zum Aufkleben auf die alten Karten.

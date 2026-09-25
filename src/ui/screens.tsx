@@ -10,7 +10,9 @@ import { VolumeButton } from './VolumeControl';
 
 export type Action = 'buy' | 'attack' | 'repair' | 'info' | 'inventory' | 'end';
 
-export function Home({ canResume, onNew, onResume }: { canResume: boolean; onNew: () => void; onResume: () => void }) {
+export function Home({ canResume, onNew, onResume, onGuide }: {
+  canResume: boolean; onNew: () => void; onResume: () => void; onGuide: () => void;
+}) {
   return (
     <div class="screen center">
       <div class="stack" style={{ gap: '4px', textAlign: 'center' }}>
@@ -22,6 +24,7 @@ export function Home({ canResume, onNew, onResume }: { canResume: boolean; onNew
       <div class="stack" style={{ marginTop: '24px' }}>
         {canResume && <button class="btn primary block" onClick={onResume}>Spiel fortsetzen</button>}
         <button class={`btn block ${canResume ? '' : 'primary'}`} onClick={onNew}>Neues Spiel</button>
+        <button class="btn block" onClick={onGuide}>Kurzanleitung</button>
         <a class="btn ghost block" href="Tools/generate_barcodes.html" style={{ textDecoration: 'none' }}>Kartendrucker</a>
         <VolumeButton />
       </div>
