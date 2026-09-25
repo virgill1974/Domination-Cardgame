@@ -7,7 +7,23 @@ Physische Spielkarten mit Barcodes, gelesen über eine Reflexlichtschranke in ei
 Die Kamera ersetzt den Barcodeleser. Statt des alten proprietären Formats tragen die Karten echte EAN-8-Barcodes.
 Die Spielmechanik ist 1:1 aus dem Microcontroller-Code übernommen. Abweichungen stehen unter [Abweichungen vom Original](#abweichungen-vom-original).
 
-## Schnellstart
+## Spielen
+
+Die App läuft im Browser und wird über **Cloudflare Pages** gehostet. Jeder Push auf `main` wird automatisch gebaut und veröffentlicht.
+
+- **Am Handy:** die Online-Adresse öffnen und über das Browsermenü **„Zum Startbildschirm hinzufügen“** (Android: „App installieren“). Danach startet sie wie eine normale App im Vollbild.
+- **Offline:** Nach dem ersten Öffnen liegen App, Barcode-Leser, Schriften, Design, Kartenbilder und Sounds auf dem Handy. Gespielt werden kann dann auch ohne Internet.
+- **Updates:** Gibt es eine neue Version, erscheint unten der Hinweis „Neue Version verfügbar“. Erst beim Tippen auf „Aktualisieren“ wird neu geladen, der Spielstand bleibt erhalten.
+- Die Kamera funktioniert, weil die Seite über HTTPS kommt.
+
+### Einmalige Einrichtung von Cloudflare Pages
+
+1. Konto auf cloudflare.com anlegen.
+2. Workers & Pages → Erstellen → Pages → Mit Git verbinden → GitHub autorisieren → Repo `CnC-web` wählen.
+3. Build-Einstellungen: Framework „None“, Build-Befehl `npm run build`, Ausgabeordner `dist`. Die Node-Version kommt aus `.node-version`.
+4. Speichern und deployen. Die Adresse lautet z. B. `https://cnc-web.pages.dev`.
+
+## Entwicklung
 
 ```bash
 npm install
@@ -17,8 +33,11 @@ npm run dev
 - Der Dev-Server läuft mit HTTPS (selbstsigniertes Zertifikat), weil Handy-Browser die Kamera nur über HTTPS freigeben.
 - Am Handy im selben WLAN die angezeigte **Network**-Adresse öffnen (z. B. `https://192.168.178.63:5173`) und die Zertifikatswarnung einmalig bestätigen. Beim ersten Zugriff fragt ggf. die Windows-Firewall nach, ob Node.js im privaten Netzwerk erreichbar sein darf.
 - `npm run dev -- --mode http` startet ohne HTTPS (nur für die Vorschau am PC, dort ohne Kamera).
+- Im Dev-Server ist der Service Worker aus. Offline-Verhalten und Update-Hinweis lassen sich mit `npm run build` und `npm run preview -- --mode http` testen.
 - `npm test` führt die Engine-Tests aus (Regeln, alle 160 Barcodes mit ZXing dekodiert, Zufallspartien).
-- `npm run build` erzeugt die statische Seite in `dist/` (Hosting später z. B. per GitHub Pages).
+- `npm run build` erzeugt die statische Seite in `dist/`.
+
+**Design:** „Holografisches Glas“. Hintergrund, Glanz-Overlay und Logo liegen als austauschbare Grafiken in [`public/ui/`](public/ui/README.md). Die App-Icons werden mit `npx pwa-assets-generator` aus `public/ui/logo.svg` erzeugt.
 
 **Kartendrucker:** `Tools/generate_barcodes.html` (im Dev-Server unter `/Tools/generate_barcodes.html` oder über den Startbildschirm).
 Er druckt alle 160 Karten im Pokerformat 63×88 mm (9 pro A4-Seite) oder nur die Barcodes als Etiketten (38×21 mm, 65 pro Bogen, z. B. Avery L7651) zum Aufkleben auf die alten Karten.
@@ -390,7 +409,7 @@ Die Kartenliste enthält bei BIOTEC teils andere Namen und Werte als der Code. D
 - [ ] **Kartenbilder:** Kommen später neu, bis dahin Platzhalter-Grafiken (farbcodiert nach Fraktion + Kartentyp-Icon). Dateien unter `public/cards/`
 - [ ] **Techtree-Grafiken:** Freischaltungs-Bäume pro Fraktion als UI-Ansicht
 - [ ] **BIOTEC Einheiten:** Werte-Diskrepanzen zwischen Code und Kartenliste abgleichen
-- [ ] **Hosting:** zurzeit nur lokal (`npm run dev`). Später z. B. GitHub Pages (braucht bei privatem Repo GitHub Pro) oder Cloudflare Pages/Netlify
+- [x] **Hosting:** Cloudflare Pages, installierbar und offline spielbar
 
 ---
 

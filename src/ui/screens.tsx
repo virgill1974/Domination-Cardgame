@@ -22,6 +22,7 @@ export function Home({ canResume, onNew, onResume }: { canResume: boolean; onNew
   return (
     <div class="screen center">
       <div class="stack" style={{ gap: '4px', textAlign: 'center' }}>
+        <img class="emblem" src="ui/logo.svg" alt="" />
         <div class="title">Command &amp; Conquer</div>
         <h1 class="logo">Das Kartenspiel</h1>
         <div class="muted small">© 2005 Jochen Feldkötter &amp; Raphael Ludwig</div>
@@ -119,10 +120,10 @@ export function Handoff({ game, onStart, onMenu }: { game: GameState; onStart: (
   const round = game.round + (seat === 0 ? 1 : 0);
   return (
     <div class="screen center" style={factionStyle(faction)}>
-      <div class="stack" style={{ textAlign: 'center', gap: '6px' }}>
+      <div class="panel stack handoff">
         <div class="title">Runde {round}</div>
         <div>Spieler {seat + 1}</div>
-        <h1 class="logo faction-name" style={{ color: 'var(--fc)', textShadow: 'none', fontSize: '42px' }}>{FACTIONS[faction]}</h1>
+        <h1 class="faction-name" style={{ fontSize: '44px' }}>{FACTIONS[faction]}</h1>
         <div class="muted small">Gerät an diesen Spieler übergeben.</div>
       </div>
       <button class="btn primary block" style={{ marginTop: '32px' }} onClick={onStart}>Zug starten</button>
@@ -136,22 +137,24 @@ export function Hud({ game, onAction, onMenu }: { game: GameState; onAction: (a:
   const p = currentPlayer(game);
   return (
     <div class="screen" style={factionStyle(f)}>
-      <div class="hud-top">
-        <div>
-          <div class="title">Runde {game.round} · Spieler {game.seat + 1}</div>
-          <div class="faction-name" style={{ fontSize: '26px' }}>{FACTIONS[f]}</div>
+      <div class="panel hud-card">
+        <div class="hud-top">
+          <div>
+            <div class="title">Runde {game.round} · Spieler {game.seat + 1}</div>
+            <div class="faction-name" style={{ fontSize: '28px' }}>{FACTIONS[f]}</div>
+          </div>
+          <button class="btn ghost" onClick={onMenu} aria-label="Menü">☰</button>
         </div>
-        <button class="btn ghost" onClick={onMenu} aria-label="Menü">☰</button>
-      </div>
-      <div class="stats">
-        <div class="stat credits"><div class="v">{p.credits}</div><div class="k">Credits</div></div>
-        <div class="stat"><div class="v">{p.vp}<span class="muted small">{game.vpLimit ? `/${game.vpLimit}` : ''}</span></div><div class="k">Siegpunkte</div></div>
-        <div class="stat"><div class="v">{f === GBA ? '–' : p.energy}</div><div class="k">Energie</div></div>
-      </div>
-      <div class="counters">
-        <span>Käufe <b>{game.buys}/{MAX_BUYS}</b></span>
-        <span>Angriffe <b>{game.attacks}/{MAX_ATTACKS}</b></span>
-        <span>Reparatur <b>{game.repairs}/{MAX_REPAIRS}</b></span>
+        <div class="stats">
+          <div class="stat credits"><div class="v">{p.credits}</div><div class="k">Credits</div></div>
+          <div class="stat"><div class="v">{p.vp}<span class="muted small">{game.vpLimit ? `/${game.vpLimit}` : ''}</span></div><div class="k">Siegpunkte</div></div>
+          <div class="stat"><div class="v">{f === GBA ? '–' : p.energy}</div><div class="k">Energie</div></div>
+        </div>
+        <div class="counters">
+          <span>Käufe <b>{game.buys}/{MAX_BUYS}</b></span>
+          <span>Angriffe <b>{game.attacks}/{MAX_ATTACKS}</b></span>
+          <span>Reparatur <b>{game.repairs}/{MAX_REPAIRS}</b></span>
+        </div>
       </div>
       <div class="actions">
         <button class="btn action" onClick={() => onAction('buy')}><Icon name="buy" />Kaufen</button>
@@ -238,7 +241,7 @@ export function Winner({ game, onNew }: { game: GameState; onNew: () => void }) 
       <div class="stack" style={{ textAlign: 'center', gap: '8px' }}>
         <div class="title">{game.winReason === 'headquarters' ? 'Kommandozentrale zerstört!' : 'Siegpunkte erreicht'}</div>
         <div>Gewinner</div>
-        <h1 class="logo faction-name" style={{ color: 'var(--fc)', fontSize: '48px' }}>{FACTIONS[f]}</h1>
+        <h1 class="faction-name" style={{ fontSize: '48px' }}>{FACTIONS[f]}</h1>
         <div class="muted">{game.players[f].vp} Siegpunkte · Runde {game.round}</div>
       </div>
       <button class="btn primary block" style={{ marginTop: '32px' }} onClick={onNew}>Neues Spiel</button>

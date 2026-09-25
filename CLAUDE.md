@@ -17,10 +17,19 @@ npm run dev                      # Vite with HTTPS (self-signed) on :5173, --hos
 npm run dev -- --mode http       # without HTTPS (desktop preview; the Browser pane rejects the self-signed cert)
 npm test                         # vitest run (engine rules, barcode decoding, fuzz games; ~10 s)
 npx vitest run src/engine/game.test.ts -t "Superwaffe"   # single file / single test
-npm run build                    # tsc --noEmit + vite build → dist/
+npm run build                    # tsc --noEmit + vite build → dist/ (incl. service worker + manifest)
+npm run preview -- --mode http   # serve dist/ to test PWA behaviour (service worker is off in dev)
+npx pwa-assets-generator         # regenerate app icons in public/ui/ from public/ui/logo.svg
 ```
 
 `.claude/launch.json` starts the dev server in http mode on port 5174 for the Browser pane.
+
+## Deployment & PWA
+
+- Hosted on **Cloudflare Pages**, connected to this private GitHub repo. Every push to `main` deploys (`npm run build` → `dist`, Node from `.node-version`). There is no deploy script.
+- `vite-plugin-pwa` (generateSW, `registerType: 'prompt'`) precaches everything needed to play offline (`workbox.globPatterns` in `vite.config.ts`: app, zxing `.wasm`, fonts, `public/ui`, `public/cards`, `public/sounds`). New asset types must be added there or they won't work offline.
+- `src/ui/UpdatePrompt.tsx` shows "Neue Version verfügbar". It reloads on its own `controllerchange` listener, because workbox-window treats updates found while the app is long open as "external" and never fires its own reload. Keep that listener, and keep `clientsClaim: true`: without it, a page opened for the first time is uncontrolled and never gets `controllerchange`.
+- The Browser pane cannot register service workers. Test offline/update behaviour with headless Chrome (puppeteer-core against `npm run preview`) instead.
 
 ## Architecture
 
@@ -37,6 +46,8 @@ npm run build                    # tsc --noEmit + vite build → dist/
 - `App.tsx` holds the state machine (home → setup → handoff → HUD/flows → winner). `commit(fn)` structuredClones state, applies the engine call and persists to localStorage.
 - Engine events become queued `Msg` dialogs (`eventMessages.tsx`), optionally with a `sound`.
 - Flows in `flows.tsx` follow the terminal: scan → confirm card → execute.
+- Design "Holografisches Glas" lives in `theme.css` (tokens on `:root`). Only large surfaces (`.panel`, `.dialog`, `.glass`) use `backdrop-filter`, for phone performance. Buttons and tiles use plain translucent gradients. Faction color arrives as `--fc` via `factionStyle()`.
+- Fonts are self-hosted via `@fontsource-variable` (Exo 2 for display, Inter for body), so they work offline.
 
 **`src/scanner/`:**
 - Uses native `BarcodeDetector` if it supports `ean_8`, otherwise the `barcode-detector` ponyfill with zxing-wasm. The `.wasm` is bundled via `?url`, no CDN.
@@ -54,6 +65,7 @@ npm run build                    # tsc --noEmit + vite build → dist/
 **Asset fallbacks (drop-in, no code change):**
 - Images: `public/cards/<cardTypeId>.png`, generated SVG placeholder if missing (`src/ui/cardArt.ts`). The printer page resolves images with base `../cards/`.
 - Sounds: `public/sounds/<name>.mp3`, else synthesized via Web Audio (`src/ui/sound.ts`).
+- Design graphics: `public/ui/background.svg`, `glass-sheen.svg`, `logo.svg`, referenced as CSS variables at the top of `theme.css`. Use absolute `/ui/...` URLs in CSS; Vite rewrites them relative for `base: './'`.
 - 404s for these files in the console are expected. Don't download third-party assets without asking: original C&C sounds and images are EA-copyrighted.
 
 ## Legacy material

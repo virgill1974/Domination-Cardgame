@@ -12,6 +12,7 @@ import { errorMsg, eventMessages } from './eventMessages';
 import { AttackFlow, BuyFlow, InfoFlow, RepairFlow, type FlowProps } from './flows';
 import { Handoff, Home, Hud, Inventory, Setup, SoundToggle, Winner, type Action } from './screens';
 import { play, unlockAudio } from './sound';
+import { UpdatePrompt } from './UpdatePrompt';
 
 type View = 'home' | 'setup' | 'game';
 type Flow = Exclude<Action, 'end'>;
@@ -155,6 +156,7 @@ export function App() {
         </div>
       )}
       {queue.length > 0 && <MessageDialog key={queue.length} msg={queue[0]} onClose={() => setQueue((q) => q.slice(1))} />}
+      <UpdatePrompt />
     </>
   );
 }
