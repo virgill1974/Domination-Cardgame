@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CnC Kartendrucker</title>
+</head>
+<body>
+<div class="controls">
+  <h1>CnC Kartendrucker</h1>
+  <div class="group">
+    <button data-mode="cards" class="active">Karten 63×88 mm</button>
+    <button data-mode="labels">Etiketten 38×21 mm</button>
+  </div>
+  <div class="group">
+    <button data-faction="-1" class="active">Alle</button>
+    <button data-faction="0">USA</button>
+    <button data-faction="1">China</button>
+    <button data-faction="2">GBA</button>
+    <button data-faction="3">BIOTEC</button>
+  </div>
+  <button id="print">Drucken</button>
+  <span id="count"></span>
+</div>
+<p class="hint">
+  Bilder: <code>public/cards/&lt;Karten-ID&gt;.png</code> ablegen, fehlende werden als Platzhalter gezeichnet.
+  Beim Drucken „Tatsächliche Größe / 100 %“ wählen, damit die Barcodes maßhaltig bleiben.
+  Etiketten passen auf Bögen mit 65 Etiketten (z.&nbsp;B. Avery L7651).
+</p>
+<main id="output"></main>
+<script type="module" src="/src/print/main.ts"></script>
+</body>
+</html>

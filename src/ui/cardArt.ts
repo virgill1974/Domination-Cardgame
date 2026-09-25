@@ -1,0 +1,36 @@
+import { CARDS, FACTION_COLORS } from '../engine/data';
+import { factionOfCardId, kindOfCardId } from '../engine/cards';
+
+const ICONS = {
+  building: '<path d="M8 88V46l20-13v13l20-13v13l20-13V14h14v74z"/><path fill="#0b0f14" d="M16 58h10v10H16zm20 0h10v10H36zm20 0h10v10H56zm0 18h10v12H56z"/>',
+  foot: '<circle cx="50" cy="20" r="11"/><path d="M34 35h32l7 34H60l-3 25H43l-3-25H27z"/><path d="M68 40l22-18 4 5-22 19z"/>',
+  vehicle: '<rect x="6" y="62" width="88" height="22" rx="11"/><path d="M14 62l9-16h54l9 16z"/><rect x="32" y="32" width="32" height="16" rx="5"/><rect x="60" y="36" width="36" height="6"/>',
+  air: '<path d="M50 4l7 26 37 26v9l-37-10-2 25 13 10v6l-18-5-18 5v-6l13-10-2-25-37 10v-9l37-26z"/>',
+  upgrade: '<path d="M50 6l38 34H66v14H34V40H12z"/><path d="M34 62h32v12H34zm0 18h32v12H34z"/>',
+};
+
+const escapeXml = (text: string) =>
+  text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+/** Generierter Platzhalter (4:3), bis unter public/cards/<id>.png ein echtes Bild liegt. */
+export function placeholderSvg(id: number): string {
+  const card = CARDS[id];
+  const color = FACTION_COLORS[factionOfCardId(id)];
+  const kind = kindOfCardId(id);
+  const icon = ICONS[kind === 'unit' ? card.unitClass! : kind];
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+<defs>
+<radialGradient id="g" cx="50%" cy="42%" r="70%"><stop offset="0" stop-color="${color}" stop-opacity=".5"/><stop offset="1" stop-color="#0b0f14" stop-opacity="0"/></radialGradient>
+<pattern id="p" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0v20" fill="none" stroke="#fff" stroke-opacity=".07"/></pattern>
+</defs>
+<rect width="400" height="300" fill="#0b0f14"/><rect width="400" height="300" fill="url(#g)"/><rect width="400" height="300" fill="url(#p)"/>
+<g transform="translate(145 40) scale(1.1)" fill="${color}" stroke="#fff" stroke-opacity=".25" stroke-width="1.5">${icon}</g>
+<text x="200" y="240" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="26" font-weight="700" fill="#e8eef5">${escapeXml(card.name)}</text>
+<text x="200" y="272" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif" font-size="13" letter-spacing="4" fill="#fff" fill-opacity=".45">BILD FOLGT</text>
+</svg>`;
+}
+
+export const placeholderDataUri = (id: number) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(placeholderSvg(id))}`;
+
+/** Pfad relativ zur Seite; der Kartendrucker unter Tools/ übergibt '../cards/'. */
+export const cardArtUrl = (id: number, base = 'cards/') => `${base}${id}.png`;
