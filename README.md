@@ -9,6 +9,8 @@ Die Spielmechanik ist 1:1 aus dem Microcontroller-Code übernommen. Abweichungen
 
 ## Spielen
 
+**Adresse: https://cnc-web.pages.dev**
+
 Die App läuft im Browser und wird über **Cloudflare Pages** gehostet. Jeder Push auf `main` wird automatisch gebaut und veröffentlicht.
 
 - **Am Handy:** die Online-Adresse öffnen und über das Browsermenü **„Zum Startbildschirm hinzufügen“** (Android: „App installieren“). Danach startet sie wie eine normale App im Vollbild.
@@ -17,12 +19,12 @@ Die App läuft im Browser und wird über **Cloudflare Pages** gehostet. Jeder Pu
 - Die Kamera funktioniert, weil die Seite über HTTPS kommt.
 - **Ton:** Effekte und Hintergrundmusik haben getrennte Regler (**Lautstärke** auf dem Startbildschirm und im Spielmenü ☰). Eigene Musik: `public/sounds/music.mp3`, Details in [`public/sounds/README.md`](public/sounds/README.md).
 
-### Einmalige Einrichtung von Cloudflare Pages
+### Einrichtung von Cloudflare Pages (bereits erledigt, zum Nachschlagen)
 
-1. Konto auf cloudflare.com anlegen.
-2. Workers & Pages → Erstellen → Pages → Mit Git verbinden → GitHub autorisieren → Repo `CnC-web` wählen.
-3. Build-Einstellungen: Framework „None“, Build-Befehl `npm run build`, Ausgabeordner `dist`. Die Node-Version kommt aus `.node-version`.
-4. Speichern und deployen. Die Adresse lautet z. B. `https://cnc-web.pages.dev`.
+1. Auf GitHub der App **Cloudflare Workers and Pages** Zugriff auf das Repo geben: https://github.com/settings/installations → Configure → Repository access.
+2. Cloudflare: **Workers & Pages** → **Create application** → ganz unten **„Looking to deploy Pages? Get started“**. Der Standard-Assistent legt sonst einen Worker an.
+3. **Import an existing Git repository** → `CnC-web` → Framework „None“, Build-Befehl `npm run build`, Ausgabeordner `dist`. Die Node-Version kommt aus `.node-version`.
+4. Richtig eingerichtet ist es, wenn im Build-Log **kein** `npx wrangler deploy` auftaucht.
 
 ## Entwicklung
 

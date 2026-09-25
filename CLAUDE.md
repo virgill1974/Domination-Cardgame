@@ -26,7 +26,9 @@ npx pwa-assets-generator         # regenerate app icons in public/ui/ from publi
 
 ## Deployment & PWA
 
-- Hosted on **Cloudflare Pages**, connected to this private GitHub repo. Every push to `main` deploys (`npm run build` → `dist`, Node from `.node-version`). There is no deploy script.
+- Hosted on **Cloudflare Pages** at https://cnc-web.pages.dev, connected to this private GitHub repo. Every push to `main` deploys (`npm run build` → `dist`, Node from `.node-version`). There is no deploy script.
+  - It is a Pages project, not a Worker. Don't add `wrangler.jsonc` or a `wrangler deploy` step; the user explicitly wants Pages.
+  - Pages serves `index.html` (200) for missing files. The card-art and sound fallbacks rely on load/decode failing, not on a 404.
 - `vite-plugin-pwa` (generateSW, `registerType: 'prompt'`) precaches everything needed to play offline (`workbox.globPatterns` in `vite.config.ts`: app, zxing `.wasm`, fonts, `public/ui`, `public/cards`, `public/sounds`). New asset types must be added there or they won't work offline.
 - `src/ui/UpdatePrompt.tsx` shows "Neue Version verfügbar". It reloads on its own `controllerchange` listener, because workbox-window treats updates found while the app is long open as "external" and never fires its own reload. Keep that listener, and keep `clientsClaim: true`: without it, a page opened for the first time is uncontrolled and never gets `controllerchange`.
 - The Browser pane cannot register service workers. Test offline/update behaviour with headless Chrome (puppeteer-core against `npm run preview`) instead.
