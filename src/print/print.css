@@ -21,6 +21,7 @@ body {
 }
 .controls button.active { background: #ffd24a; color: #11151c; border-color: #ffd24a; font-weight: 600; }
 .controls #print { background: #2fbf71; border-color: #2fbf71; color: #0b0f14; font-weight: 600; }
+.controls .link { color: #ffd24a; font-size: 14px; }
 .controls #count { color: #8a96a8; font-size: 13px; }
 .hint { padding: 8px 16px; color: #8a96a8; font-size: 13px; }
 .hint code { color: #ffd24a; }

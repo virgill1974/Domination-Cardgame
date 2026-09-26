@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domination Technologiebäume</title>
+</head>
+<body>
+<div class="controls">
+  <h1>Domination Technologiebäume</h1>
+  <div class="group">
+    <button data-faction="-1" class="active">Alle</button>
+    <button data-faction="0">Starwing</button>
+    <button data-faction="1">Lightforce</button>
+    <button data-faction="2">Scaretech</button>
+    <button data-faction="3">BIOTEC</button>
+  </div>
+  <button id="print">Drucken / PDF</button>
+  <a href="generate_barcodes.html">Kartendrucker</a>
+</div>
+<p class="hint">
+  Je Fraktion eine A4-Seite quer. Beim Drucken „Als PDF speichern“ wählen, Hintergrundgrafiken einschalten, Ränder „Keine“.
+  Der Baum wird aus den Voraussetzungen der Kartendaten berechnet und stimmt damit immer mit den Regeln überein.
+</p>
+<main id="output"></main>
+<script type="module" src="/src/print/techtree.ts"></script>
+</body>
+</html>

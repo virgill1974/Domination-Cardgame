@@ -69,6 +69,12 @@ App und Drucker nutzen dasselbe Kartenlayout (`src/ui/cardFace.ts`).
 - **Duplexdruck:** Die Rückseitenbögen sind zeilenweise gespiegelt. Beim Drucken „beidseitig, Wenden an der langen Kante“ wählen, dann liegt jede Rückseite hinter ihrer Vorderseite. „Beidseitig“ gibt abwechselnd Vorder- und Rückseitenbogen aus (160 Karten auf 18 Blatt).
 Beim Drucken „Tatsächliche Größe / 100 %“ wählen.
 
+**Technologiebäume:** [`Unterlagen/Domination_Techtrees.pdf`](Unterlagen/Domination_Techtrees.pdf) enthält je Fraktion eine A4-Seite quer, aufgebaut wie die alten C&C-Techtrees.
+- **Aufbau:** Die Planeten laufen als Kette in der Mitte von oben nach unten, daneben stehen die Einheiten und Upgrades, die ein Planet freischaltet.
+- **Kacheln:** mit Kartenbild und farbigem Rahmen, Planet kräftig, Einheit dunkel, Upgrade hell.
+- **Pfeile:** zeigen, was was freischaltet.
+- **Neu erzeugen:** Die Seite `Tools/techtree.html` (im Dev-Server, verlinkt im Kartendrucker) berechnet die Bäume aus den Voraussetzungen der Kartendaten. Nach Regeländerungen dort „Drucken / PDF“ → „Als PDF speichern“ wählen, mit Hintergrundgrafiken und ohne Ränder.
+
 **Kartenbilder:** pro Kartentyp eine Datei `public/cards/<ID>.png` (Bildfenster im Format 512:299, 1024×598 px). Fehlende Bilder werden in App und Kartendrucker als Platzhalter gezeichnet. Die Checkliste aller 92 Dateinamen steht in [`public/cards/README.md`](public/cards/README.md).
 
 ### Kartenbilder erzeugen (Stable Diffusion, lokal)
@@ -455,7 +461,8 @@ Die alte Kartenliste enthält bei BIOTEC teils andere Namen und Werte als der Co
 - [ ] **BIOTEC:** in das Domination-Universum übertragen (Namen, evtl. Fraktionsname)
 - [x] **Kartenbilder:** mit Stable Diffusion lokal im Stil von Helge Vogt erzeugt (`Tools/card-art/`, siehe „Kartenbilder erzeugen“)
 - [ ] **Cloudflare Pages:** Projekt `domination-cardgame` anlegen (siehe oben)
-- [ ] **Techtree-Grafiken:** Freischaltungs-Bäume pro Fraktion als UI-Ansicht
+- [x] **Techtree-Grafiken:** `Unterlagen/Domination_Techtrees.pdf`, erzeugt aus `Tools/techtree.html`
+- [ ] **Techtree in der App:** Freischaltungs-Baum als Ansicht im Spiel
 - [ ] **BIOTEC Einheiten:** Werte-Diskrepanzen zwischen Code und Kartenliste abgleichen
 - [x] **BIOTEC Upgrades 1–6:** neu entworfen, siehe Upgrade-Tabelle
 - [x] **Auge des Raumes / Schwarzer Schleier:** als Hinweis in der App umgesetzt (Aufdecken bzw. verdeckt Ausspielen passiert am Tisch)
