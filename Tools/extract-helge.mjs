@@ -5,8 +5,10 @@
 // nur anders eingefärbt. Deshalb wird Scaretech aus der Starwing-Vorlage umgefärbt (Farbtabelle aus
 // Scaretechs Vorlage gelernt), BIOTEC (organisch-grün) und Gunmetal (neutral) werden daraus generiert.
 import sharp from 'sharp';
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { readPsd } from './psd.mjs';
+
+const SELECTION = 'Tools/card-art/selection.json';
 
 const SRC = 'domination_gfx/Helge';
 const OUT = 'public/ui';
@@ -356,7 +358,9 @@ async function main() {
   await printEmblem(`${SRC}/KartenVorderseite/PRINT_Flash_03.psd`, back('lightforce'), [0.08, 0.1, 0.84, 0.78]);
   await sharp(`${SRC}/Karten Scaretech/Demo/Scaretech-Rückseite-Planet.jpg`).extract({ left: 60, top: 70, width: 532, height: 630 })
     .resize({ width: 600 }).webp({ quality: 80 }).toFile(back('scaretech'));
-  await sharp(Buffer.from(biotecBackSvg())).webp({ quality: 82 }).toFile(back('biotec'));
+  // BIOTEC: Die gemalte Rückseite (Tools/card-art, „biotec-back“ in selection.json) hat Vorrang vor der Vektor-Helix
+  const painted = existsSync(SELECTION) && JSON.parse(readFileSync(SELECTION, 'utf8'))['biotec-back'];
+  if (!painted) await sharp(Buffer.from(biotecBackSvg())).webp({ quality: 82 }).toFile(back('biotec'));
   console.log('Rückseiten-Embleme');
 
   // Symbole (weiße Masken): Werte aus der Scaretech-Einheitenvorlage, Embleme aus den drei Vorlagen

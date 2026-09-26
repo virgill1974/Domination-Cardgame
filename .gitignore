@@ -5,3 +5,6 @@ dist/
 
 # Kartengrafik-Entwürfe von Helge Vogt (lokal, groß, enthält fremde Beispielbilder)
 domination_gfx/
+
+# Zwischenergebnisse der Kartenbild-Generierung (npm run art)
+art-work/

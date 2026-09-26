@@ -54,7 +54,7 @@ Karten zeigt die App in Helges Kartenlayout. Schriften wie im Projekt ModZart_We
 **Kartengrafiken von Helge Vogt:** Entwürfe (Photoshop-Vorlagen je Fraktion, Kartenrückseiten, Beispielkarten) liegen lokal in `domination_gfx/`. Der Ordner ist nicht im Repo (große PSD-Dateien, Beispielbilder fremder Künstler).
 - `npm run gfx` (`Tools/extract-helge.mjs`) erzeugt daraus die Grafiken in [`public/ui/`](public/ui/README.md): Rahmen, Texturen, Platten, Fasen, Symbole, Rückseiten.
 - Weil alle Vorlagen dieselbe Rahmenstruktur haben, wird Scaretech umgefärbt. BIOTEC (organisch-grün) und Gunmetal werden generiert.
-- Die Bilder im Kartenfenster werden später in Helges Stil erstellt.
+- Die Bilder im Kartenfenster malt Stable Diffusion in Helges Stil (siehe „Kartenbilder erzeugen“).
 
 **Kurzanleitung:** in der App auf dem Startbildschirm, aufklappbar nach Themen (`src/ui/Guide.tsx`).
 
@@ -65,7 +65,30 @@ Er druckt alle 160 Karten in Helges Kartenlayout (63 mm breit, 86,9 mm hoch nach
 App und Drucker nutzen dasselbe Kartenlayout (`src/ui/cardFace.ts`).
 Beim Drucken „Tatsächliche Größe / 100 %“ wählen.
 
-**Kartenbilder:** pro Kartentyp eine Datei `public/cards/<ID>.png` ablegen (Bildfenster im Format 512:299, z. B. 1024×598 px). Fehlende Bilder werden in App und Kartendrucker als Platzhalter gezeichnet. Die Checkliste aller 92 Dateinamen steht in [`public/cards/README.md`](public/cards/README.md).
+**Kartenbilder:** pro Kartentyp eine Datei `public/cards/<ID>.png` (Bildfenster im Format 512:299, 1024×598 px). Fehlende Bilder werden in App und Kartendrucker als Platzhalter gezeichnet. Die Checkliste aller 92 Dateinamen steht in [`public/cards/README.md`](public/cards/README.md).
+
+### Kartenbilder erzeugen (Stable Diffusion, lokal)
+
+Die Bilder entstehen lokal mit **SDXL 1.0** in **ComfyUI** auf der eigenen Grafikkarte (getestet: RTX 3060 Laptop, 6 GB, ca. 30 s pro Bild).
+Helges Rückseiten-Motive (Flügel, Faust, Totenkopf, BIOTEC-Helix) gehen über den **IP-Adapter** („style transfer“, Gewicht 0,35) als Stilvorlage ein. Die Motive stehen je Karte in [`Tools/card-art/prompts.mjs`](Tools/card-art/prompts.mjs); die Fraktionsfarbe ist nur Akzent, die Bilder dürfen mehrfarbig sein.
+
+Einrichtung (einmalig, ca. 12 GB, liegt außerhalb des Repos unter `C:\Users\joche\ComfyUI\`):
+1. Aktuellen NVIDIA-Treiber installieren (≥ 528; CUDA 12).
+2. `ComfyUI_windows_portable_nvidia_cu126.7z` von github.com/comfyanonymous/ComfyUI/releases entpacken (`tar -xf …` unter Windows 11).
+3. Modelle von Hugging Face:
+   - `sd_xl_base_1.0.safetensors` (stabilityai) → `models/checkpoints/`
+   - `ip-adapter-plus_sdxl_vit-h.safetensors` (h94/IP-Adapter, `sdxl_models/`) → `models/ipadapter/`
+   - `models/image_encoder/model.safetensors` (h94/IP-Adapter) als `CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors` → `models/clip_vision/`
+4. `git clone https://github.com/cubiq/ComfyUI_IPAdapter_plus` nach `custom_nodes/`.
+5. ComfyUI starten: `run_nvidia_gpu.bat` (API auf `http://127.0.0.1:8188`).
+
+Ablauf:
+- **Erzeugen:** `npm run art -- --ids 0-91 --variants 3` schreibt Varianten nach `art-work/<id>/<seed>.png` (nicht im Repo). Vorhandene werden übersprungen, ein abgebrochener Lauf kann also einfach neu gestartet werden.
+- **Auswählen:** `npm run art -- --sheet` erzeugt Kontaktbögen je Fraktion (`art-work/sheet-<fraktion>.png`). Die gewählte Variante je Karte kommt in `Tools/card-art/selection.json` (`"17": 2`).
+- **Übernehmen:** `npm run art -- --apply` schneidet auf das Kartenfenster zu und schreibt nach `public/cards/<id>.png` (WebP-Inhalt).
+- **Einzelne Karten neu:** z. B. `npm run art -- --ids 59 --variants 6`, oder mit anderem Stilgewicht `--weight 0.5`.
+
+Lizenzen: SDXL 1.0 (CreativeML Open RAIL++-M) und IP-Adapter (Apache 2.0) erlauben die Nutzung der Ergebnisse.
 
 ---
 
@@ -425,7 +448,7 @@ Die alte Kartenliste enthält bei BIOTEC teils andere Namen und Werte als der Co
 
 - [ ] **Namen bestätigen:** Lightforce-Einheiten 32–39 und die Upgrades 22 und 40 haben Vorschlagsnamen (in der Kartenliste noch leer)
 - [ ] **BIOTEC:** in das Domination-Universum übertragen (Namen, evtl. Fraktionsname)
-- [ ] **Kartenbilder:** im Stil der Entwürfe von Helge Vogt (`domination_gfx/`), bis dahin Platzhalter-Grafiken. Dateien unter `public/cards/`
+- [x] **Kartenbilder:** mit Stable Diffusion lokal im Stil von Helge Vogt erzeugt (`Tools/card-art/`, siehe „Kartenbilder erzeugen“)
 - [ ] **Cloudflare Pages:** Projekt `domination-cardgame` anlegen (siehe oben)
 - [ ] **Techtree-Grafiken:** Freischaltungs-Bäume pro Fraktion als UI-Ansicht
 - [ ] **BIOTEC Einheiten:** Werte-Diskrepanzen zwischen Code und Kartenliste abgleichen

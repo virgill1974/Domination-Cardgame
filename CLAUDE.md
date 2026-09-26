@@ -13,7 +13,7 @@ Web app for the sci-fi card game **"Domination – Das Kartenspiel"**. It began 
 - UI terms: Gebäude → **Planet**, Kommandozentrale → **Zentralgestirn**, Fußeinheit → **Aufklärer**, Fahrzeug → **Kampfschiff**, Flugzeug → **Hyperraumschiff**, Flugabwehr → **Planetenabwehr**, Kraftwerk → **Energiequelle**. Engine internals (`building`, `isFlak`, `AIRCRAFT`, German test names) still use the old mechanic words; only user-visible text must use the new ones.
 - Names without an XLS entry are proposals (Feuerschwinge 22, Lightforce 32–40); README lists them.
 - Never reintroduce C&C names, logos or sounds in anything user-visible.
-- `domination_gfx/` (git-ignored, local only): card design drafts by Helge Vogt (PSD templates, backs, demo cards). The app design and the printed card are derived from them (see "Design" below). Final card art (the picture in the window) will be generated later in his style. Its `Beispielbilder/` and the galaxies/nebulae in his template windows are third-party images, never ship them.
+- `domination_gfx/` (git-ignored, local only): card design drafts by Helge Vogt (PSD templates, backs, demo cards). The app design and the printed card are derived from them (see "Design" below). Card art (the picture in the window) is generated with Stable Diffusion in his style (see "Card art" below). Its `Beispielbilder/` and the galaxies/nebulae in his template windows are third-party images, never ship them.
 
 ## Commands
 
@@ -101,6 +101,16 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 
 **Asset fallbacks (drop-in, no code change):**
 - Images: `public/cards/<cardTypeId>.png` (picture window ratio 512:299), generated SVG placeholder if missing (`src/ui/cardArt.ts`). The printer page resolves images with base `../cards/`.
+
+**Card art** (`Tools/card-art/`, `npm run art`): local Stable Diffusion, no cloud.
+- Setup: SDXL 1.0 base in a ComfyUI portable install at `C:\Users\joche\ComfyUI\` (outside the repo; start it with `run_nvidia_gpu.bat`, API on `127.0.0.1:8188`). The GPU is an RTX 3060 Laptop, 6 GB, about 30 s per image.
+- Style: Helge's back motifs (`public/ui/factions/<f>/back.webp`) are the style reference via IP-Adapter plus (`cubiq/ComfyUI_IPAdapter_plus`, weight type "style transfer", default weight 0.35). The user wants **multicoloured** pictures, so the faction colour is only an accent in the prompt. Higher weights make them monochrome in the back motif's palette.
+- Prompts: `prompts.mjs` holds one English subject per card id plus the faction accent, a common style suffix and the negative prompt. `SPECIALS` holds extra motifs, e.g. `biotec-back`: the painted BIOTEC back, which is also the BIOTEC style reference.
+- Workflow:
+  - Variants go to `art-work/` (git-ignored); seeds are `id*1000+variant`.
+  - `--sheet` makes contact sheets.
+  - The choice goes into `selection.json`, `--apply` writes `public/cards/<id>.png` (WebP bytes in a `.png` name, 1024×598).
+  - `npm run gfx` keeps the painted BIOTEC back while `selection.json` has `biotec-back`.
 - Sounds: `public/sounds/<name>.mp3`, else synthesized via Web Audio (`src/ui/sound.ts`).
 - Music: `public/sounds/music.mp3` loops during the game (`src/ui/music.ts`), else a generated ambient pad.
   - It is routed through a `MediaElementAudioSourceNode` into the music bus, because iOS ignores `<audio>.volume`.
