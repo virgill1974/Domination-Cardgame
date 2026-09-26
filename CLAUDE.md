@@ -101,16 +101,6 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 
 **Asset fallbacks (drop-in, no code change):**
 - Images: `public/cards/<cardTypeId>.png` (picture window ratio 512:299), generated SVG placeholder if missing (`src/ui/cardArt.ts`). The printer page resolves images with base `../cards/`.
-
-**Card art** (`Tools/card-art/`, `npm run art`): local Stable Diffusion, no cloud.
-- Setup: SDXL 1.0 base in a ComfyUI portable install at `C:\Users\joche\ComfyUI\` (outside the repo; start it with `run_nvidia_gpu.bat`, API on `127.0.0.1:8188`). The GPU is an RTX 3060 Laptop, 6 GB, about 30 s per image.
-- Style: Helge's back motifs (`public/ui/factions/<f>/back.webp`) are the style reference via IP-Adapter plus (`cubiq/ComfyUI_IPAdapter_plus`, weight type "style transfer", default weight 0.35). The user wants **multicoloured** pictures, so the faction colour is only an accent in the prompt. Higher weights make them monochrome in the back motif's palette.
-- Prompts: `prompts.mjs` holds one English subject per card id plus the faction accent, a common style suffix and the negative prompt. `SPECIALS` holds extra motifs, e.g. `biotec-back`: the painted BIOTEC back, which is also the BIOTEC style reference.
-- Workflow:
-  - Variants go to `art-work/` (git-ignored); seeds are `id*1000+variant`.
-  - `--sheet` makes contact sheets.
-  - The choice goes into `selection.json`, `--apply` writes `public/cards/<id>.png` (WebP bytes in a `.png` name, 1024×598).
-  - `npm run gfx` keeps the painted BIOTEC back while `selection.json` has `biotec-back`.
 - Sounds: `public/sounds/<name>.mp3`, else synthesized via Web Audio (`src/ui/sound.ts`).
 - Music: `public/sounds/music.mp3` loops during the game (`src/ui/music.ts`), else a generated ambient pad.
   - It is routed through a `MediaElementAudioSourceNode` into the music bus, because iOS ignores `<audio>.volume`.
@@ -120,6 +110,18 @@ npm run gfx                      # regenerate the Helge-style graphics in public
   - All three faction templates share one frame structure. Scaretech is recoloured from Starwing with a learned colour table. BIOTEC (organic green) and neutral Gunmetal are generated.
   - `logo.svg` stays the home emblem and icon source.
 - 404s for these files in the console are expected. Don't download third-party assets without asking: original C&C sounds and images are EA-copyrighted.
+
+**Card art** (`Tools/card-art/`, `npm run art`): local Stable Diffusion, no cloud.
+- Setup: SDXL 1.0 base in a ComfyUI portable install at `C:\Users\joche\ComfyUI\` (outside the repo; start it with `run_nvidia_gpu.bat`, API on `127.0.0.1:8188`). The GPU is an RTX 3060 Laptop, 6 GB, about 30 s per image.
+- Style: Helge's back motifs (`public/ui/factions/<f>/back.webp`) are the style reference via IP-Adapter plus (`cubiq/ComfyUI_IPAdapter_plus`, weight type "style transfer", default weight 0.35). The user wants **multicoloured** pictures, so the faction colour is only an accent in the prompt. Higher weights make them monochrome in the back motif's palette.
+- Prompts: `prompts.mjs` holds one English subject per card id plus the faction accent, a common style suffix and the negative prompt. `SPECIALS` holds extra motifs, e.g. `biotec-back`: the painted BIOTEC back, which is also the BIOTEC style reference.
+- Scaretech's skull reference pushes people and faces into planet/upgrade motifs. `promptFor` adds a negative prompt for them, and five cards (47, 48, 49, 53, 68) were regenerated with `--weight 0.2` (variants 4–7).
+- Workflow:
+  - Variants go to `art-work/` (git-ignored); seeds are `id*1000+variant`.
+  - `--sheet` makes contact sheets.
+  - The choice goes into `selection.json`, `--apply` writes `public/cards/<id>.png` (WebP bytes in a `.png` name, 1024×598).
+  - The BIOTEC back is only rewritten with `--apply --special biotec-back` (a running generator keeps the file open on Windows).
+  - `npm run gfx` keeps the painted BIOTEC back while `selection.json` has `biotec-back`.
 
 ## Legacy material
 

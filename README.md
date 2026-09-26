@@ -86,7 +86,8 @@ Ablauf:
 - **Erzeugen:** `npm run art -- --ids 0-91 --variants 3` schreibt Varianten nach `art-work/<id>/<seed>.png` (nicht im Repo). Vorhandene werden übersprungen, ein abgebrochener Lauf kann also einfach neu gestartet werden.
 - **Auswählen:** `npm run art -- --sheet` erzeugt Kontaktbögen je Fraktion (`art-work/sheet-<fraktion>.png`). Die gewählte Variante je Karte kommt in `Tools/card-art/selection.json` (`"17": 2`).
 - **Übernehmen:** `npm run art -- --apply` schneidet auf das Kartenfenster zu und schreibt nach `public/cards/<id>.png` (WebP-Inhalt).
-- **Einzelne Karten neu:** z. B. `npm run art -- --ids 59 --variants 6`, oder mit anderem Stilgewicht `--weight 0.5`.
+- **Einzelne Karten neu:** z. B. `npm run art -- --ids 59 --variants 6`, oder mit anderem Stilgewicht `--weight 0.2`. So entstanden die Scaretech-Karten 47, 48, 49, 53 und 68: Helges Totenkopf-Vorlage brachte sonst Figuren ins Bild.
+- **BIOTEC-Rückseite:** `npm run art -- --special biotec-back --variants 4`, übernehmen mit `--apply --special biotec-back`.
 
 Lizenzen: SDXL 1.0 (CreativeML Open RAIL++-M) und IP-Adapter (Apache 2.0) erlauben die Nutzung der Ergebnisse.
 
