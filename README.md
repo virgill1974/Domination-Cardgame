@@ -63,6 +63,10 @@ Karten zeigt die App in Helges Kartenlayout. Schriften wie im Projekt ModZart_We
 **Kartendrucker:** `Tools/generate_barcodes.html` (im Dev-Server unter `/Tools/generate_barcodes.html` oder über den Startbildschirm).
 Er druckt alle 160 Karten in Helges Kartenlayout (63 mm breit, 86,9 mm hoch nach seiner Vorlage, 9 pro A4-Seite, EAN-8 im weißen Streifen unten). Alternativ druckt er nur die Barcodes als Etiketten (38×21 mm, 65 pro Bogen, z. B. Avery L7651) zum Aufkleben auf die alten Karten.
 App und Drucker nutzen dasselbe Kartenlayout (`src/ui/cardFace.ts`).
+
+**Rückseiten** (Modus „Rückseiten“ oder „Beidseitig“): Helges Motiv der Fraktion im Fasenrahmen, also Starwing-Flügel, Lightforce-Blitzfaust, Scaretech-Totenkopf oder BIOTEC-Helix.
+- **Kartentyp von hinten erkennbar:** großes Abzeichen mit Symbol und Schrift (Planet, Einheit, Upgrade), dazu kleine Symbole oben links und unten rechts für die aufgefächerte Hand.
+- **Duplexdruck:** Die Rückseitenbögen sind zeilenweise gespiegelt. Beim Drucken „beidseitig, Wenden an der langen Kante“ wählen, dann liegt jede Rückseite hinter ihrer Vorderseite. „Beidseitig“ gibt abwechselnd Vorder- und Rückseitenbogen aus (160 Karten auf 18 Blatt).
 Beim Drucken „Tatsächliche Größe / 100 %“ wählen.
 
 **Kartenbilder:** pro Kartentyp eine Datei `public/cards/<ID>.png` (Bildfenster im Format 512:299, 1024×598 px). Fehlende Bilder werden in App und Kartendrucker als Platzhalter gezeichnet. Die Checkliste aller 92 Dateinamen steht in [`public/cards/README.md`](public/cards/README.md).

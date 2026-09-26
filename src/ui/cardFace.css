@@ -60,3 +60,43 @@
 }
 .cf-foot svg { display: block; }
 .cf-digits { font-family: var(--font-mono, 'Consolas', monospace); font-size: calc(20 * var(--u)); letter-spacing: calc(7 * var(--u)); color: #000; }
+
+/* Rückseite (cardBackHtml): Rand und Rundung wie die Vorderseite, Motiv im Fasenrahmen, Kartentyp als
+   Abzeichen unten und als Eck-Symbole (oben links, unten rechts gedreht). */
+.cb {
+  --u: calc(100cqw / 652);
+  position: relative; container-type: inline-size; width: 100%; aspect-ratio: 652 / 899;
+  background: #000; border-radius: 3.4% / 2.45%; overflow: hidden;
+}
+.cb * { margin: 0; padding: 0; box-sizing: border-box; }
+.cb::before {
+  content: ''; position: absolute; inset: calc(28 * var(--u));
+  background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3)), var(--cb-tex) 0 0 / calc(300 * var(--u));
+}
+.cb-win {
+  position: absolute; inset: calc(56 * var(--u)); background: #000;
+  border: calc(18 * var(--u)) solid transparent;
+  border-image: var(--cb-rim) 21 22 19 19 / calc(18 * var(--u)) stretch;
+  box-shadow: 0 0 calc(18 * var(--u)) rgba(0, 0, 0, 0.7);
+}
+.cb-win img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cb-corner {
+  position: absolute; width: calc(112 * var(--u)); height: calc(74 * var(--u));
+  border-radius: 50%; background: #050505; color: #fff;
+  box-shadow: 0 0 0 calc(4 * var(--u)) rgba(255, 255, 255, 0.85), 0 calc(3 * var(--u)) calc(10 * var(--u)) rgba(0, 0, 0, 0.7);
+}
+.cb-corner .cf-icon { position: absolute; inset: calc(8 * var(--u)) calc(16 * var(--u)); }
+.cb-tl { left: calc(38 * var(--u)); top: calc(38 * var(--u)); }
+.cb-br { right: calc(38 * var(--u)); bottom: calc(38 * var(--u)); transform: rotate(180deg); }
+.cb-badge {
+  position: absolute; left: 50%; bottom: calc(92 * var(--u)); transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: calc(6 * var(--u));
+  min-width: calc(300 * var(--u)); padding: calc(18 * var(--u)) calc(34 * var(--u)) calc(16 * var(--u));
+  border-radius: calc(40 * var(--u)); background: rgba(5, 5, 5, 0.92); color: #fff;
+  box-shadow: 0 0 0 calc(5 * var(--u)) rgba(255, 255, 255, 0.9), 0 calc(6 * var(--u)) calc(22 * var(--u)) rgba(0, 0, 0, 0.8);
+}
+.cb-badge .cf-icon { width: calc(150 * var(--u)); height: calc(100 * var(--u)); }
+.cb-badge span {
+  font-family: var(--font-display, 'Silkscreen', monospace); font-size: calc(40 * var(--u));
+  letter-spacing: calc(4 * var(--u)); text-transform: uppercase; line-height: 1;
+}

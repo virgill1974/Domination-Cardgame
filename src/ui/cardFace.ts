@@ -4,7 +4,7 @@ import { eanForIndex } from '../engine/ean';
 import { ean8Svg } from '../print/barcodeSvg';
 import { factionAsset, helgeIcon } from './assets';
 import { cardArtUrl, placeholderDataUri } from './cardArt';
-import { DESCRIPTIONS, categoryLabel, requirementName, upgradeEffect } from './cardText';
+import { DESCRIPTIONS, KIND_LABEL, categoryLabel, requirementName, upgradeEffect } from './cardText';
 
 export interface CardFaceOptions {
   /** Pfad-Präfix zu public/ (App: '', Kartendrucker unter Tools/: '../') */
@@ -62,4 +62,23 @@ export function cardFaceHtml(ean: number, { base = '', footer = 'none' }: CardFa
 <div class="cf-win"><img alt="" src="${cardArtUrl(id, `${base}cards/`)}" onerror="this.onerror=null;this.src='${fallback}'"></div>
 <div class="cf-plate cf-plate-${kind === 'upgrade' ? 'upgrade' : 'stats'}">${plate}</div>
 ${foot}</article>`;
+}
+
+/**
+ * Rückseite im Stil von Helge Vogt: Rahmentextur der Fraktion, Rückseiten-Motiv (Flügel, Blitzfaust,
+ * Totenkopf, DNA-Helix) im Fasenrahmen. Der Kartentyp ist von hinten erkennbar: großes Abzeichen mit
+ * Symbol und Schrift unten, dazu kleine Symbole oben links und (gedreht) unten rechts wie bei Spielkarten,
+ * damit man den Typ auch in der aufgefächerten Hand sieht.
+ */
+export function cardBackHtml(ean: number, { base = '' }: Pick<CardFaceOptions, 'base'> = {}): string {
+  const kind = kindOfEan(ean);
+  const faction = factionOfEan(ean);
+  const emblem = `<i class="cf-icon" style="--m:url('${helgeIcon(EMBLEM[kind], base)}')"></i>`;
+  const tex = factionAsset(faction, 'tile.webp', base);
+  const rim = factionAsset(faction, 'rim.webp', base);
+  return `<article class="cb cb-${kind}" style="--cb-tex:url('${tex}');--cb-rim:url('${rim}')">
+<div class="cb-win"><img alt="" src="${factionAsset(faction, 'back.webp', base)}"></div>
+<div class="cb-corner cb-tl">${emblem}</div><div class="cb-corner cb-br">${emblem}</div>
+<div class="cb-badge">${emblem}<span>${KIND_LABEL[kind]}</span></div>
+</article>`;
 }

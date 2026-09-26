@@ -9,7 +9,9 @@
 <div class="controls">
   <h1>Domination Kartendrucker</h1>
   <div class="group">
-    <button data-mode="cards" class="active">Karten 63×88 mm</button>
+    <button data-mode="cards" class="active">Vorderseiten</button>
+    <button data-mode="backs">Rückseiten</button>
+    <button data-mode="duplex">Beidseitig</button>
     <button data-mode="labels">Etiketten 38×21 mm</button>
   </div>
   <div class="group">
@@ -25,7 +27,8 @@
 <p class="hint">
   Bilder: <code>public/cards/&lt;Karten-ID&gt;.png</code> ablegen, fehlende werden als Platzhalter gezeichnet.
   Beim Drucken „Tatsächliche Größe / 100 %“ wählen, damit die Barcodes maßhaltig bleiben.
-  Etiketten passen auf Bögen mit 65 Etiketten (z.&nbsp;B. Avery L7651).
+  Etiketten passen auf Bögen mit 65 Etiketten (z.&nbsp;B. Avery L7651).<br>
+  Rückseiten sind zeilenweise gespiegelt: Beim beidseitigen Druck „Wenden an der langen Kante“ wählen, dann liegt jede Rückseite genau hinter ihrer Vorderseite.
 </p>
 <main id="output"></main>
 <script type="module" src="/src/print/main.ts"></script>

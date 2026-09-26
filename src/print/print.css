@@ -41,7 +41,8 @@ body {
 /* Karten im Layout von Helge Vogt (cardFace.css): 63 mm breit, Seitenverhältnis seiner Vorlage (652×899),
    senkrecht im 88-mm-Raster zentriert. Der schwarze Rand der Karte ist die Schnittkante. */
 .cell { display: flex; align-items: center; justify-content: center; outline: 0.2mm dashed #ddd; }
-.cell .cf { width: 63mm; }
+.cell .cf, .cell .cb { width: 63mm; }
+.cell.empty { outline: none; }
 .digits { font-family: 'Consolas', 'Courier New', monospace; font-size: 7pt; letter-spacing: 0.8mm; }
 
 .label { display: flex; flex-direction: column; align-items: center; justify-content: center; outline: 0.2mm dashed #ddd; }
