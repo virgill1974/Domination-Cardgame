@@ -20,7 +20,7 @@ export function placeholderSvg(id: number): string {
   const icon = ICONS[kind === 'unit' ? card.unitClass! : kind];
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
 <defs>
-<radialGradient id="g" cx="50%" cy="40%" r="68%"><stop offset="0" stop-color="${color}" stop-opacity=".55"/><stop offset=".55" stop-color="#6a4bff" stop-opacity=".12"/><stop offset="1" stop-color="#070a1a" stop-opacity="0"/></radialGradient>
+<radialGradient id="g" cx="50%" cy="40%" r="68%"><stop offset="0" stop-color="${color}" stop-opacity=".55"/><stop offset=".55" stop-color="${color}" stop-opacity=".1"/><stop offset="1" stop-color="#070a1a" stop-opacity="0"/></radialGradient>
 <pattern id="p" width="28" height="48.5" patternUnits="userSpaceOnUse"><path d="M14 0L28 8.1V24.2L14 32.3L0 24.2V8.1ZM14 32.3V48.5" fill="none" stroke="#bfe6ff" stroke-opacity=".08"/></pattern>
 <linearGradient id="i" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="${color}"/></linearGradient>
 <linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>

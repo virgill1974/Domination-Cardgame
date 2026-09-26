@@ -50,12 +50,13 @@ npx pwa-assets-generator         # regenerate app icons in public/ui/ from publi
 - Flows in `flows.tsx` follow the terminal: scan → confirm card → execute.
 - Design "Holografisches Glas" lives in `theme.css` (tokens on `:root`). Only large surfaces (`.panel`, `.dialog`, `.glass`) use `backdrop-filter`, for phone performance. Buttons and tiles use plain translucent gradients.
 - Faction color arrives as `--fc` and `--tint` via `factionStyle()`. `App.tsx` also puts it on the `display: contents` root, so dialogs and the scanner are tinted during a turn.
-  - Primary buttons, the dialog top stroke and the scanner frame use `--accent-grad`/`--accent-ink`/`--accent-glow`/`--accent-line`. These are cyan→violet on neutral screens and the faction color (white text) inside tinted elements. Only error (red) and warning (orange) dialogs keep signal colors.
+  - Primary buttons, the dialog top stroke and the scanner frame use `--accent-grad`/`--accent-ink`/`--accent-glow`/`--accent-line`. These are a silver/gray gradient on neutral screens and the faction color (white text) inside tinted elements. The user does not want the old cyan→violet→pink gradient anywhere (logo and icons included); only the background art keeps its nebula colors. Only error (red) and warning (orange) dialogs keep signal colors.
   - Custom properties resolve where they are declared. So anything derived from `--tint`/`--fc` (e.g. `--glass`) is re-declared under `:root, [style*='--tint']`. Don't define such derived variables on `:root` alone, or they stay cyan.
 - Fonts as in the ModZart_Web project, self-hosted via fontsource (offline):
-  - Silkscreen (pixel, `--font-display`): headings, labels, faction names
-  - Space Grotesk (`--font-body`): text, buttons
-  - JetBrains Mono (`--font-mono`): numbers
+  - Silkscreen (pixel, `--font-display`): the user's favourite. Used for headings, faction names, all buttons, stat tiles and values, counters, card type lines, key/value tiles, badges, combat log headings.
+  - Space Grotesk (`--font-body`): running text and card names (readability)
+  - JetBrains Mono (`--font-mono`): card codes only
+  - Pixel text is wide. Font sizes use `clamp()`; check 320 px width after changes.
   - Silkscreen/JetBrains are imported as latin-only subsets; German umlauts are included.
 - `Guide.tsx` is the in-app Kurzanleitung, reachable only from the home screen. Rule values in it follow the code, not the manual.
 

@@ -103,7 +103,7 @@ export function Setup({ onStart, onBack }: { onStart: (seats: Faction[], vpLimit
         {notice && <div class="small" style={{ color: 'var(--err)' }}>{notice}</div>}
         {seats.length > 0 && <button class="btn ghost" onClick={() => setSeats([])}>Auswahl zurücksetzen</button>}
       </div>
-      <button class="btn ok block" style={{ marginTop: 'auto' }} disabled={!full} onClick={() => onStart(seats, limit)}>Spiel starten</button>
+      <button class="btn primary block" style={{ marginTop: 'auto' }} disabled={!full} onClick={() => onStart(seats, limit)}>Spiel starten</button>
     </div>
   );
 }
