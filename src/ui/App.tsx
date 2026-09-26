@@ -14,6 +14,7 @@ import { AttackFlow, BuyFlow, InfoFlow, RepairFlow, type FlowProps } from './flo
 import { Handoff, Home, Hud, Inventory, Setup, Winner, type Action } from './screens';
 import { play, unlockAudio } from './sound';
 import { kickMusic, setMusicTrack, type Track } from './music';
+import { setGlitchActive } from './glitch';
 import { VolumeButton } from './VolumeControl';
 import { UpdatePrompt } from './UpdatePrompt';
 
@@ -73,6 +74,8 @@ export function App() {
   // Die Kampfmusik schaltet die Kampfansicht selbst (setCombatMusic).
   const track: Track | null = view !== 'game' ? 'menu' : game && game.winner === null ? 'game' : null;
   useEffect(() => setMusicTrack(track), [track]);
+  // Zufällige Glitches nur während der laufenden Partie (glitch.ts, nie bei Kamera)
+  useEffect(() => setGlitchActive(track === 'game'), [track]);
 
   const replace = (next: GameState | null) => {
     gameRef.current = next;
@@ -142,6 +145,7 @@ export function App() {
   return (
     <div class="app-root" style={tint}>
       <div class="backdrop" style={bgFaction === null ? undefined : factionStyle(bgFaction)} />
+      <div class="glitch-layer" aria-hidden="true" />
       {screen}
       {dialog === 'end' && (
         <div class="overlay">

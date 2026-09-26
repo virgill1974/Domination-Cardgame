@@ -6,6 +6,7 @@ import type { CardStats } from '../engine/state';
 import { CardArt, DefBar, Die, factionStyle } from './components';
 import { play } from './sound';
 import { setCombatMusic } from './music';
+import { glitch } from './glitch';
 
 const KIND_LABEL: Record<CombatKind, string> = {
   unitVsUnit: 'Einheit vs Einheit',
@@ -67,13 +68,19 @@ export function CombatView({ result, stats, onDone }: { result: CombatResult; st
     prevShown.current = shown;
     const step = result.steps[shown - 1];
     if (single && step) {
-      if (step.roll === null) play('superweapon');
-      else {
+      if (step.roll === null) {
+        play('superweapon');
+        glitch('noise', 1.4);
+      } else {
         play('dice');
         play(step.hit ? 'hit' : 'miss', 0.4);
+        if (step.hit) setTimeout(() => glitch('rgb', 0.6), 400);
       }
     }
-    if (done && result.destroyed.length && result.kind !== 'superweapon') play('explosion', single ? 0.8 : 0);
+    if (done && result.destroyed.length && result.kind !== 'superweapon') {
+      play('explosion', single ? 0.8 : 0);
+      setTimeout(() => glitch('tear', 1.2), single ? 800 : 0);
+    }
   }, [shown]);
 
   const last = result.steps[shown - 1];

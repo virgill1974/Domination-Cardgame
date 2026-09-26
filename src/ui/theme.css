@@ -349,7 +349,69 @@ a.btn { color: var(--text); text-decoration: none; }
 }
 .toast .btn { min-height: 44px; }
 
+/* Glitch (glitch.ts setzt data-glitch auf <html>). Nur .screen bewegen, nie #app: ein transform dort
+   würde fixierte Overlays (Dialoge, Kamera) mitverschieben. Keine großflächigen Filter (Handy-Leistung). */
+:root { --glitch-strength: 1; }
+.glitch-layer { position: fixed; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; }
+.glitch-layer::before, .glitch-layer::after { content: ''; position: absolute; inset: 0; opacity: 0; }
+
+[data-glitch='rgb'] .screen { animation: glitch-jitter 0.22s steps(2) 1; }
+[data-glitch='rgb'] .screen :is(h1, h2, .title, .faction-name, .stat .v, .card-name) {
+  text-shadow: calc(-2px * var(--glitch-strength)) 0 rgba(255, 40, 80, 0.85), calc(2px * var(--glitch-strength)) 0 rgba(0, 230, 255, 0.85);
+}
+[data-glitch='rgb'] .screen :is(.cf-win img, .art) {
+  filter: drop-shadow(calc(-3px * var(--glitch-strength)) 0 rgba(255, 40, 80, 0.7)) drop-shadow(calc(3px * var(--glitch-strength)) 0 rgba(0, 230, 255, 0.7));
+}
+@keyframes glitch-jitter {
+  0% { transform: translate(calc(-3px * var(--glitch-strength)), 1px); }
+  50% { transform: translate(calc(3px * var(--glitch-strength)), -1px); }
+  100% { transform: none; }
+}
+
+[data-glitch='tear'] .screen { animation: glitch-tear 0.26s steps(1) 1; }
+[data-glitch='tear'] .glitch-layer::before {
+  opacity: 0.55;
+  background:
+    linear-gradient(transparent 18%, rgba(255, 40, 80, 0.5) 18% 20%, transparent 20% 57%, rgba(0, 230, 255, 0.45) 57% 58.5%, transparent 58.5%);
+  animation: glitch-bars 0.26s steps(1) 1;
+}
+@keyframes glitch-tear {
+  0% { clip-path: inset(12% 0 64% 0); transform: translateX(calc(14px * var(--glitch-strength))); }
+  25% { clip-path: inset(48% 0 30% 0); transform: translateX(calc(-18px * var(--glitch-strength))); }
+  50% { clip-path: inset(70% 0 8% 0); transform: translateX(calc(10px * var(--glitch-strength))); }
+  75% { clip-path: inset(0 0 0 0); transform: translateX(calc(-4px * var(--glitch-strength))); }
+  100% { clip-path: none; transform: none; }
+}
+@keyframes glitch-bars { 50% { transform: translateY(23%); } }
+
+[data-glitch='scan'] .glitch-layer::before {
+  opacity: calc(0.7 * var(--glitch-strength)); inset: auto 0 auto 0; height: 18vh; top: -20vh;
+  background:
+    repeating-linear-gradient(transparent 0 2px, rgba(0, 0, 0, 0.35) 2px 3px),
+    linear-gradient(transparent, rgba(190, 240, 255, 0.22) 45%, rgba(255, 255, 255, 0.4) 50%, rgba(190, 240, 255, 0.22) 55%, transparent);
+  animation: glitch-scan 0.48s linear 1;
+}
+@keyframes glitch-scan { to { transform: translateY(125vh); } }
+
+[data-glitch='noise'] .screen { animation: glitch-flicker 0.32s steps(4) 1; }
+[data-glitch='noise'] .glitch-layer::after {
+  background:
+    repeating-radial-gradient(circle at 17% 32%, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 4px),
+    linear-gradient(90deg, rgba(255, 40, 80, 0.1), rgba(0, 230, 255, 0.1));
+  background-size: 7px 9px, 100% 100%, 100% 100%;
+  animation: glitch-noise 0.32s steps(4) 1;
+}
+@keyframes glitch-flicker { 25% { opacity: 0.82; } 50% { opacity: 1; } 75% { opacity: 0.88; } }
+@keyframes glitch-noise {
+  0% { opacity: calc(0.9 * var(--glitch-strength)); background-position: 0 0, 0 0, 0 0; }
+  33% { opacity: calc(0.5 * var(--glitch-strength)); background-position: 3px 5px, 0 2px, 0 0; }
+  66% { opacity: calc(0.8 * var(--glitch-strength)); background-position: -4px 2px, 0 -1px, 0 0; }
+  100% { opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .emblem, .scanner .frame::after { animation: none; }
+  [data-glitch] .screen, [data-glitch] .glitch-layer::before, [data-glitch] .glitch-layer::after { animation: none; opacity: 0; }
 }
 .badge.start { color: #1a1000; background: linear-gradient(180deg, #ffe58a, #f0b429 55%, #c98a18); border-color: rgba(0, 0, 0, 0.6); }

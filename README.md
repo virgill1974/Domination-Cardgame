@@ -49,7 +49,7 @@ npm run dev
 - Start, Setup und Kurzanleitung in neutralem Gunmetal
 - bei der Übergabe das Rückseiten-Motiv der Fraktion: Starwing-Flügel, Lightforce-Faust, Scaretech-Totenkopf, Biotec-Doppelhelix (generiert)
 
-Karten zeigt die App in Helges Kartenlayout. Schriften wie im Projekt ModZart_Web: Silkscreen, Space Grotesk, JetBrains Mono. Die App-Icons werden mit `npx pwa-assets-generator` aus `public/ui/logo.svg` erzeugt.
+Karten zeigt die App in Helges Kartenlayout. Während der Partie gibt es gelegentlich kurze Glitch-Effekte (RGB-Versatz, Bildriss, Scanline, Rauschen), zufällig und bei Treffern, Explosionen und Superwaffen, aber nie bei laufender Kamera. Schriften wie im Projekt ModZart_Web: Silkscreen, Space Grotesk, JetBrains Mono. Die App-Icons werden mit `npx pwa-assets-generator` aus `public/ui/logo.svg` erzeugt.
 
 **Kartengrafiken von Helge Vogt:** Entwürfe (Photoshop-Vorlagen je Fraktion, Kartenrückseiten, Beispielkarten) liegen lokal in `domination_gfx/`. Der Ordner ist nicht im Repo (große PSD-Dateien, Beispielbilder fremder Künstler).
 - `npm run gfx` (`Tools/extract-helge.mjs`) erzeugt daraus die Grafiken in [`public/ui/`](public/ui/README.md): Rahmen, Texturen, Platten, Fasen, Symbole, Rückseiten.
