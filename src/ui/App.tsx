@@ -139,9 +139,9 @@ export function App() {
         <div class="overlay">
           <div class="dialog">
             <h3>Zug beenden?</h3>
-            <div class="row">
-              <button class="btn grow" onClick={() => setDialog(null)}>Abbruch</button>
-              <button class="btn primary grow" onClick={() => { commit((s) => (s.turnActive = false)); setDialog(null); }}>OK</button>
+            <div class="btn-row">
+              <button class="btn cancel" onClick={() => setDialog(null)}>Abbruch</button>
+              <button class="btn primary" onClick={() => { commit((s) => (s.turnActive = false)); setDialog(null); }}>OK</button>
             </div>
           </div>
         </div>
@@ -162,9 +162,9 @@ export function App() {
           <div class="dialog error">
             <h3>Spiel wirklich abbrechen?</h3>
             <div>Der Spielstand wird gelöscht.</div>
-            <div class="row">
-              <button class="btn grow" onClick={() => setDialog('menu')}>Nein</button>
-              <button class="btn danger grow" onClick={() => { replace(null); setDialog(null); setFlow(null); setView('home'); }}>Abbrechen</button>
+            <div class="btn-row">
+              <button class="btn cancel" onClick={() => setDialog('menu')}>Nein</button>
+              <button class="btn danger" onClick={() => { replace(null); setDialog(null); setFlow(null); setView('home'); }}>Abbrechen</button>
             </div>
           </div>
         </div>

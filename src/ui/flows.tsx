@@ -29,9 +29,9 @@ function Confirm({ title, ean, okLabel = 'OK', onOk, onCancel, children, showSta
     <div class="screen">
       <div class="title">{title}</div>
       <CardView ean={ean} showStats={showStats}>{children}</CardView>
-      <div class="row" style={{ marginTop: 'auto' }}>
-        <button class="btn danger" onClick={onCancel}>Abbruch</button>
-        <button class="btn primary grow" onClick={onOk}>{okLabel}</button>
+      <div class="btn-row" style={{ marginTop: 'auto' }}>
+        <button class="btn cancel" onClick={onCancel}>Abbruch</button>
+        <button class="btn primary" onClick={onOk}>{okLabel}</button>
       </div>
     </div>
   );

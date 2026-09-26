@@ -51,7 +51,12 @@ export function Scanner({ title, hint, manualFactions, available, onCard, onCanc
   }, [manual]);
 
   if (manual) {
-    return <ManualPicker title={title} factions={manualFactions} available={available} onPick={onCard} onBack={() => setManual(false)} />;
+    return (
+      <ManualPicker
+        title={title} factions={manualFactions} available={available}
+        onPick={onCard} onBack={() => setManual(false)} onCancel={onCancel}
+      />
+    );
   }
 
   return (
@@ -69,17 +74,18 @@ export function Scanner({ title, hint, manualFactions, available, onCard, onCanc
             Licht {torch.on ? 'aus' : 'an'}
           </button>
         )}
-        <div class="row">
-          <button class="btn grow" onClick={() => setManual(true)}>Karte manuell wählen</button>
-          <button class="btn danger" onClick={onCancel}>Abbruch</button>
+        <div class="btn-row">
+          <button class="btn cancel" onClick={onCancel}>Abbruch</button>
+          <button class="btn" onClick={() => setManual(true)}>Karte manuell wählen</button>
         </div>
       </div>
     </div>
   );
 }
 
-function ManualPicker({ title, factions, available, onPick, onBack }: {
-  title: string; factions: Faction[]; available?: (ean: number) => boolean; onPick: (ean: number) => void; onBack: () => void;
+function ManualPicker({ title, factions, available, onPick, onBack, onCancel }: {
+  title: string; factions: Faction[]; available?: (ean: number) => boolean;
+  onPick: (ean: number) => void; onBack: () => void; onCancel: () => void;
 }) {
   const [query, setQuery] = useState('');
   const [showAll, setShowAll] = useState(false);
@@ -93,12 +99,9 @@ function ManualPicker({ title, factions, available, onPick, onBack }: {
   return (
     <div class="manual">
       <div class="screen">
-        <div class="row spread">
-          <div>
-            <div class="title">{title}</div>
-            <h2>Karte wählen</h2>
-          </div>
-          <button class="btn" onClick={onBack}>Kamera</button>
+        <div>
+          <div class="title">{title}</div>
+          <h2>Karte wählen</h2>
         </div>
         <input class="search" placeholder="Name oder Nummer suchen" value={query} onInput={(e) => setQuery(e.currentTarget.value)} />
         {available && (
@@ -117,6 +120,12 @@ function ManualPicker({ title, factions, available, onPick, onBack }: {
               <span class="code">{eanForIndex(ean)}</span>
             </button>
           ))}
+        </div>
+      </div>
+      <div class="manual-bar">
+        <div class="btn-row">
+          <button class="btn cancel" onClick={onCancel}>Abbruch</button>
+          <button class="btn" onClick={onBack}>Kamera</button>
         </div>
       </div>
     </div>
