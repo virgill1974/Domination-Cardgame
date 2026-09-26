@@ -19,7 +19,7 @@ Nur Sounds mit passender Lizenz verwenden, keine Originalsounds aus kommerzielle
 | `dice.mp3` | Würfelwurf im Kampf |
 | `hit.mp3` | Treffer |
 | `miss.mp3` | Verfehlt |
-| `explosion.mp3` | Karte im Kampf zerstört |
+| `explosion.mp3` | Karte im Kampf zerstört (vorhanden: eigener Sound, 5 s) |
 | `superweapon.mp3` | Superwaffe feuert (inkl. Einschlag) |
 | `victory.mp3` | Siegesfanfare |
 
@@ -27,11 +27,11 @@ Nur Sounds mit passender Lizenz verwenden, keine Originalsounds aus kommerzielle
 
 Drei Stücke laufen in Schleife und blenden beim Wechsel weich ineinander über:
 
-| Datei | Wann | ohne Datei |
-|---|---|---|
-| `menu.mp3` | Startbildschirm, Spieleinrichtung, Kurzanleitung | erzeugte, getragene Klangfläche (Dm – B♭ – F – C) |
-| `music.mp3` | während der Partie | erzeugte, ruhige Sci-Fi-Klangfläche (Am – F – C – G) |
-| `combat.mp3` | solange die Kampfansicht läuft, danach zurück zur Partie-Musik | erzeugter Action-Loop (138 BPM, Beat, Bass, Arpeggio) |
+| Datei | Wann | vorhanden | ohne Datei |
+|---|---|---|---|
+| `menu.mp3` | Startbildschirm, Spieleinrichtung, Kurzanleitung | „Domination Cardgame title“, 3:04 | erzeugte, getragene Klangfläche (Dm – B♭ – F – C) |
+| `music.mp3` | während der Partie | „Domination Cardgame ingame“, 3:28 | erzeugte, ruhige Sci-Fi-Klangfläche (Am – F – C – G) |
+| `combat.mp3` | solange die Kampfansicht läuft, danach zurück zur Partie-Musik | „Domination Cardgame battle“, 2:19 | erzeugter Action-Loop (138 BPM, Beat, Bass, Arpeggio) |
 
 Beim Sieg ist Stille, damit die Fanfare frei steht.
 Jede Datei darf bis 20 MB groß sein und wird für das Offline-Spiel mit auf dem Handy gespeichert. Für einen sauberen Übergang am Schleifenende sollte der Anfang nahtlos an das Ende passen.

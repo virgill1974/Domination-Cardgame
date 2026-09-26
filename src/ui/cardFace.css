@@ -52,6 +52,7 @@
   font-size: calc(var(--cf-text) * var(--u)); overflow: hidden; hyphens: manual; overflow-wrap: normal; text-wrap: pretty;
 }
 .cf-text p { margin-top: calc(10 * var(--u)); }
+.cf-text p.cf-rule { margin-top: calc(7 * var(--u)); font-weight: 700; }
 .cf-upgrade-text { left: calc(46 * var(--u)); top: calc(84 * var(--u)); }
 
 .cf-foot {

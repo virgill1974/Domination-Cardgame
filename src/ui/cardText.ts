@@ -1,4 +1,6 @@
-import { CARDS, FACTIONS, NO_REQUIREMENT, STARTING_EANS, UPG } from '../engine/data';
+import {
+  CARDS, FACTIONS, HELICOPTER, NO_REQUIREMENT, REACTOR_ENERGY, SCARETECH, STARTING_EANS, STEALTH, SUPERWEAPON_RECHARGE, SUPPLY_INCOME, UPG,
+} from '../engine/data';
 import {
   factionOfCardId, factionOfEan, isCenter, isFlak, isHeadquarters, isReactor, isSuperweapon, isSupply, kindOfCardId, type CardKind,
 } from '../engine/cards';
@@ -102,8 +104,33 @@ export const DESCRIPTIONS: Record<number, string> = {
 /** Startkarte: wird in Runde 1 aktiviert (Zentralgestirn, erster Produktionsplanet, erste Energiequelle) */
 export const isStartCard = (ean: number) => STARTING_EANS[factionOfEan(ean)].includes(ean);
 
-/** Sonderfähigkeiten von Einheiten, die auf der Karte stehen müssen */
+/** Sonderfähigkeiten einzelner Karten (zusätzlich zu den Regeln aus rulesFor) */
 export const ABILITIES: Record<number, string> = {
-  16: 'Tarnmodus: Wird von der Planetenabwehr nicht erfasst.',
-  85: 'Mit dem Upgrade Flüstern im Tarnmodus: Wird von der Planetenabwehr nicht erfasst.',
+  [STEALTH]: 'Tarnmodus: Wird von der Planetenabwehr nicht erfasst.',
+  [HELICOPTER]: 'Mit dem Upgrade Flüstern im Tarnmodus: Wird von der Planetenabwehr nicht erfasst.',
 };
+
+const WORMHOLE = 54;
+
+/**
+ * Sonderregeln, die auf die Karte gedruckt werden. Abgeleitet aus denselben Konstanten wie die Engine,
+ * damit Karte und Spiel übereinstimmen (Werte aus data.ts, Regeln laut Kurzanleitung).
+ */
+export function rulesFor(id: number): string[] {
+  const card = CARDS[id];
+  const rules: string[] = [];
+  if (kindOfCardId(id) === 'unit') {
+    if (card.unitClass === 'air') rules.push('Überspringt beim Angriff eine Reihe.');
+    if (card.def === 0) rules.push('Zerstört sich beim Angriff selbst und erhält keinen Stern.');
+    if (factionOfCardId(id) === SCARETECH && card.unitClass === 'foot') rules.push('Mit dem Wurmloch: Überspringt beim Angriff Reihe 1.');
+  } else if (kindOfCardId(id) === 'building') {
+    if (isReactor(id)) rules.push(`Liefert ${REACTOR_ENERGY} Energie.`);
+    if (isSupply(id)) rules.push(`+${SUPPLY_INCOME} Credits pro Runde.`);
+    if (isFlak(id)) rules.push('Planetenabwehr: Schlägt bei Angriffen zurück und beschießt angreifende Hyperraumschiffe.');
+    if (isCenter(id)) rules.push('Angriffe kosten keine Credits.');
+    if (isSuperweapon(id)) rules.push(`Superwaffe: Trifft immer, danach ${SUPERWEAPON_RECHARGE} Runden Nachladen.`);
+    if (id === WORMHOLE) rules.push('Aufklärer überspringen beim Angriff Reihe 1.');
+  }
+  if (ABILITIES[id]) rules.push(ABILITIES[id]);
+  return rules;
+}

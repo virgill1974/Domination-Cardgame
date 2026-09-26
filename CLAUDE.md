@@ -78,7 +78,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - Geometry constants (window 67–579 × 122–421, plate 39–600 × 457–703, footer 725–873) match `Tools/extract-helge.mjs`.
 - No barcode digits anywhere (cards, labels, app, card picker); the user does not want the numbers shown.
 - Text column: no automatic hyphenation (`hyphens: manual`, `text-wrap: pretty`), the user does not want breaks like "Scare-tech".
-- Start cards (`isStartCard`, from `STARTING_EANS`, e.g. the first energy planet) get a gold "Startkarte" ribbon on the picture window and a badge in compact views. Units with special rules show them from `ABILITIES` in `cardText.ts` (Nostradamus stealth, Helicopter with Flüstern).
+- Start cards (`isStartCard`, from `STARTING_EANS`, e.g. the first energy planet) get a gold "Startkarte" ribbon on the picture window and a badge in compact views. Special rules are printed in bold from `rulesFor()` in `cardText.ts`, derived from the engine constants: hyperspace ships skip a row (by `unitClass`, since `AIRCRAFT` excludes the stealth ship), Def-0 units self-destruct, Scaretech scouts with the wormhole, energy sources, trade planets, planet defence, free attacks, superweapons. Card-specific extras are in `ABILITIES` (Nostradamus stealth, Helicopter with Flüstern).
 - Fonts as in the ModZart_Web project, self-hosted via fontsource (offline):
   - Silkscreen (pixel, `--font-display`): the user's favourite. Used for headings, faction names, all buttons, stat tiles and values, counters, card type lines, key/value tiles, badges, combat log headings.
   - Space Grotesk (`--font-body`): running text and card names (readability)
@@ -115,7 +115,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 **Asset fallbacks (drop-in, no code change):**
 - Images: `public/cards/<cardTypeId>.png` (picture window ratio 512:299), generated SVG placeholder if missing (`src/ui/cardArt.ts`). The printer page resolves images with base `../cards/`.
 - Sounds: `public/sounds/<name>.mp3`, else synthesized via Web Audio (`src/ui/sound.ts`).
-- Music (`src/ui/music.ts`): three looping tracks with crossfade: `menu.mp3` (home, setup, guide), `music.mp3` (game), `combat.mp3` (while `CombatView` is mounted, via `setCombatMusic`). Silence at the winner screen. Missing files fall back to generated music: two `Ambient` pads (menu, game) and the `CombatLoop` step sequencer (138 BPM, look-ahead scheduling).
+- Music (`src/ui/music.ts`): three looping tracks (the user's own MP3s are in `public/sounds/`, as is `explosion.mp3`) with crossfade: `menu.mp3` (home, setup, guide), `music.mp3` (game), `combat.mp3` (while `CombatView` is mounted, via `setCombatMusic`). Silence at the winner screen. Missing files fall back to generated music: two `Ambient` pads (menu, game) and the `CombatLoop` step sequencer (138 BPM, look-ahead scheduling).
   - It is routed through a `MediaElementAudioSourceNode` into the music bus, because iOS ignores `<audio>.volume`.
   - `sound.ts` has two gain buses (`sfx`, `music`) with volumes persisted in localStorage. The UI is `VolumeControl.tsx`, rendered via portal so its fixed overlay isn't trapped inside a dialog (a `backdrop-filter`/`transform` ancestor would do that).
   - Browsers may reject `play()` without a gesture. `kickMusic()` runs on every pointerdown to retry.

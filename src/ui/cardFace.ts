@@ -4,7 +4,7 @@ import { eanForIndex } from '../engine/ean';
 import { ean8Svg } from '../print/barcodeSvg';
 import { factionAsset, helgeIcon } from './assets';
 import { cardArtUrl, placeholderDataUri } from './cardArt';
-import { ABILITIES, DESCRIPTIONS, KIND_LABEL, categoryLabel, isStartCard, requirementName, upgradeEffect } from './cardText';
+import { DESCRIPTIONS, KIND_LABEL, categoryLabel, isStartCard, requirementName, rulesFor, upgradeEffect } from './cardText';
 
 export interface CardFaceOptions {
   /** Pfad-Präfix zu public/ (App: '', Kartendrucker unter Tools/: '../') */
@@ -36,7 +36,8 @@ export function cardFaceHtml(ean: number, { base = '', footer = 'none' }: CardFa
     `Kategorie: ${esc(categoryLabel(id))}`,
     `Voraussetzung: ${esc(requirementName(id))}`,
   ].join('<br>');
-  const extra = kind === 'upgrade' ? upgradeEffect(id) : DESCRIPTIONS[id] ?? ABILITIES[id];
+  const extra = kind === 'upgrade' ? upgradeEffect(id) : DESCRIPTIONS[id];
+  const rules = rulesFor(id).map((r) => `<p class="cf-rule">${esc(r)}</p>`).join('');
 
   const plate = kind === 'upgrade'
     ? `<div class="cf-cost">${icon('icon-cost')}<b>${card.price}</b></div>
@@ -47,7 +48,7 @@ export function cardFaceHtml(ean: number, { base = '', footer = 'none' }: CardFa
       stat('def', card.def || '–'),
       ...(card.off ? [stat('off', card.off), stat('dmg', card.dmg)] : []),
     ].join('')}</ul>
-       <div class="cf-text">${lines}${extra ? `<p>${esc(extra)}</p>` : ''}</div>`;
+       <div class="cf-text">${lines}${extra ? `<p>${esc(extra)}</p>` : ''}${rules}</div>`;
 
   const code = eanForIndex(ean);
   const foot = footer === 'barcode'
