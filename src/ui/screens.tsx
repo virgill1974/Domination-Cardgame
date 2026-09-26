@@ -4,7 +4,7 @@ import { CARDS, FACTIONS, SCARETECH, MAX_ATTACKS, MAX_BUYS, MAX_REPAIRS, type Fa
 import { cardIdOfEan, factionOfEan, kindOfEan } from '../engine/cards';
 import { currentFaction, currentPlayer, ownedSlots, type GameState } from '../engine/state';
 import { Scanner } from '../scanner/Scanner';
-import { CardArt, DefBar, Icon, factionStyle } from './components';
+import { CardArt, DefBar, Icon, factionBack, factionStyle } from './components';
 import { play } from './sound';
 import { VolumeButton } from './VolumeControl';
 
@@ -19,7 +19,7 @@ export function Home({ canResume, onNew, onResume, onGuide }: {
         <img class="emblem" src="ui/logo.svg" alt="" />
         <div class="title">Das Kartenspiel</div>
         <h1 class="logo">Domination</h1>
-        <div class="muted small">© 2005 Jochen Feldkötter &amp; Raphael Ludwig</div>
+        <div class="muted small">© 2005 Jochen Feldkötter &amp; Raphael Ludwig<br />Kartendesign: Helge Vogt</div>
       </div>
       <div class="stack" style={{ marginTop: '24px' }}>
         {canResume && <button class="btn primary block" onClick={onResume}>Spiel fortsetzen</button>}
@@ -75,7 +75,7 @@ export function Setup({ onStart, onBack }: { onStart: (seats: Faction[], vpLimit
           ))}
         </div>
         <div class="small muted">
-          {limit === null ? 'Nur die Zerstörung einer gegnerischen Zentralgestirns führt zum Sieg.' : `${limit} Siegpunkte oder zerstörtes Zentralgestirn.`}
+          {limit === null ? 'Nur die Zerstörung eines gegnerischen Zentralgestirns führt zum Sieg.' : `${limit} Siegpunkte oder zerstörtes Zentralgestirn.`}
         </div>
       </div>
       <div class="panel stack">
@@ -91,10 +91,11 @@ export function Setup({ onStart, onBack }: { onStart: (seats: Faction[], vpLimit
         {!full && (
           <>
             <button class="btn primary block" onClick={() => setScanning(true)}>Spieler {seats.length + 1}: Karte scannen</button>
-            <div class="seg">
+            <div class="faction-pick">
               {([0, 1, 2, 3] as Faction[]).map((f) => (
-                <button key={f} class="btn" style={{ ...factionStyle(f), color: 'var(--fc)' }} disabled={seats.includes(f)} onClick={() => add(f)}>
-                  {FACTIONS[f]}
+                <button key={f} class="btn" style={factionStyle(f)} disabled={seats.includes(f)} onClick={() => add(f)}>
+                  <img src={factionBack(f)} alt="" />
+                  <span>{FACTIONS[f]}</span>
                 </button>
               ))}
             </div>
@@ -116,12 +117,12 @@ export function Handoff({ game, onStart, onMenu }: { game: GameState; onStart: (
   return (
     <div class="screen center" style={factionStyle(faction)}>
       <div class="panel stack handoff">
-        <div class="title">Runde {round}</div>
-        <div>Spieler {seat + 1}</div>
-        <h1 class="faction-name" style={{ fontSize: '44px' }}>{FACTIONS[faction]}</h1>
+        <img class="back" src={factionBack(faction)} alt="" />
+        <div class="title">Runde {round} · Spieler {seat + 1}</div>
+        <h1 class="faction-name" style={{ fontSize: 'clamp(26px, 9vw, 40px)' }}>{FACTIONS[faction]}</h1>
         <div class="muted small">Gerät an diesen Spieler übergeben.</div>
       </div>
-      <button class="btn primary block" style={{ marginTop: '32px' }} onClick={onStart}>Zug starten</button>
+      <button class="btn primary block" style={{ marginTop: '20px' }} onClick={onStart}>Zug starten</button>
       <button class="btn ghost block" onClick={onMenu}>Menü</button>
     </div>
   );

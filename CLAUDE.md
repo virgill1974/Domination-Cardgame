@@ -13,7 +13,7 @@ Web app for the sci-fi card game **"Domination – Das Kartenspiel"**. It began 
 - UI terms: Gebäude → **Planet**, Kommandozentrale → **Zentralgestirn**, Fußeinheit → **Aufklärer**, Fahrzeug → **Kampfschiff**, Flugzeug → **Hyperraumschiff**, Flugabwehr → **Planetenabwehr**, Kraftwerk → **Energiequelle**. Engine internals (`building`, `isFlak`, `AIRCRAFT`, German test names) still use the old mechanic words; only user-visible text must use the new ones.
 - Names without an XLS entry are proposals (Feuerschwinge 22, Lightforce 32–40); README lists them.
 - Never reintroduce C&C names, logos or sounds in anything user-visible.
-- `domination_gfx/` (git-ignored, local only): card design drafts by Helge Vogt (PSD templates, backs, demo cards). They are drafts; final card art will be generated later in his style. Its `Beispielbilder/` are third-party DeviantArt images, never ship them.
+- `domination_gfx/` (git-ignored, local only): card design drafts by Helge Vogt (PSD templates, backs, demo cards). The app design and the printed card are derived from them (see "Design" below). Final card art (the picture in the window) will be generated later in his style. Its `Beispielbilder/` and the galaxies/nebulae in his template windows are third-party images, never ship them.
 
 ## Commands
 
@@ -27,6 +27,7 @@ npx vitest run src/engine/game.test.ts -t "Superwaffe"   # single file / single 
 npm run build                    # tsc --noEmit + vite build → dist/ (incl. service worker + manifest)
 npm run preview -- --mode http   # serve dist/ to test PWA behaviour (service worker is off in dev)
 npx pwa-assets-generator         # regenerate app icons in public/ui/ from public/ui/logo.svg
+npm run gfx                      # regenerate the Helge-style graphics in public/ui/ from domination_gfx/ (local only)
 ```
 
 `.claude/launch.json` starts the dev server in http mode on port 5175 for the Browser pane (CnC-web uses 5174).
@@ -59,11 +60,22 @@ npx pwa-assets-generator         # regenerate app icons in public/ui/ from publi
 - `App.tsx` holds the state machine (home → setup → handoff → HUD/flows → winner). `commit(fn)` structuredClones state, applies the engine call and persists to localStorage.
 - Engine events become queued `Msg` dialogs (`eventMessages.tsx`), optionally with a `sound`.
 - Flows in `flows.tsx` follow the terminal: scan → confirm card → execute.
-- Button pairs use `.btn-row`: cancel (`.btn.cancel`, plain faction-tinted glass, never red) on the **left** at ⅓ width, main action on the right at ⅔. Both stretch to equal height when pixel text wraps. Red (`.btn.danger`) is reserved for deleting the game ("Spiel abbrechen" and its confirmation).
-- Design "Holografisches Glas" lives in `theme.css` (tokens on `:root`). Only large surfaces (`.panel`, `.dialog`, `.glass`) use `backdrop-filter`, for phone performance. Buttons and tiles use plain translucent gradients.
-- Faction color arrives as `--fc` and `--tint` via `factionStyle()`. `App.tsx` also puts it on the `display: contents` root, so dialogs and the scanner are tinted during a turn.
-  - Primary buttons, the dialog top stroke and the scanner frame use `--accent-grad`/`--accent-ink`/`--accent-glow`/`--accent-line`. These are a silver/gray gradient on neutral screens and the faction color (white text) inside tinted elements. The user does not want the old cyan→violet→pink gradient anywhere (logo and icons included); only the background art keeps its nebula colors. Only error (red) and warning (orange) dialogs keep signal colors.
-  - Custom properties resolve where they are declared. So anything derived from `--tint`/`--fc` (e.g. `--glass`) is re-declared under `:root, [style*='--tint']`. Don't define such derived variables on `:root` alone, or they stay cyan.
+- Button pairs use `.btn-row`: cancel (`.btn.cancel`, dark metal, never red) on the **left** at ⅓ width, main action on the right at ⅔. Both stretch to equal height when pixel text wraps. Red (`.btn.danger`) is reserved for deleting the game ("Spiel abbrechen" and its confirmation).
+
+**Design "Helge-Stil"** (`theme.css`, tokens on `:root`), derived from Helge Vogt's card drafts. The app should look like the printed cards:
+- Backgrounds, `.btn` and `.panel`/`.dialog` use the faction's dark metal/camo texture `--tex`. Panels, dialogs and card pictures get Helge's bevel frame via `border-image: var(--rim)`. No `backdrop-filter` (performance).
+- "Plates" (light weathered stat panel, dark `--ink` text, like on the card): `.btn.primary`, `.btn.selected`, `.stat`, `.kv > div`, `.list-item`, `.log-line`, `.badge` use `--plate`. Light `.muted` text inside plates is overridden to `--ink-muted`.
+- `factionStyle(f)` (`components.tsx`) sets `--fc`/`--tint` (plate colour from Helge: Starwing cyan, Lightforce amber, Scaretech grey-green, BIOTEC generated toxic green) plus `--tex`, `--plate`, `--rim` URLs. Neutral screens (home, setup, guide) use the generated Gunmetal set from `:root`.
+  - `App.tsx` renders a fixed `.backdrop` with the faction on turn, the next one at handoff and the winner at the end. It also puts `factionStyle` on the `display: contents` root during a turn, so dialogs and the scanner are tinted.
+- Asset URLs set from JS go through `src/ui/assets.ts`, which makes them **absolute** (`new URL(…, document.baseURI)`). An `url()` inside a custom property resolves relative to the stylesheet that *uses* it, which would be `assets/*.css` in the build. In CSS files use absolute `/ui/...` URLs; Vite rewrites them for `base: './'`.
+- `--accent-grad`/`--accent-glow`/`--accent-line` (dialog top stroke, scanner frame, sliders) are silver on neutral screens and the faction colour inside tinted elements. The user does not want the old cyan→violet→pink gradient anywhere. Only error (red) and warning (orange) dialogs keep signal colours.
+- Custom properties resolve where they are declared. So anything derived from `--fc` is re-declared under `[style*='--tint']`. Rules that need the faction texture reference `var(--tex)` directly instead of a derived variable.
+
+**Card face** (`src/ui/cardFace.ts` + `cardFace.css`) is Helge's card layout, shared by the app and the printer:
+- black border and faction frame, oval emblem (planet/ship/gear) and name, picture window, stat plate (icons + price/rounds/def/off/dmg), text column (name, `categoryLabel`, requirement, planet description or upgrade effect from `cardText.ts`)
+- in print, a white strip with the EAN-8
+- `cardFaceHtml()` returns an HTML string: the app renders it via `dangerouslySetInnerHTML` in `CardView`, the printer directly. All sizes use `--u` = 1 px of the 652 px template (container units), so it scales from 63 mm to phone width.
+- Geometry constants (window 67–579 × 122–421, plate 39–600 × 457–703, footer 725–873) match `Tools/extract-helge.mjs`.
 - Fonts as in the ModZart_Web project, self-hosted via fontsource (offline):
   - Silkscreen (pixel, `--font-display`): the user's favourite. Used for headings, faction names, all buttons, stat tiles and values, counters, card type lines, key/value tiles, badges, combat log headings.
   - Space Grotesk (`--font-body`): running text and card names (readability)
@@ -85,16 +97,18 @@ npx pwa-assets-generator         # regenerate app icons in public/ui/ from publi
 
 **Card printer (`Tools/generate_barcodes.html` + `src/print/`):**
 - It is a second Vite entry, so it is not double-clickable; open it via the dev server.
-- It shares data and the EAN encoder with the app and renders SVG barcodes (integer module grid, ≥7-module quiet zone, 0.4 mm/module) on 63×88 mm cards or 38×21 mm labels.
+- It shares data, the EAN encoder and the card face with the app. It renders SVG barcodes (integer module grid, ≥7-module quiet zone, 0.4 mm/module, 9.5 mm high on cards) on Helge-layout cards (63 mm wide, his 652:899 ratio ≈ 86.9 mm, 9 per A4) or 38×21 mm labels.
 
 **Asset fallbacks (drop-in, no code change):**
-- Images: `public/cards/<cardTypeId>.png`, generated SVG placeholder if missing (`src/ui/cardArt.ts`). The printer page resolves images with base `../cards/`.
+- Images: `public/cards/<cardTypeId>.png` (picture window ratio 512:299), generated SVG placeholder if missing (`src/ui/cardArt.ts`). The printer page resolves images with base `../cards/`.
 - Sounds: `public/sounds/<name>.mp3`, else synthesized via Web Audio (`src/ui/sound.ts`).
 - Music: `public/sounds/music.mp3` loops during the game (`src/ui/music.ts`), else a generated ambient pad.
   - It is routed through a `MediaElementAudioSourceNode` into the music bus, because iOS ignores `<audio>.volume`.
-  - `sound.ts` has two gain buses (`sfx`, `music`) with volumes persisted in localStorage. The UI is `VolumeControl.tsx`, rendered via portal because `backdrop-filter` on `.dialog` would trap a fixed overlay.
+  - `sound.ts` has two gain buses (`sfx`, `music`) with volumes persisted in localStorage. The UI is `VolumeControl.tsx`, rendered via portal so its fixed overlay isn't trapped inside a dialog (a `backdrop-filter`/`transform` ancestor would do that).
   - Browsers may reject `play()` without a gesture. `kickMusic()` runs on every pointerdown to retry.
-- Design graphics: `public/ui/background.svg`, `glass-sheen.svg`, `logo.svg`, referenced as CSS variables at the top of `theme.css`. Use absolute `/ui/...` URLs in CSS; Vite rewrites them relative for `base: './'`.
+- Design graphics: `public/ui/factions/<key>/` (card, card-short, tile, plate, rim, back) and `public/ui/helge/` (icon/emblem masks) are generated by `Tools/extract-helge.mjs` and committed; see `public/ui/README.md`.
+  - All three faction templates share one frame structure. Scaretech is recoloured from Starwing with a learned colour table. BIOTEC (organic green) and neutral Gunmetal are generated.
+  - `logo.svg` stays the home emblem and icon source.
 - 404s for these files in the console are expected. Don't download third-party assets without asking: original C&C sounds and images are EA-copyrighted.
 
 ## Legacy material

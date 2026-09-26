@@ -1,7 +1,7 @@
 # Kartenbilder
 
 Hier liegt pro **Kartentyp** ein Bild: `<ID>.png` (z. B. `12.png` für die Pegasus).
-Mehrfach vorhandene Karten teilen sich ein Bild. Empfohlen: Querformat 4:3, mindestens 800×600 px.
+Mehrfach vorhandene Karten teilen sich ein Bild. Empfohlen: Format des Bildfensters 512:299, z. B. 1024×598 px (wird sonst zugeschnitten).
 Fehlt eine Datei, zeigen App und Kartendrucker automatisch einen Platzhalter.
 Der Dateiname endet immer auf `.png`. Die Endung ist nur der Name: Browser zeigen auch JPG- oder WebP-Inhalte korrekt an.
 

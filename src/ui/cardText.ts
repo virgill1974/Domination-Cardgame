@@ -1,5 +1,7 @@
-import { CARDS, FACTIONS, NO_REQUIREMENT } from '../engine/data';
-import { factionOfCardId, kindOfCardId, type CardKind } from '../engine/cards';
+import { CARDS, FACTIONS, NO_REQUIREMENT, UPG } from '../engine/data';
+import {
+  factionOfCardId, isCenter, isFlak, isHeadquarters, isReactor, isSuperweapon, isSupply, kindOfCardId, type CardKind,
+} from '../engine/cards';
 
 export const KIND_LABEL: Record<CardKind, string> = { building: 'Planet', unit: 'Einheit', upgrade: 'Upgrade' };
 export const CLASS_LABEL = { foot: 'Aufklärer', vehicle: 'Kampfschiff', air: 'Hyperraumschiff' } as const;
@@ -42,3 +44,57 @@ export const requirementName = (id: number) =>
   CARDS[id].requires === NO_REQUIREMENT ? 'Start' : CARDS[CARDS[id].requires].name;
 
 export const factionName = (id: number) => FACTIONS[factionOfCardId(id)];
+
+// Kategorie-Zeile wie auf Helges Karten („Kategorie: Produktion“), abgeleitet aus den Regel-Konstanten
+const STRATEGY_PLANETS = [52, 54];
+const SUPPLY_UPGRADES: number[] = [UPG.starwingControlRods, UPG.lightforceOvercharge, UPG.biotecPerpetuum];
+const STRATEGY_UPGRADES: number[] = [UPG.starwingSpySatellite, UPG.scaretechAutorepair, UPG.scaretechCamouflage, UPG.biotecNeuronet];
+
+export function categoryLabel(id: number): string {
+  const kind = kindOfCardId(id);
+  if (kind === 'unit') return typeLabel(id);
+  if (kind === 'upgrade') {
+    if (SUPPLY_UPGRADES.includes(id)) return 'Versorgung';
+    return STRATEGY_UPGRADES.includes(id) ? 'Strategie' : 'Konflikt';
+  }
+  if (isHeadquarters(id)) return 'Basis';
+  if (isReactor(id) || isSupply(id)) return 'Versorgung';
+  if (isFlak(id)) return 'Verteidigung';
+  if (isSuperweapon(id)) return 'Superwaffe';
+  if (isCenter(id) || STRATEGY_PLANETS.includes(id)) return 'Strategie';
+  return 'Produktion';
+}
+
+const heart = (galaxy: string) =>
+  `Dies ist das Zentrum und gleichzeitig der wunde Punkt der ${galaxy}-Galaxie. Es sollte immer gut bewacht werden.`;
+
+/** Beschreibungen der Planeten aus Unterlagen/Domination_Kartenliste.xls (BIOTEC hat noch keine). */
+export const DESCRIPTIONS: Record<number, string> = {
+  0: heart('Starwing'),
+  1: 'Herstellungsort unbemannter Drohnen',
+  2: 'Natürliche Energieressource der Galaxie',
+  3: 'Wirtschaftszentrum zur finanziellen Versorgung',
+  4: 'Elektromagnetisches Schutzfeld',
+  5: 'Herstellungsstätte der Raumflotte',
+  6: 'Herstellungsort der interstellaren Flotte',
+  7: 'Planungs- und Forschungseinrichtung',
+  8: 'Größte Offensivkraft der Starwing-Galaxie',
+  23: heart('Lightforce'),
+  24: 'Herstellungsort unbemannter Drohnen',
+  25: 'Natürliche Energieressource der Galaxie',
+  26: 'Kometen- und Sternenstaubring zur Verteidigung',
+  27: 'Wirtschaftszentrum zur finanziellen Versorgung',
+  28: 'Herstellungsstätte der Raumflotte',
+  29: 'Herstellungsort der interstellaren Flotte',
+  30: 'Planungs- und Forschungseinrichtung',
+  31: 'Größte Offensivkraft der Lightforce-Galaxie',
+  46: heart('Scaretech'),
+  47: 'Herstellungsort unbemannter Aufklärer',
+  48: 'Natürliche Materialressource der Galaxie',
+  49: 'Metallischer Abwehrgürtel zur Verteidigung',
+  50: 'Herstellungsort der Raumflotte',
+  51: 'Planungs- und Forschungseinrichtung',
+  52: 'Datenauswertungszentrale',
+  53: 'Größte Offensivkraft der Scaretech-Galaxie',
+  54: 'Künstliche Raumsprungzone für Drohnen',
+};

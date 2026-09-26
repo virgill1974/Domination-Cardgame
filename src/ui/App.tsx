@@ -131,9 +131,16 @@ export function App() {
 
   // Fraktion am Zug färbt auch Dialoge und Scanner-Overlay ein
   const tint = view === 'game' && game?.turnActive && game.winner === null ? factionStyle(currentFaction(game)) : undefined;
+  // Hintergrund-Textur: Fraktion am Zug, bei der Übergabe schon die nächste, am Ende der Sieger, sonst Gunmetal
+  let bgFaction: Faction | null = null;
+  if (view === 'game' && game) {
+    if (game.winner !== null) bgFaction = game.winner;
+    else bgFaction = game.turnActive ? currentFaction(game) : game.seats[(game.seat + 1) % game.playerCount];
+  }
 
   return (
     <div class="app-root" style={tint}>
+      <div class="backdrop" style={bgFaction === null ? undefined : factionStyle(bgFaction)} />
       {screen}
       {dialog === 'end' && (
         <div class="overlay">

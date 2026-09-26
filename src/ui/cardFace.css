@@ -1,0 +1,62 @@
+/* Karte im Layout von Helge Vogt (src/ui/cardFace.ts). Alle Maße in --u = 1 Pixel der 652 px breiten Vorlage,
+   dadurch skaliert dieselbe Karte vom 63-mm-Druck bis zur Handybreite. */
+.cf {
+  --u: calc(100cqw / 652);
+  --cf-ink: #101214;
+  --cf-text: 17;
+  position: relative; container-type: inline-size; width: 100%;
+  aspect-ratio: 652 / 751;
+  background: var(--cf-bg) center / 100% 100% no-repeat;
+  color: var(--cf-ink); font-family: var(--font-body, 'Space Grotesk Variable', 'Segoe UI', sans-serif);
+  line-height: 1.2; text-align: left;
+}
+.cf-print { aspect-ratio: 652 / 899; }
+.cf-app { --cf-text: 19; }
+.cf * { margin: 0; padding: 0; box-sizing: border-box; }
+
+.cf-icon {
+  display: block; background: currentColor;
+  -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat;
+}
+.cf-oval {
+  position: absolute; left: calc(36 * var(--u)); top: calc(34 * var(--u)); width: calc(106 * var(--u)); height: calc(70 * var(--u));
+  border-radius: 50%; background: #050505; color: #fff; box-shadow: 0 calc(2 * var(--u)) calc(6 * var(--u)) rgba(0, 0, 0, 0.5);
+}
+.cf-oval .cf-icon { position: absolute; inset: calc(6 * var(--u)) calc(12 * var(--u)); }
+.cf-name {
+  position: absolute; left: calc(152 * var(--u)); right: calc(34 * var(--u)); top: calc(34 * var(--u)); height: calc(70 * var(--u));
+  display: flex; align-items: center; color: #fff; font-family: inherit; font-weight: 700; letter-spacing: 0;
+  font-size: calc(36 * var(--u)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-shadow: 0 calc(2 * var(--u)) calc(4 * var(--u)) rgba(0, 0, 0, 0.7);
+}
+.cf-win { position: absolute; left: calc(67 * var(--u)); top: calc(122 * var(--u)); width: calc(512 * var(--u)); height: calc(299 * var(--u)); background: #06080a; }
+.cf-win img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.cf-plate { position: absolute; left: calc(39 * var(--u)); top: calc(457 * var(--u)); width: calc(561 * var(--u)); height: calc(246 * var(--u)); }
+/* Rille zwischen Werten und Text bzw. unter dem Preis, wie in Helges Vorlagen */
+.cf-plate-stats::before, .cf-plate-upgrade::before { content: ''; position: absolute; box-shadow: calc(-1 * var(--u)) 0 0 rgba(0, 0, 0, 0.28), calc(1 * var(--u)) 0 0 rgba(255, 255, 255, 0.35); }
+.cf-plate-stats::before { left: calc(258 * var(--u)); top: calc(12 * var(--u)); bottom: calc(12 * var(--u)); width: calc(2 * var(--u)); background: rgba(0, 0, 0, 0.18); }
+.cf-plate-upgrade::before {
+  left: calc(14 * var(--u)); right: calc(14 * var(--u)); top: calc(64 * var(--u)); height: calc(2 * var(--u)); background: rgba(0, 0, 0, 0.18);
+  box-shadow: 0 calc(-1 * var(--u)) 0 rgba(0, 0, 0, 0.28), 0 calc(1 * var(--u)) 0 rgba(255, 255, 255, 0.35);
+}
+
+.cf-stats { position: absolute; left: calc(40 * var(--u)); top: calc(14 * var(--u)); list-style: none; display: flex; flex-direction: column; }
+.cf-stats li, .cf-cost { display: flex; align-items: center; gap: calc(14 * var(--u)); height: calc(43.5 * var(--u)); }
+.cf-stats .cf-icon, .cf-cost .cf-icon { width: calc(40 * var(--u)); height: calc(40 * var(--u)); flex: 0 0 auto; }
+.cf-stats b, .cf-cost b { font-size: calc(31 * var(--u)); font-weight: 500; white-space: nowrap; }
+.cf-cost { position: absolute; left: calc(40 * var(--u)); top: calc(10 * var(--u)); }
+
+.cf-text {
+  position: absolute; left: calc(276 * var(--u)); right: calc(18 * var(--u)); top: calc(22 * var(--u)); bottom: calc(10 * var(--u));
+  font-size: calc(var(--cf-text) * var(--u)); overflow: hidden; overflow-wrap: break-word; hyphens: auto;
+}
+.cf-text p { margin-top: calc(10 * var(--u)); }
+.cf-upgrade-text { left: calc(46 * var(--u)); top: calc(84 * var(--u)); }
+
+.cf-foot {
+  position: absolute; left: calc(28 * var(--u)); right: calc(28 * var(--u)); top: calc(725 * var(--u)); height: calc(148 * var(--u));
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(2 * var(--u)); background: #fff;
+}
+.cf-foot svg { display: block; }
+.cf-digits { font-family: var(--font-mono, 'Consolas', monospace); font-size: calc(20 * var(--u)); letter-spacing: calc(7 * var(--u)); color: #000; }

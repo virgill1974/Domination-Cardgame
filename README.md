@@ -42,25 +42,36 @@ npm run dev
 - `npm test` führt die Engine-Tests aus (Regeln, alle 160 Barcodes mit ZXing dekodiert, Zufallspartien).
 - `npm run build` erzeugt die statische Seite in `dist/`.
 
-**Design:** „Holografisches Glas“, leicht in der Farbe der Fraktion am Zug getönt. Schriften wie im Projekt ModZart_Web: Silkscreen, Space Grotesk, JetBrains Mono. Hintergrund, Glanz-Overlay und Logo liegen als austauschbare Grafiken in [`public/ui/`](public/ui/README.md). Die App-Icons werden mit `npx pwa-assets-generator` aus `public/ui/logo.svg` erzeugt.
+**Design:** nach den Kartenentwürfen von **Helge Vogt**. Die App sieht aus wie die gedruckten Karten:
+- dunkle Metall- bzw. Tarn-Textur der Fraktion am Zug
+- Fasenrahmen um Panels und Bilder
+- helle, verwitterte Werte-Platten mit dunkler Schrift für Haupt-Buttons, Werte und Listen
+- Start, Setup und Kurzanleitung in neutralem Gunmetal
+- bei der Übergabe das Rückseiten-Motiv der Fraktion: Starwing-Flügel, Lightforce-Faust, Scaretech-Totenkopf, BIOTEC-Doppelhelix (generiert)
 
-**Kartengrafiken von Helge Vogt:** Entwürfe (Photoshop-Vorlagen je Fraktion, Kartenrückseiten, Beispielkarten) liegen lokal in `domination_gfx/`. Der Ordner ist nicht im Repo (große PSD-Dateien, Beispielbilder fremder Künstler). Die finalen Kartenbilder werden später in seinem Stil erstellt.
+Karten zeigt die App in Helges Kartenlayout. Schriften wie im Projekt ModZart_Web: Silkscreen, Space Grotesk, JetBrains Mono. Die App-Icons werden mit `npx pwa-assets-generator` aus `public/ui/logo.svg` erzeugt.
+
+**Kartengrafiken von Helge Vogt:** Entwürfe (Photoshop-Vorlagen je Fraktion, Kartenrückseiten, Beispielkarten) liegen lokal in `domination_gfx/`. Der Ordner ist nicht im Repo (große PSD-Dateien, Beispielbilder fremder Künstler).
+- `npm run gfx` (`Tools/extract-helge.mjs`) erzeugt daraus die Grafiken in [`public/ui/`](public/ui/README.md): Rahmen, Texturen, Platten, Fasen, Symbole, Rückseiten.
+- Weil alle Vorlagen dieselbe Rahmenstruktur haben, wird Scaretech umgefärbt. BIOTEC (organisch-grün) und Gunmetal werden generiert.
+- Die Bilder im Kartenfenster werden später in Helges Stil erstellt.
 
 **Kurzanleitung:** in der App auf dem Startbildschirm, aufklappbar nach Themen (`src/ui/Guide.tsx`).
 
 **Manuelle Kartenauswahl** (nur zum Testen): Sie zeigt standardmäßig nur Karten, die im aktuellen Schritt gültig sind. Mit „Alle Karten zeigen“ lassen sich die Fehlermeldungen testen.
 
 **Kartendrucker:** `Tools/generate_barcodes.html` (im Dev-Server unter `/Tools/generate_barcodes.html` oder über den Startbildschirm).
-Er druckt alle 160 Karten im Pokerformat 63×88 mm (9 pro A4-Seite) oder nur die Barcodes als Etiketten (38×21 mm, 65 pro Bogen, z. B. Avery L7651) zum Aufkleben auf die alten Karten.
+Er druckt alle 160 Karten in Helges Kartenlayout (63 mm breit, 86,9 mm hoch nach seiner Vorlage, 9 pro A4-Seite, EAN-8 im weißen Streifen unten). Alternativ druckt er nur die Barcodes als Etiketten (38×21 mm, 65 pro Bogen, z. B. Avery L7651) zum Aufkleben auf die alten Karten.
+App und Drucker nutzen dasselbe Kartenlayout (`src/ui/cardFace.ts`).
 Beim Drucken „Tatsächliche Größe / 100 %“ wählen.
 
-**Kartenbilder:** pro Kartentyp eine Datei `public/cards/<ID>.png` ablegen. Fehlende Bilder werden in App und Kartendrucker als Platzhalter gezeichnet. Die Checkliste aller 92 Dateinamen steht in [`public/cards/README.md`](public/cards/README.md).
+**Kartenbilder:** pro Kartentyp eine Datei `public/cards/<ID>.png` ablegen (Bildfenster im Format 512:299, z. B. 1024×598 px). Fehlende Bilder werden in App und Kartendrucker als Platzhalter gezeichnet. Die Checkliste aller 92 Dateinamen steht in [`public/cards/README.md`](public/cards/README.md).
 
 ---
 
 ## Spielübersicht
 
-© 2005 Jochen Feldkötter & Raphael Ludwig — Quellen: Microcontroller-Code, Anleitung V1.01, Kartenliste 4P, Domination-Kartenliste
+© 2005 Jochen Feldkötter & Raphael Ludwig · Kartendesign Domination: Helge Vogt — Quellen: Microcontroller-Code, Anleitung V1.01, Kartenliste 4P, Domination-Kartenliste
 
 - **2–4 Spieler**, rundenbasiert, Hot-Seat (ein Gerät)
 - **4 Fraktionen:** Starwing, Lightforce, Scaretech, BIOTEC

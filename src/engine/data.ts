@@ -7,7 +7,8 @@ export const STARWING: Faction = 0;
 export const LIGHTFORCE: Faction = 1;
 export const SCARETECH: Faction = 2;
 export const BIOTEC: Faction = 3;
-export const FACTION_COLORS = ['#1e90ff', '#dc143c', '#228b22', '#9932cc'] as const;
+// Plattenfarben aus Helge Vogts Kartenentwürfen (BIOTEC: generiertes Giftgrün)
+export const FACTION_COLORS = ['#74d4e6', '#ffb469', '#9aa9a1', '#9be05a'] as const;
 
 export const START_CREDITS = 1600;
 export const BASE_INCOME = 400;

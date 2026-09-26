@@ -1,13 +1,27 @@
 import type { ComponentChildren } from 'preact';
 import { CARDS, FACTION_COLORS, FACTIONS, type Faction } from '../engine/data';
-import { cardIdOfEan, factionOfEan, kindOfEan } from '../engine/cards';
+import { cardIdOfEan, factionOfEan } from '../engine/cards';
 import { eanForIndex } from '../engine/ean';
+import { factionAsset } from './assets';
 import { cardArtUrl, placeholderDataUri } from './cardArt';
-import { requirementName, typeLabel, upgradeEffect } from './cardText';
+import { cardFaceHtml } from './cardFace';
+import { typeLabel } from './cardText';
 import type { SoundName } from './sound';
 
-/** --tint färbt das Glas (siehe theme.css, abgeleitete Variablen werden pro Element neu aufgelöst). */
-export const factionStyle = (f: Faction) => ({ '--fc': FACTION_COLORS[f], '--tint': FACTION_COLORS[f] }) as Record<string, string>;
+/**
+ * Fraktionsfarbe und -grafiken (Helge-Stil, siehe theme.css): --fc/--tint Farbe, --tex Rahmen-Textur,
+ * --plate Werte-Platte, --rim Fasenrahmen. Abgeleitete Variablen werden pro Element neu aufgelöst.
+ */
+export const factionStyle = (f: Faction) => ({
+  '--fc': FACTION_COLORS[f],
+  '--tint': FACTION_COLORS[f],
+  '--tex': `url('${factionAsset(f, 'tile.webp')}')`,
+  '--plate': `url('${factionAsset(f, 'plate.webp')}')`,
+  '--rim': `url('${factionAsset(f, 'rim.webp')}')`,
+}) as Record<string, string>;
+
+/** Rückseiten-Motiv der Fraktion (Emblem auf Übergabe- und Setup-Bildschirm) */
+export const factionBack = (f: Faction) => factionAsset(f, 'back.webp');
 
 export function CardArt({ id, class: cls = 'art' }: { id: number; class?: string }) {
   return (
@@ -36,27 +50,30 @@ export function KV({ items }: { items: Array<[string, string | number]> }) {
   );
 }
 
-/** Kartenansicht mit Bild, Name und Grundwerten der physischen Karte (EAN-Index). */
-export function CardView({ ean, compact, children, showStats = true }: {
-  ean: number; compact?: boolean; children?: ComponentChildren; showStats?: boolean;
-}) {
+/**
+ * Kartenansicht der physischen Karte (EAN-Index): voll im Kartenlayout von Helge Vogt (cardFace.ts, wie gedruckt),
+ * kompakt als Zeile mit Bild im Fasenrahmen (Meldungslisten).
+ */
+export function CardView({ ean, compact, children }: { ean: number; compact?: boolean; children?: ComponentChildren }) {
   const id = cardIdOfEan(ean);
-  const card = CARDS[id];
-  const kind = kindOfEan(ean);
-  return (
-    <div class={`card-view ${compact ? 'compact' : ''}`} style={factionStyle(factionOfEan(ean))}>
-      <CardArt id={id} />
-      <div class="stack grow" style={{ gap: '6px' }}>
-        <div>
-          <div class="card-sub">{FACTIONS[factionOfEan(ean)]} · {typeLabel(id)}</div>
-          <div class="card-name">{card.name}</div>
+  const faction = factionOfEan(ean);
+  if (compact) {
+    return (
+      <div class="card-view compact" style={factionStyle(faction)}>
+        <CardArt id={id} />
+        <div class="stack grow" style={{ gap: '2px' }}>
+          <div class="card-sub">{FACTIONS[faction]} · {typeLabel(id)}</div>
+          <div class="card-name">{CARDS[id].name}</div>
           <div class="muted small">Karte {eanForIndex(ean)}</div>
         </div>
-        {showStats && !compact && (kind === 'upgrade'
-          ? <div class="panel small">{upgradeEffect(id)}<div class="muted">Preis {card.price} · Voraussetzung {requirementName(id)}</div></div>
-          : <KV items={[['Preis', card.price], ['Runden', card.rounds], ['Def', card.def], ['Off', card.off], ['Schaden', card.dmg]]} />)}
         {children}
       </div>
+    );
+  }
+  return (
+    <div class="card-view" style={factionStyle(faction)}>
+      <div class="card-face" dangerouslySetInnerHTML={{ __html: cardFaceHtml(ean) }} />
+      {children}
     </div>
   );
 }

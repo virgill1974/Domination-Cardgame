@@ -21,14 +21,14 @@ export interface FlowProps {
   close: () => void;
 }
 
-function Confirm({ title, ean, okLabel = 'OK', onOk, onCancel, children, showStats }: {
+function Confirm({ title, ean, okLabel = 'OK', onOk, onCancel, children }: {
   title: string; ean: number; okLabel?: string; onOk: () => void; onCancel: () => void;
-  children?: ComponentChildren; showStats?: boolean;
+  children?: ComponentChildren;
 }) {
   return (
     <div class="screen">
       <div class="title">{title}</div>
-      <CardView ean={ean} showStats={showStats}>{children}</CardView>
+      <CardView ean={ean}>{children}</CardView>
       <div class="btn-row" style={{ marginTop: 'auto' }}>
         <button class="btn cancel" onClick={onCancel}>Abbruch</button>
         <button class="btn primary" onClick={onOk}>{okLabel}</button>
@@ -174,7 +174,7 @@ export function RepairFlow(props: FlowProps) {
   }
   return (
     <Confirm
-      title="Reparatur · 200 Credits" ean={ean} okLabel="Reparieren" showStats={false} onCancel={close}
+      title="Reparatur · 200 Credits" ean={ean} okLabel="Reparieren" onCancel={close}
       onOk={() => {
         const result = commit((s) => repair(s, ean));
         if (result.error) return fail(result.error);
@@ -208,7 +208,7 @@ export function InfoFlow(props: FlowProps) {
   return (
     <div class="screen">
       <div class="title">Daten anzeigen</div>
-      <CardView ean={ean} showStats={false}>
+      <CardView ean={ean}>
         <div class="panel stack" style={{ gap: '6px' }}>
           <div class="row spread small"><span>Defensive</span><b>{data.def} / {data.maxDef}</b></div>
           <DefBar def={data.def} max={data.maxDef} />
