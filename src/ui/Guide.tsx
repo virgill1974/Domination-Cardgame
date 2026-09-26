@@ -19,7 +19,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
       <ul>
         <li>Jeder wählt eine Fraktion (Karte scannen oder antippen) und legt seine Karten in drei Stapeln bereit: Planeten, Einheiten, Upgrades.</li>
         <li>Jeder bekommt seinen Technologiebaum. Er zeigt, welcher Planet welche Karten freischaltet.</li>
-        <li>Startkapital: 1600 Credits. In Runde 1 werden Zentralgestirn, der erste Produktionsplanet und die erste Energiequelle aktiviert, bei SCARETECH nur Zentralgestirn und Telecluster.</li>
+        <li>Startkapital: 1600 Credits. In Runde 1 werden Zentralgestirn, der erste Produktionsplanet und die erste Energiequelle aktiviert, bei Scaretech nur Zentralgestirn und Telecluster.</li>
         <li>Das Handy wird reihum weitergereicht.</li>
       </ul>
     ),
@@ -55,7 +55,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
       <ul>
         <li><b>Kaufen</b>: bis zu 3 Karten pro Zug. Die Karte muss freigeschaltet sein, und du brauchst genug Credits. Planeten kosten zusätzlich 1 Energie. Upgrades wirken sofort.</li>
         <li><b>Angriff</b>: bis zu 3 pro Zug, jede Einheit einmal. Kostet 200 Credits, mit aktivem Sternenparlament/Tribunal des Lichts/Dunklen Rat/Abt. Forschung kostenlos. Erst den Angreifer scannen, dann das Ziel.</li>
-        <li><b>Reparatur</b>: 1× pro Zug für 200 Credits, +1 Defensive (SCARETECH mit Rekonfiguration +2).</li>
+        <li><b>Reparatur</b>: 1× pro Zug für 200 Credits, +1 Defensive (Scaretech mit Rekonfiguration +2).</li>
         <li><b>Info</b>: aktuelle Werte einer eigenen Karte.</li>
         <li><b>Inventar</b>: Planeten, Einheiten, Upgrades, Siege, Energie und was gerade gebaut wird.</li>
       </ul>
@@ -73,7 +73,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
           <li><b>Nostradamus</b>: ignoriert die Planetenabwehr.</li>
           <li><b>Superwaffe</b>: trifft immer jedes Ziel, danach 3 Runden Nachladen.</li>
         </ul>
-        <p><b>Reihenfolge</b>: Reihe 2 ist erst angreifbar, wenn Reihe 1 leer ist, Reihe 3 erst, wenn Reihe 1 und 2 leer sind. Hyperraumschiffe überspringen eine Reihe. Mit dem SCARETECH-Wurmloch überspringen Aufklärer Reihe 1.</p>
+        <p><b>Reihenfolge</b>: Reihe 2 ist erst angreifbar, wenn Reihe 1 leer ist, Reihe 3 erst, wenn Reihe 1 und 2 leer sind. Hyperraumschiffe überspringen eine Reihe. Mit dem Scaretech-Wurmloch überspringen Aufklärer Reihe 1.</p>
       </>
     ),
   },
@@ -84,7 +84,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
         <li>Jede Energiequelle (Protonenmond, Elektronenmond, Plasmareaktor) liefert 3 Energie (mit Upgrade 5). Jeder andere Planet verbraucht 1.</li>
         <li>Ohne Energie keine neuen Planeten.</li>
         <li>Wird die Energiequelle zerstört und die Energie fällt unter 0, bleibt es liegen und wird wieder aufgebaut. Der Besitzer setzt eine Runde aus.</li>
-        <li>SCARETECH braucht keine Energie.</li>
+        <li>Scaretech braucht keine Energie.</li>
       </ul>
     ),
   },

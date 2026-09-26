@@ -1,6 +1,6 @@
-import { CARDS, FACTIONS, NO_REQUIREMENT, UPG } from '../engine/data';
+import { CARDS, FACTIONS, NO_REQUIREMENT, STARTING_EANS, UPG } from '../engine/data';
 import {
-  factionOfCardId, isCenter, isFlak, isHeadquarters, isReactor, isSuperweapon, isSupply, kindOfCardId, type CardKind,
+  factionOfCardId, factionOfEan, isCenter, isFlak, isHeadquarters, isReactor, isSuperweapon, isSupply, kindOfCardId, type CardKind,
 } from '../engine/cards';
 
 export const KIND_LABEL: Record<CardKind, string> = { building: 'Planet', unit: 'Einheit', upgrade: 'Upgrade' };
@@ -97,4 +97,13 @@ export const DESCRIPTIONS: Record<number, string> = {
   52: 'Datenauswertungszentrale',
   53: 'Größte Offensivkraft der Scaretech-Galaxie',
   54: 'Künstliche Raumsprungzone für Drohnen',
+};
+
+/** Startkarte: wird in Runde 1 aktiviert (Zentralgestirn, erster Produktionsplanet, erste Energiequelle) */
+export const isStartCard = (ean: number) => STARTING_EANS[factionOfEan(ean)].includes(ean);
+
+/** Sonderfähigkeiten von Einheiten, die auf der Karte stehen müssen */
+export const ABILITIES: Record<number, string> = {
+  16: 'Tarnmodus: Wird von der Planetenabwehr nicht erfasst.',
+  85: 'Mit dem Upgrade Flüstern im Tarnmodus: Wird von der Planetenabwehr nicht erfasst.',
 };

@@ -1,11 +1,10 @@
 import type { ComponentChildren } from 'preact';
 import { CARDS, FACTION_COLORS, FACTIONS, type Faction } from '../engine/data';
 import { cardIdOfEan, factionOfEan } from '../engine/cards';
-import { eanForIndex } from '../engine/ean';
 import { factionAsset } from './assets';
 import { cardArtUrl, placeholderDataUri } from './cardArt';
 import { cardFaceHtml } from './cardFace';
-import { typeLabel } from './cardText';
+import { isStartCard, typeLabel } from './cardText';
 import type { SoundName } from './sound';
 
 /**
@@ -64,7 +63,7 @@ export function CardView({ ean, compact, children }: { ean: number; compact?: bo
         <div class="stack grow" style={{ gap: '2px' }}>
           <div class="card-sub">{FACTIONS[faction]} · {typeLabel(id)}</div>
           <div class="card-name">{CARDS[id].name}</div>
-          <div class="muted small">Karte {eanForIndex(ean)}</div>
+          {isStartCard(ean) && <div><span class="badge start">Startkarte</span></div>}
         </div>
         {children}
       </div>

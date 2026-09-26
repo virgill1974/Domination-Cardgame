@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { CARDS, CARD_OF_EAN, FACTION_COLORS, PHYSICAL_CARDS, type Faction } from '../engine/data';
 import { factionOfEan } from '../engine/cards';
-import { eanForIndex } from '../engine/ean';
+import { isStartCard } from '../ui/cardText';
 import { scanFeedback, startCameraScan, type CameraScan } from './detector';
 
 interface Props {
@@ -95,7 +95,7 @@ function ManualPicker({ title, factions, available, onPick, onBack, onCancel }: 
   );
   const pool = available && !showAll ? cards.filter(available) : cards;
   const q = query.trim().toLowerCase();
-  const shown = pool.filter((ean) => !q || CARDS[CARD_OF_EAN[ean]].name.toLowerCase().includes(q) || eanForIndex(ean).includes(q));
+  const shown = pool.filter((ean) => !q || CARDS[CARD_OF_EAN[ean]].name.toLowerCase().includes(q));
   return (
     <div class="manual">
       <div class="screen">
@@ -103,7 +103,7 @@ function ManualPicker({ title, factions, available, onPick, onBack, onCancel }: 
           <div class="title">{title}</div>
           <h2>Karte wählen</h2>
         </div>
-        <input class="search" placeholder="Name oder Nummer suchen" value={query} onInput={(e) => setQuery(e.currentTarget.value)} />
+        <input class="search" placeholder="Name suchen" value={query} onInput={(e) => setQuery(e.currentTarget.value)} />
         {available && (
           <label class="check small">
             <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.currentTarget.checked)} />
@@ -117,7 +117,7 @@ function ManualPicker({ title, factions, available, onPick, onBack, onCancel }: 
               data-unavailable={available && !available(ean) ? '' : undefined}>
               <span class="dot" />
               <span>{CARDS[CARD_OF_EAN[ean]].name}</span>
-              <span class="code">{eanForIndex(ean)}</span>
+              {isStartCard(ean) && <span class="badge start">Startkarte</span>}
             </button>
           ))}
         </div>

@@ -49,7 +49,7 @@
 
 .cf-text {
   position: absolute; left: calc(276 * var(--u)); right: calc(18 * var(--u)); top: calc(22 * var(--u)); bottom: calc(10 * var(--u));
-  font-size: calc(var(--cf-text) * var(--u)); overflow: hidden; overflow-wrap: break-word; hyphens: auto;
+  font-size: calc(var(--cf-text) * var(--u)); overflow: hidden; hyphens: manual; overflow-wrap: normal; text-wrap: pretty;
 }
 .cf-text p { margin-top: calc(10 * var(--u)); }
 .cf-upgrade-text { left: calc(46 * var(--u)); top: calc(84 * var(--u)); }
@@ -59,7 +59,6 @@
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(2 * var(--u)); background: #fff;
 }
 .cf-foot svg { display: block; }
-.cf-digits { font-family: var(--font-mono, 'Consolas', monospace); font-size: calc(20 * var(--u)); letter-spacing: calc(7 * var(--u)); color: #000; }
 
 /* Rückseite (cardBackHtml): Rand und Rundung wie die Vorderseite, Motiv im Fasenrahmen, Kartentyp als
    Abzeichen unten und als Eck-Symbole (oben links, unten rechts gedreht). */
@@ -100,3 +99,15 @@
   font-family: var(--font-display, 'Silkscreen', monospace); font-size: calc(40 * var(--u));
   letter-spacing: calc(4 * var(--u)); text-transform: uppercase; line-height: 1;
 }
+
+/* Startkarte: goldenes Band oben rechts im Bildfenster */
+.cf-start {
+  position: absolute; right: calc(-6 * var(--u)); top: calc(18 * var(--u));
+  padding: calc(8 * var(--u)) calc(22 * var(--u)) calc(7 * var(--u)) calc(26 * var(--u));
+  background: linear-gradient(180deg, #ffe58a, #f0b429 55%, #b97a10); color: #1a1000;
+  font-family: var(--font-display, 'Silkscreen', monospace); font-size: calc(30 * var(--u)); line-height: 1;
+  text-transform: uppercase; letter-spacing: calc(2 * var(--u));
+  clip-path: polygon(calc(16 * var(--u)) 0, 100% 0, 100% 100%, calc(16 * var(--u)) 100%, 0 50%);
+}
+.cf-win { overflow: visible; }
+.cf-win img { position: relative; }

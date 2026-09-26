@@ -47,13 +47,13 @@ npm run dev
 - Fasenrahmen um Panels und Bilder
 - helle, verwitterte Werte-Platten mit dunkler Schrift für Haupt-Buttons, Werte und Listen
 - Start, Setup und Kurzanleitung in neutralem Gunmetal
-- bei der Übergabe das Rückseiten-Motiv der Fraktion: Starwing-Flügel, Lightforce-Faust, Scaretech-Totenkopf, BIOTEC-Doppelhelix (generiert)
+- bei der Übergabe das Rückseiten-Motiv der Fraktion: Starwing-Flügel, Lightforce-Faust, Scaretech-Totenkopf, Biotec-Doppelhelix (generiert)
 
 Karten zeigt die App in Helges Kartenlayout. Schriften wie im Projekt ModZart_Web: Silkscreen, Space Grotesk, JetBrains Mono. Die App-Icons werden mit `npx pwa-assets-generator` aus `public/ui/logo.svg` erzeugt.
 
 **Kartengrafiken von Helge Vogt:** Entwürfe (Photoshop-Vorlagen je Fraktion, Kartenrückseiten, Beispielkarten) liegen lokal in `domination_gfx/`. Der Ordner ist nicht im Repo (große PSD-Dateien, Beispielbilder fremder Künstler).
 - `npm run gfx` (`Tools/extract-helge.mjs`) erzeugt daraus die Grafiken in [`public/ui/`](public/ui/README.md): Rahmen, Texturen, Platten, Fasen, Symbole, Rückseiten.
-- Weil alle Vorlagen dieselbe Rahmenstruktur haben, wird Scaretech umgefärbt. BIOTEC (organisch-grün) und Gunmetal werden generiert.
+- Weil alle Vorlagen dieselbe Rahmenstruktur haben, wird Scaretech umgefärbt. Biotec (organisch-grün) und Gunmetal werden generiert.
 - Die Bilder im Kartenfenster malt Stable Diffusion in Helges Stil (siehe „Kartenbilder erzeugen“).
 
 **Kurzanleitung:** in der App auf dem Startbildschirm, aufklappbar nach Themen (`src/ui/Guide.tsx`).
@@ -64,7 +64,7 @@ Karten zeigt die App in Helges Kartenlayout. Schriften wie im Projekt ModZart_We
 Er druckt alle 160 Karten in Helges Kartenlayout (63 mm breit, 86,9 mm hoch nach seiner Vorlage, 9 pro A4-Seite, EAN-8 im weißen Streifen unten). Alternativ druckt er nur die Barcodes als Etiketten (38×21 mm, 65 pro Bogen, z. B. Avery L7651) zum Aufkleben auf die alten Karten.
 App und Drucker nutzen dasselbe Kartenlayout (`src/ui/cardFace.ts`).
 
-**Rückseiten** (Modus „Rückseiten“ oder „Beidseitig“): Helges Motiv der Fraktion im Fasenrahmen, also Starwing-Flügel, Lightforce-Blitzfaust, Scaretech-Totenkopf oder BIOTEC-Helix.
+**Rückseiten** (Modus „Rückseiten“ oder „Beidseitig“): Helges Motiv der Fraktion im Fasenrahmen, also Starwing-Flügel, Lightforce-Blitzfaust, Scaretech-Totenkopf oder Biotec-Helix.
 - **Kartentyp von hinten erkennbar:** großes Abzeichen mit Symbol und Schrift (Planet, Einheit, Upgrade), dazu kleine Symbole oben links und unten rechts für die aufgefächerte Hand.
 - **Duplexdruck:** Die Rückseitenbögen sind zeilenweise gespiegelt. Beim Drucken „beidseitig, Wenden an der langen Kante“ wählen, dann liegt jede Rückseite hinter ihrer Vorderseite. „Beidseitig“ gibt abwechselnd Vorder- und Rückseitenbogen aus (160 Karten auf 18 Blatt).
 Beim Drucken „Tatsächliche Größe / 100 %“ wählen.
@@ -80,7 +80,7 @@ Beim Drucken „Tatsächliche Größe / 100 %“ wählen.
 ### Kartenbilder erzeugen (Stable Diffusion, lokal)
 
 Die Bilder entstehen lokal mit **SDXL 1.0** in **ComfyUI** auf der eigenen Grafikkarte (getestet: RTX 3060 Laptop, 6 GB, ca. 30 s pro Bild).
-Helges Rückseiten-Motive (Flügel, Faust, Totenkopf, BIOTEC-Helix) gehen über den **IP-Adapter** („style transfer“, Gewicht 0,35) als Stilvorlage ein. Die Motive stehen je Karte in [`Tools/card-art/prompts.mjs`](Tools/card-art/prompts.mjs); die Fraktionsfarbe ist nur Akzent, die Bilder dürfen mehrfarbig sein.
+Helges Rückseiten-Motive (Flügel, Faust, Totenkopf, Biotec-Helix) gehen über den **IP-Adapter** („style transfer“, Gewicht 0,35) als Stilvorlage ein. Die Motive stehen je Karte in [`Tools/card-art/prompts.mjs`](Tools/card-art/prompts.mjs); die Fraktionsfarbe ist nur Akzent, die Bilder dürfen mehrfarbig sein.
 
 Einrichtung (einmalig, ca. 12 GB, liegt außerhalb des Repos unter `C:\Users\joche\ComfyUI\`):
 1. Aktuellen NVIDIA-Treiber installieren (≥ 528; CUDA 12).
@@ -97,7 +97,7 @@ Ablauf:
 - **Auswählen:** `npm run art -- --sheet` erzeugt Kontaktbögen je Fraktion (`art-work/sheet-<fraktion>.png`). Die gewählte Variante je Karte kommt in `Tools/card-art/selection.json` (`"17": 2`).
 - **Übernehmen:** `npm run art -- --apply` schneidet auf das Kartenfenster zu und schreibt nach `public/cards/<id>.png` (WebP-Inhalt).
 - **Einzelne Karten neu:** z. B. `npm run art -- --ids 59 --variants 6`, oder mit anderem Stilgewicht `--weight 0.2`. So entstanden die Scaretech-Karten 47, 48, 49, 53 und 68: Helges Totenkopf-Vorlage brachte sonst Figuren ins Bild.
-- **BIOTEC-Rückseite:** `npm run art -- --special biotec-back --variants 4`, übernehmen mit `--apply --special biotec-back`.
+- **Biotec-Rückseite:** `npm run art -- --special biotec-back --variants 4`, übernehmen mit `--apply --special biotec-back`.
 
 Lizenzen: SDXL 1.0 (CreativeML Open RAIL++-M) und IP-Adapter (Apache 2.0) erlauben die Nutzung der Ergebnisse.
 
@@ -108,7 +108,7 @@ Lizenzen: SDXL 1.0 (CreativeML Open RAIL++-M) und IP-Adapter (Apache 2.0) erlaub
 © 2005 Jochen Feldkötter & Raphael Ludwig · Kartendesign Domination: Helge Vogt — Quellen: Microcontroller-Code, Anleitung V1.01, Kartenliste 4P, Domination-Kartenliste
 
 - **2–4 Spieler**, rundenbasiert, Hot-Seat (ein Gerät)
-- **4 Fraktionen:** Starwing, Lightforce, Scaretech, BIOTEC
+- **4 Fraktionen:** Starwing, Lightforce, Scaretech, Biotec
 - **92 einzigartige Kartentypen** (pro Fraktion: 9 Planeten, 8 Einheiten, 6 Upgrades)
 - **160 physische Karten** (viele Karten existieren 2–5× pro Fraktion, z. B. 3× Fährtensucher, 3× Protonenmond)
 - **Gewinnbedingung:** 30/40 Siegpunkte erreichen ODER gegnerisches Zentralgestirn zerstören
@@ -127,7 +127,7 @@ Lizenzen: SDXL 1.0 (CreativeML Open RAIL++-M) und IP-Adapter (Apache 2.0) erlaub
 | Planetenabwehr (Planetenschild, Schutzring, Raumbarriere, Deflektor) | Flugabwehr |
 | Energiequelle (Protonenmond, Elektronenmond, Plasmareaktor) | Kraftwerk |
 
-BIOTEC behält vorerst seine Kartennamen (Hive, Helicopter, Panzer …), die Kategorien gelten aber auch dort.
+Biotec behält vorerst seine Kartennamen (Hive, Helicopter, Panzer …), die Kategorien gelten aber auch dort.
 
 ### Spielfeld (aus Anleitung)
 
@@ -199,7 +199,7 @@ Jeder Spieler hat ein Spielfeld mit **3 Reihen × 7 Feldern**:
 - ➕ Schwarzer Schleier: Einheiten verdeckt ausspielen
 - ➕ Rekonfiguration: Reparatur +2 Def
 
-**BIOTEC:**
+**Biotec:**
 - Späterer Zusatz, aufgebaut wie Lightforce, Kartennamen noch aus der alten Fassung
 - ➕ Energiesystem wie Starwing/Lightforce (Plasmareaktoren)
 - ➕ Vielfältige Panzer-Einheiten
@@ -210,7 +210,7 @@ Jeder Spieler hat ein Spielfeld mit **3 Reihen × 7 Feldern**:
 1. **Einheit vs Einheit** – Rundenkampf bis einer fällt (beide würfeln abwechselnd)
 2. **Einheit vs Planet** – Einmal-Angriff; Gegenangriff nur durch Planetenabwehr
 3. **Hyperraumschiff vs Planet** – Erst Planetenabwehr (Off = Anzahl Abwehrplaneten + 1), dann Angriff des Schiffs
-4. **Getarntes Schiff vs Planet** (Nostradamus, BIOTEC-Helicopter mit Flüstern) – ignoriert die Planetenabwehr komplett
+4. **Getarntes Schiff vs Planet** (Nostradamus, Biotec-Helicopter mit Flüstern) – ignoriert die Planetenabwehr komplett
 5. **Superwaffe** (Ionenpulsar, Supernova, Schwarzes Loch, Abt. Forschung) – trifft immer, danach 3 Runden Nachladen
 
 ---
@@ -306,7 +306,7 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 | 67 | Gravitationsboost | Upgrade | 1 | 1000 | 0 | – | – | – | Spionagezentrum |
 | 68 | Schwarzer Schleier | Upgrade | 1 | 2000 | 0 | – | – | – | Dunkler Rat |
 
-**BIOTEC (ID 69–91)**
+**Biotec (ID 69–91)**
 
 | ID | Name | Typ | Anzahl | Preis | Runden | Def | Off | Schaden | Freischaltung |
 |---|---|---|---|---|---|---|---|---|---|
@@ -336,7 +336,7 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 
 > **Namen ohne Eintrag in der Kartenliste** (Vorschläge, noch zu bestätigen): Feuerschwinge (22), Lichtfunke (32), Strahlenjäger (33), Sonnenfaust (34), Glutdrache (35), Inferno (36), Lichtkoloss (37), Novakanone (38), Lichtpfeil (39), Sonnenkern (40).
 >
-> BIOTEC-Upgrades 86–91 hießen im Original „Update 1–6“ (alle Abt. Forschung, 1000/1000/2000/800/1000/2000 Credits, ohne Wirkung). Namen, Preise und Voraussetzungen sind eine Neuentwicklung. „Perpetuum“ und „Flüstern“ und ihre Position im Baum stammen aus `CnC_Techtrees_4p.ppt`.
+> Biotec-Upgrades 86–91 hießen im Original „Update 1–6“ (alle Abt. Forschung, 1000/1000/2000/800/1000/2000 Credits, ohne Wirkung). Namen, Preise und Voraussetzungen sind eine Neuentwicklung. „Perpetuum“ und „Flüstern“ und ihre Position im Baum stammen aus `CnC_Techtrees_4p.ppt`.
 
 </details>
 
@@ -362,12 +362,12 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 | 66 | Scaretech: Rauminvasion | Rage Schaden +1 (→3) |
 | 67 | Scaretech: Gravitationsboost | Sternenaxt Off +1 (→3) |
 | 68 | Scaretech: Schwarzer Schleier | Im Original ohne Effekt. Die App weist nach dem Kauf darauf hin, dass Einheiten verdeckt ausgespielt werden dürfen |
-| 86 | BIOTEC: Mutagen | Einheit 5 Off +1 (→2), Mutant Off +1 (→2) |
-| 87 | BIOTEC: Flüstern | Helicopter wird von der Planetenabwehr nicht erfasst (Kampf wie Nostradamus) |
-| 88 | BIOTEC: Perpetuum | Energie-Upgrade: jeder Plasmareaktor +2 Energie (wie Teilchenbeschleuniger/Quantensammler) |
-| 89 | BIOTEC: Chitinpanzer | Agressor Panzer Def +1 (→5), Regenerat. Panzer Def +1 (→4), auch bereits gebaute |
-| 90 | BIOTEC: Neuronetz | Spielfeld: einmal pro Runde zwei eigene verdeckte Planeten tauschen oder eine eigene Einheit in Reihe 1 umsetzen (Stapelregeln gelten, aufgedeckte Karten bleiben offen). Die App erinnert zu Zugbeginn |
-| 91 | BIOTEC: Zellregeneration | Zu Beginn jedes eigenen Zuges +1 Defensive für alle beschädigten Einheiten (bis zum Maximum) |
+| 86 | Biotec: Mutagen | Einheit 5 Off +1 (→2), Mutant Off +1 (→2) |
+| 87 | Biotec: Flüstern | Helicopter wird von der Planetenabwehr nicht erfasst (Kampf wie Nostradamus) |
+| 88 | Biotec: Perpetuum | Energie-Upgrade: jeder Plasmareaktor +2 Energie (wie Teilchenbeschleuniger/Quantensammler) |
+| 89 | Biotec: Chitinpanzer | Agressor Panzer Def +1 (→5), Regenerat. Panzer Def +1 (→4), auch bereits gebaute |
+| 90 | Biotec: Neuronetz | Spielfeld: einmal pro Runde zwei eigene verdeckte Planeten tauschen oder eine eigene Einheit in Reihe 1 umsetzen (Stapelregeln gelten, aufgedeckte Karten bleiben offen). Die App erinnert zu Zugbeginn |
+| 91 | Biotec: Zellregeneration | Zu Beginn jedes eigenen Zuges +1 Defensive für alle beschädigten Einheiten (bis zum Maximum) |
 
 ---
 
@@ -421,7 +421,7 @@ Die Mechanik folgt dem Microcontroller-Code. Folgende Programmierfehler bzw. feh
 7. **Auge des Raumes** (Spionagesatellit): Erinnerung zu Zugbeginn, dass eine verdeckte Gegnerkarte aufgedeckt werden darf.
 8. **Schwarzer Schleier** (Tarnung): Hinweis nach dem Kauf, dass Einheiten verdeckt ausgespielt werden dürfen.
 9. Jedes neue Spiel startet mit frischen Kartenwerten. Im Original wurde z. B. Lichtgeschwindigkeit (Mig-Panzerung) bei einem Neustart ohne Stromreset nicht zurückgesetzt.
-10. **BIOTEC-Upgrades** (86–91) haben Namen, Preise, Voraussetzungen und Wirkungen bekommen. Im Original waren sie unfertig und wirkungslos.
+10. **Biotec-Upgrades** (86–91) haben Namen, Preise, Voraussetzungen und Wirkungen bekommen. Im Original waren sie unfertig und wirkungslos.
 
 Bewusst **wie im Original** belassen:
 - Sonderaktion tritt mit 4/6 Wahrscheinlichkeit ein (der Kommentar im Code sagt 1:3).
@@ -434,9 +434,9 @@ Bewusst **wie im Original** belassen:
 
 ---
 
-### BIOTEC Einheiten (Detail aus der alten Kartenliste)
+### Biotec Einheiten (Detail aus der alten Kartenliste)
 
-Die alte Kartenliste enthält bei BIOTEC teils andere Namen und Werte als der Code:
+Die alte Kartenliste enthält bei Biotec teils andere Namen und Werte als der Code:
 
 | Kartenliste-Name | Code-Name | Typ | Preis | Def | Off | Schaden | Voraussetzung |
 |---|---|---|---|---|---|---|---|
@@ -458,12 +458,12 @@ Die alte Kartenliste enthält bei BIOTEC teils andere Namen und Werte als der Co
 ## Offene Punkte / TODO
 
 - [ ] **Namen bestätigen:** Lightforce-Einheiten 32–39 und die Upgrades 22 und 40 haben Vorschlagsnamen (in der Kartenliste noch leer)
-- [ ] **BIOTEC:** in das Domination-Universum übertragen (Namen, evtl. Fraktionsname)
+- [ ] **Biotec:** in das Domination-Universum übertragen (Namen, evtl. Fraktionsname)
 - [x] **Kartenbilder:** mit Stable Diffusion lokal im Stil von Helge Vogt erzeugt (`Tools/card-art/`, siehe „Kartenbilder erzeugen“)
 - [ ] **Cloudflare Pages:** Projekt `domination-cardgame` anlegen (siehe oben)
 - [x] **Techtree-Grafiken:** `Unterlagen/Domination_Techtrees.pdf`, erzeugt aus `Tools/techtree.html` (gedrucktes Spielmaterial, bewusst nicht in der App)
-- [ ] **BIOTEC Einheiten:** Werte-Diskrepanzen zwischen Code und Kartenliste abgleichen
-- [x] **BIOTEC Upgrades 1–6:** neu entworfen, siehe Upgrade-Tabelle
+- [ ] **Biotec Einheiten:** Werte-Diskrepanzen zwischen Code und Kartenliste abgleichen
+- [x] **Biotec Upgrades 1–6:** neu entworfen, siehe Upgrade-Tabelle
 - [x] **Auge des Raumes / Schwarzer Schleier:** als Hinweis in der App umgesetzt (Aufdecken bzw. verdeckt Ausspielen passiert am Tisch)
 - [x] **EAN-8 Zuordnung:** alle 160 physischen Karten haben echte EAN-8-Codes (Kartendrucker)
 

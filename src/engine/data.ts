@@ -1,7 +1,7 @@
 // Kartendaten und Konstanten 1:1 aus Altes Projekt/CnC_Microcontroller_code.txt
 // Namen: Domination-Universum (Domination_Kartenliste.xls); BIOTEC unverändert
 
-export const FACTIONS = ['STARWING', 'LIGHTFORCE', 'SCARETECH', 'BIOTEC'] as const;
+export const FACTIONS = ['Starwing', 'Lightforce', 'Scaretech', 'Biotec'] as const;
 export type Faction = 0 | 1 | 2 | 3;
 export const STARWING: Faction = 0;
 export const LIGHTFORCE: Faction = 1;

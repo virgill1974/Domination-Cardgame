@@ -9,7 +9,7 @@ Web app for the sci-fi card game **"Domination – Das Kartenspiel"**. It began 
 **The reference for all game rules is `Altes Projekt/CnC_Microcontroller_code.txt`.** Mechanics are ported 1:1; intentional deviations are listed in README.md under "Abweichungen vom Original". When changing a rule, keep that list in sync. Engine comments cite original line numbers (e.g. `Z. 1943–2483`). Where the manual (`.doc`) and the code disagree, the code wins. UI text and the user are German.
 
 **Universe & naming** (`Unterlagen/Domination_Kartenliste.xls` is the source for names; README.md has the full table and a glossary):
-- Factions: Starwing (was USA), Lightforce (China), Scaretech (GBA), BIOTEC (unchanged for now, incl. its card names). Code identifiers follow: `STARWING`, `LIGHTFORCE`, `SCARETECH`, `UPG.starwing*` etc. UPG keys keep their mechanic names (`starwingSpySatellite` = „Auge des Raumes“).
+- Factions: Starwing (was USA), Lightforce (China), Scaretech (GBA), Biotec (unchanged for now, incl. its card names). Display names are mixed case (`FACTIONS`); the user does not want "BIOTEC" in capitals. Silkscreen has no lowercase, so pixel-font headings show small caps. Code identifiers follow: `STARWING`, `LIGHTFORCE`, `SCARETECH`, `UPG.starwing*` etc. UPG keys keep their mechanic names (`starwingSpySatellite` = „Auge des Raumes“).
 - UI terms: Gebäude → **Planet**, Kommandozentrale → **Zentralgestirn**, Fußeinheit → **Aufklärer**, Fahrzeug → **Kampfschiff**, Flugzeug → **Hyperraumschiff**, Flugabwehr → **Planetenabwehr**, Kraftwerk → **Energiequelle**. Engine internals (`building`, `isFlak`, `AIRCRAFT`, German test names) still use the old mechanic words; only user-visible text must use the new ones.
 - Names without an XLS entry are proposals (Feuerschwinge 22, Lightforce 32–40); README lists them.
 - Never reintroduce C&C names, logos or sounds in anything user-visible.
@@ -50,7 +50,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - **Actions** (`buy`, `attack`, `repair`, `info`) re-run every validation step themselves and return `{ error?: ErrorCode, ... }`. The step-wise helpers (`buyScan`, `attackScanAttacker`, `attackConfirmAttacker`, …) exist so the UI can report errors at the same moment the terminal did (after scan vs after OK). Keep the original check order.
 - **`beginTurn`** = C `einstiegspunkt` (income, overload skip, special action, build phase). **`mainCheck`** = C `hauptanzeige` (medals, VP, win) and must run after every action. The UI calls it when a flow closes.
 - `Slot.counted` tracks whether a card is in `buildings`/`units` (fix for recharging superweapons). The fuzz test asserts counters equal counted slots.
-- BIOTEC upgrades 86–91 are a **new design** (the original had "Update 1–6" without effect). The table is in README.md.
+- Biotec upgrades 86–91 are a **new design** (the original had "Update 1–6" without effect). The table is in README.md.
   - Mutagen, Perpetuum and Chitinpanzer live in `applyUpgrade`.
   - Flüstern is the `stealthy` check in `combat.ts`.
   - Zellregeneration and the Neuronetz hint run in `beginTurn`.
@@ -65,7 +65,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 **Design "Helge-Stil"** (`theme.css`, tokens on `:root`), derived from Helge Vogt's card drafts. The app should look like the printed cards:
 - Backgrounds, `.btn` and `.panel`/`.dialog` use the faction's dark metal/camo texture `--tex`. Panels, dialogs and card pictures get Helge's bevel frame via `border-image: var(--rim)`. No `backdrop-filter` (performance).
 - "Plates" (light weathered stat panel, dark `--ink` text, like on the card): `.btn.primary`, `.btn.selected`, `.stat`, `.kv > div`, `.list-item`, `.log-line`, `.badge` use `--plate`. Light `.muted` text inside plates is overridden to `--ink-muted`.
-- `factionStyle(f)` (`components.tsx`) sets `--fc`/`--tint` (plate colour from Helge: Starwing cyan, Lightforce amber, Scaretech grey-green, BIOTEC generated toxic green) plus `--tex`, `--plate`, `--rim` URLs. Neutral screens (home, setup, guide) use the generated Gunmetal set from `:root`.
+- `factionStyle(f)` (`components.tsx`) sets `--fc`/`--tint` (plate colour from Helge: Starwing cyan, Lightforce amber, Scaretech grey-green, Biotec generated toxic green) plus `--tex`, `--plate`, `--rim` URLs. Neutral screens (home, setup, guide) use the generated Gunmetal set from `:root`.
   - `App.tsx` renders a fixed `.backdrop` with the faction on turn, the next one at handoff and the winner at the end. It also puts `factionStyle` on the `display: contents` root during a turn, so dialogs and the scanner are tinted.
 - Asset URLs set from JS go through `src/ui/assets.ts`, which makes them **absolute** (`new URL(…, document.baseURI)`). An `url()` inside a custom property resolves relative to the stylesheet that *uses* it, which would be `assets/*.css` in the build. In CSS files use absolute `/ui/...` URLs; Vite rewrites them for `base: './'`.
 - `--accent-grad`/`--accent-glow`/`--accent-line` (dialog top stroke, scanner frame, sliders) are silver on neutral screens and the faction colour inside tinted elements. The user does not want the old cyan→violet→pink gradient anywhere. Only error (red) and warning (orange) dialogs keep signal colours.
@@ -76,6 +76,9 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - in print, a white strip with the EAN-8
 - `cardFaceHtml()` returns an HTML string: the app renders it via `dangerouslySetInnerHTML` in `CardView`, the printer directly. All sizes use `--u` = 1 px of the 652 px template (container units), so it scales from 63 mm to phone width.
 - Geometry constants (window 67–579 × 122–421, plate 39–600 × 457–703, footer 725–873) match `Tools/extract-helge.mjs`.
+- No barcode digits anywhere (cards, labels, app, card picker); the user does not want the numbers shown.
+- Text column: no automatic hyphenation (`hyphens: manual`, `text-wrap: pretty`), the user does not want breaks like "Scare-tech".
+- Start cards (`isStartCard`, from `STARTING_EANS`, e.g. the first energy planet) get a gold "Startkarte" ribbon on the picture window and a badge in compact views. Units with special rules show them from `ABILITIES` in `cardText.ts` (Nostradamus stealth, Helicopter with Flüstern).
 - Fonts as in the ModZart_Web project, self-hosted via fontsource (offline):
   - Silkscreen (pixel, `--font-display`): the user's favourite. Used for headings, faction names, all buttons, stat tiles and values, counters, card type lines, key/value tiles, badges, combat log headings.
   - Space Grotesk (`--font-body`): running text and card names (readability)
@@ -105,7 +108,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 **Tech trees (`Tools/techtree.html` + `src/print/techtree.ts`/`.css`)**, a third Vite entry, rendered to `Unterlagen/Domination_Techtrees.pdf`: printed game material; the user does not want the tree inside the app.
 - Layout of the old `CnC_Techtrees_4p.ppt`: one A4-landscape page per faction. Planets form the centre column by `requires` depth. Units and upgrades unlocked by a planet sit left or right of it (units first, upgrades below, at most 4 per row).
 - Computed from `CARDS[].requires`, so regenerate the PDF after rule changes (print → save as PDF, background graphics on, no margins).
-- `fit()` shrinks tiles (`--k`) until a tree fits the page (BIOTEC and Lightforce get 0.92).
+- `fit()` shrinks tiles (`--k`) until a tree fits the page (Biotec and Lightforce get 0.92).
 - `drawArrows()` draws SVG connectors after layout: planet→planet as elbows, planet→group horizontal.
 - PDF size: Chrome embeds WebP as lossless pixels (>100 MB), so `toJpeg()` swaps images for 400 px JPEG data URIs (PDF ≈ 4 MB). CSS filters on the SVG make Chrome rasterise the whole page, so arrow shadows are a second dark stroke, not a filter.
 
@@ -117,21 +120,21 @@ npm run gfx                      # regenerate the Helge-style graphics in public
   - `sound.ts` has two gain buses (`sfx`, `music`) with volumes persisted in localStorage. The UI is `VolumeControl.tsx`, rendered via portal so its fixed overlay isn't trapped inside a dialog (a `backdrop-filter`/`transform` ancestor would do that).
   - Browsers may reject `play()` without a gesture. `kickMusic()` runs on every pointerdown to retry.
 - Design graphics: `public/ui/factions/<key>/` (card, card-short, tile, plate, rim, back) and `public/ui/helge/` (icon/emblem masks) are generated by `Tools/extract-helge.mjs` and committed; see `public/ui/README.md`.
-  - All three faction templates share one frame structure. Scaretech is recoloured from Starwing with a learned colour table. BIOTEC (organic green) and neutral Gunmetal are generated.
+  - All three faction templates share one frame structure. Scaretech is recoloured from Starwing with a learned colour table. Biotec (organic green) and neutral Gunmetal are generated.
   - `logo.svg` stays the home emblem and icon source.
 - 404s for these files in the console are expected. Don't download third-party assets without asking: original C&C sounds and images are EA-copyrighted.
 
 **Card art** (`Tools/card-art/`, `npm run art`): local Stable Diffusion, no cloud.
 - Setup: SDXL 1.0 base in a ComfyUI portable install at `C:\Users\joche\ComfyUI\` (outside the repo; start it with `run_nvidia_gpu.bat`, API on `127.0.0.1:8188`). The GPU is an RTX 3060 Laptop, 6 GB, about 30 s per image.
 - Style: Helge's back motifs (`public/ui/factions/<f>/back.webp`) are the style reference via IP-Adapter plus (`cubiq/ComfyUI_IPAdapter_plus`, weight type "style transfer", default weight 0.35). The user wants **multicoloured** pictures, so the faction colour is only an accent in the prompt. Higher weights make them monochrome in the back motif's palette.
-- Prompts: `prompts.mjs` holds one English subject per card id plus the faction accent, a common style suffix and the negative prompt. `SPECIALS` holds extra motifs, e.g. `biotec-back`: the painted BIOTEC back, which is also the BIOTEC style reference.
+- Prompts: `prompts.mjs` holds one English subject per card id plus the faction accent, a common style suffix and the negative prompt. `SPECIALS` holds extra motifs, e.g. `biotec-back`: the painted Biotec back, which is also the Biotec style reference.
 - Scaretech's skull reference pushes people and faces into planet/upgrade motifs. `promptFor` adds a negative prompt for them, and five cards (47, 48, 49, 53, 68) were regenerated with `--weight 0.2` (variants 4–7).
 - Workflow:
   - Variants go to `art-work/` (git-ignored); seeds are `id*1000+variant`.
   - `--sheet` makes contact sheets.
   - The choice goes into `selection.json`, `--apply` writes `public/cards/<id>.png` (WebP bytes in a `.png` name, 1024×598).
-  - The BIOTEC back is only rewritten with `--apply --special biotec-back` (a running generator keeps the file open on Windows).
-  - `npm run gfx` keeps the painted BIOTEC back while `selection.json` has `biotec-back`.
+  - The Biotec back is only rewritten with `--apply --special biotec-back` (a running generator keeps the file open on Windows).
+  - `npm run gfx` keeps the painted Biotec back while `selection.json` has `biotec-back`.
 
 ## Legacy material
 

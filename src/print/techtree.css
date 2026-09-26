@@ -32,7 +32,7 @@ body {
 }
 .page header .back { height: 13mm; aspect-ratio: 3 / 4; object-fit: cover; border: 0.6mm solid #000; border-radius: 1.2mm; }
 .page h2 {
-  font-family: 'Silkscreen', monospace; font-weight: 400; font-size: 18pt; letter-spacing: 0.5mm; text-transform: uppercase;
+  font-family: 'Silkscreen', monospace; font-weight: 400; font-size: 18pt; letter-spacing: 0.5mm;
   color: color-mix(in oklab, var(--fc) 80%, white); text-shadow: 0 0.5mm 0 #000;
 }
 

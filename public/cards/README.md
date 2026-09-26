@@ -89,7 +89,7 @@ Der Dateiname endet immer auf `.png`. Die Endung ist nur der Name: Browser zeige
 | `67.png` | Gravitationsboost | Upgrade | 1 | [x] |
 | `68.png` | Schwarzer Schleier | Upgrade | 1 | [x] |
 
-## BIOTEC
+## Biotec
 
 | Datei | Karte | Typ | Anzahl im Deck | erledigt |
 |---|---|---|---|---|

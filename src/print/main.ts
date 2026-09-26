@@ -39,7 +39,7 @@ function mirroredBacks(chunk: number[]): string {
 
 function labelHtml(ean: number): string {
   const code = eanForIndex(ean);
-  return `<div class="label"><div class="label-name">${esc(CARDS[CARD_OF_EAN[ean]].name)} · ${FACTIONS[factionOfEan(ean)]}</div>${ean8Svg(code, 0.36, 9)}<div class="digits">${code}</div></div>`;
+  return `<div class="label"><div class="label-name">${esc(CARDS[CARD_OF_EAN[ean]].name)} · ${FACTIONS[factionOfEan(ean)]}</div>${ean8Svg(code, 0.36, 9)}</div>`;
 }
 
 function render() {

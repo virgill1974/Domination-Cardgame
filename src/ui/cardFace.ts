@@ -4,7 +4,7 @@ import { eanForIndex } from '../engine/ean';
 import { ean8Svg } from '../print/barcodeSvg';
 import { factionAsset, helgeIcon } from './assets';
 import { cardArtUrl, placeholderDataUri } from './cardArt';
-import { DESCRIPTIONS, KIND_LABEL, categoryLabel, requirementName, upgradeEffect } from './cardText';
+import { ABILITIES, DESCRIPTIONS, KIND_LABEL, categoryLabel, isStartCard, requirementName, upgradeEffect } from './cardText';
 
 export interface CardFaceOptions {
   /** Pfad-Präfix zu public/ (App: '', Kartendrucker unter Tools/: '../') */
@@ -36,7 +36,7 @@ export function cardFaceHtml(ean: number, { base = '', footer = 'none' }: CardFa
     `Kategorie: ${esc(categoryLabel(id))}`,
     `Voraussetzung: ${esc(requirementName(id))}`,
   ].join('<br>');
-  const extra = kind === 'upgrade' ? upgradeEffect(id) : DESCRIPTIONS[id];
+  const extra = kind === 'upgrade' ? upgradeEffect(id) : DESCRIPTIONS[id] ?? ABILITIES[id];
 
   const plate = kind === 'upgrade'
     ? `<div class="cf-cost">${icon('icon-cost')}<b>${card.price}</b></div>
@@ -51,15 +51,18 @@ export function cardFaceHtml(ean: number, { base = '', footer = 'none' }: CardFa
 
   const code = eanForIndex(ean);
   const foot = footer === 'barcode'
-    ? `<footer class="cf-foot">${ean8Svg(code, 0.4, 9.5)}<div class="cf-digits">${code}</div></footer>`
+    ? `<footer class="cf-foot">${ean8Svg(code, 0.4, 9.5)}</footer>`
     : '';
   const bg = factionAsset(faction, footer === 'barcode' ? 'card.webp' : 'card-short.webp', base);
   const fallback = placeholderDataUri(id).replace(/'/g, '%27');
 
+  // Startkarten (in Runde 1 aktiv, z. B. die erste Energiequelle) tragen ein Band über dem Bildfenster
+  const start = isStartCard(ean) ? '<div class="cf-start">Startkarte</div>' : '';
+
   return `<article class="cf cf-${kind} cf-${footer === 'barcode' ? 'print' : 'app'}" style="--cf-bg:url('${bg}')">
 <div class="cf-oval">${icon(EMBLEM[kind])}</div>
 <h3 class="cf-name">${esc(card.name)}</h3>
-<div class="cf-win"><img alt="" src="${cardArtUrl(id, `${base}cards/`)}" onerror="this.onerror=null;this.src='${fallback}'"></div>
+<div class="cf-win"><img alt="" src="${cardArtUrl(id, `${base}cards/`)}" onerror="this.onerror=null;this.src='${fallback}'">${start}</div>
 <div class="cf-plate cf-plate-${kind === 'upgrade' ? 'upgrade' : 'stats'}">${plate}</div>
 ${foot}</article>`;
 }

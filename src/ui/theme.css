@@ -148,7 +148,7 @@ a.btn { color: var(--text); text-decoration: none; }
 
 .faction-bar { border-left: 4px solid var(--fc); border-radius: 2px; padding-top: 4px; padding-bottom: 4px; }
 .faction-name {
-  letter-spacing: 1px; text-transform: uppercase; color: color-mix(in oklab, var(--fc) 85%, white);
+  letter-spacing: 1px; color: color-mix(in oklab, var(--fc) 85%, white);
   text-shadow: 0 2px 0 rgba(0, 0, 0, 0.75), 0 0 16px color-mix(in oklab, var(--fc) 35%, transparent);
 }
 /* Fraktionswahl mit Rückseiten-Motiv */
@@ -205,7 +205,7 @@ a.btn { color: var(--text); text-decoration: none; }
 .card-view.compact .card-name { font-size: clamp(16px, 4.8vw, 20px); overflow-wrap: anywhere; }
 .card-view.compact .art { width: clamp(84px, 26vw, 108px); flex: 0 0 clamp(84px, 26vw, 108px); aspect-ratio: 512 / 299; }
 .card-name { font-size: 22px; font-weight: 700; }
-.card-sub { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: color-mix(in oklab, var(--fc) 85%, white); }
+.card-sub { font-size: 10px; letter-spacing: 1px; color: color-mix(in oklab, var(--fc) 85%, white); }
 .kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(62px, 1fr)); gap: 6px; }
 .kv > div { padding: 7px 4px; text-align: center; }
 .kv .k { font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; }
@@ -352,3 +352,4 @@ a.btn { color: var(--text); text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   .emblem, .scanner .frame::after { animation: none; }
 }
+.badge.start { color: #1a1000; background: linear-gradient(180deg, #ffe58a, #f0b429 55%, #c98a18); border-color: rgba(0, 0, 0, 0.6); }

@@ -18,7 +18,7 @@ Nach dem Erzeugen werden die Dateien committet; die App braucht die Vorlagen nic
 Herkunft je Fraktion:
 - **Starwing** und **Lightforce**: direkt aus `Vorderseite_Wings.psd` bzw. `Vorderseite_Flash.psd`. Rückseiten sind die Flügel (`PRINT_Flügel_05.psd`) und die Faust (`PRINT_Flash_03.psd`).
 - **Scaretech**: Alle drei Vorlagen teilen dieselbe Rahmenstruktur. Deshalb wird die Starwing-Vorderseite mit einer aus Scaretechs Vorlage gelernten Farbtabelle umgefärbt. Die Rückseite ist der Totenkopf aus dem Demo-JPG.
-- **BIOTEC** (generiert): dieselbe Struktur in Giftgrün mit Zellgewebe-Rauschen.
+- **Biotec** (generiert): dieselbe Struktur in Giftgrün mit Zellgewebe-Rauschen.
   - Die Rückseite ist eine gepanzerte Doppelhelix, gemalt mit Stable Diffusion und Helges Flügel-Motiv als Stilvorlage (`npm run art -- --special biotec-back`, siehe `Tools/card-art/`).
   - `npm run gfx` überschreibt sie nicht, solange `Tools/card-art/selection.json` eine Wahl für `biotec-back` enthält.
 - **neutral** (generiert): entsättigtes Gunmetal für Start, Setup und Kurzanleitung.
