@@ -168,8 +168,9 @@ async function sheets() {
 
 async function apply() {
   const selection = JSON.parse(readFileSync(SELECTION, 'utf8'));
-  // Sondermotive (z. B. "biotec-back": 2) → Ziel aus SPECIALS
-  for (const [key, s] of Object.entries(SPECIALS)) {
+  // Sondermotive (z. B. "biotec-back": 2) → Ziel aus SPECIALS, nur mit --special <name>
+  // (die BIOTEC-Rückseite ist zugleich Stilvorlage; ein laufender Generator hält sie unter Windows offen)
+  for (const [key, s] of Object.entries(SPECIALS).filter(([k]) => k === special)) {
     const files = variantFiles(key);
     const file = selection[key] && files[selection[key] - 1];
     if (!file) continue;
