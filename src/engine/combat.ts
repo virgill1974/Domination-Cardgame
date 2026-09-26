@@ -1,5 +1,5 @@
 import {
-  ATTACK_PRICE, FLAK_DAMAGE, FLAK_OFFENSIVE, GBA, HELICOPTER, MAX_ATTACKS, STEALTH, SUPERWEAPON_RECHARGE, UPG,
+  ATTACK_PRICE, FLAK_DAMAGE, FLAK_OFFENSIVE, SCARETECH, HELICOPTER, MAX_ATTACKS, STEALTH, SUPERWEAPON_RECHARGE, UPG,
 } from './data';
 import {
   cardIdOfEan, factionOfEan, isAircraft, isCenter, isFlak, isHeadquarters, isReactor, isSuperweapon, kindOfEan,
@@ -114,7 +114,7 @@ export function attack(s: GameState, attackerEan: number, defenderEan: number, r
   };
   const attStats = s.stats[attId];
   const defStats = s.stats[defId];
-  // BIOTEC "Flüstern": der Helicopter wird wie der Stealth-Fighter nicht von Flugabwehr erfasst
+  // BIOTEC "Flüstern": der Helicopter wird wie Nostradamus (Stealth) nicht von Flugabwehr erfasst
   const stealthy = attId === STEALTH || (attId === HELICOPTER && hasCard(me, UPG.biotecWhisper));
 
   if (defKind === 'unit' && attKind === 'unit') {
@@ -176,7 +176,7 @@ function removeCard(s: GameState, owner: Player, index: number): 'deleted' | 're
   const id = slotCardId(slot);
   const kind = kindOfEan(slot.ean);
   if (isReactor(id)) owner.energy -= reactorEnergy(owner);
-  if (owner.energy < 0 && owner.faction !== GBA) {
+  if (owner.energy < 0 && owner.faction !== SCARETECH) {
     // Korrektur 5: volle Defensive der Karte statt pauschal 3
     slot.def = s.stats[id].def;
     return 'rescued';

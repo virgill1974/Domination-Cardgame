@@ -8,9 +8,9 @@ import { play } from './sound';
 
 const KIND_LABEL: Record<CombatKind, string> = {
   unitVsUnit: 'Einheit vs Einheit',
-  unitVsBuilding: 'Einheit vs Gebäude',
-  airVsBuilding: 'Flugzeug vs Gebäude',
-  stealthVsBuilding: 'Flugzeug getarnt!',
+  unitVsBuilding: 'Einheit vs Planet',
+  airVsBuilding: 'Hyperraumschiff vs Planet',
+  stealthVsBuilding: 'Schiff getarnt!',
   superweapon: 'Superwaffe',
 };
 
@@ -29,7 +29,7 @@ function Fighter({ ean, def, max, dead }: { ean: number; def: number; max: numbe
 }
 
 function StepLine({ step, result, rolling }: { step: CombatStep; result: CombatResult; rolling: boolean }) {
-  const who = step.by === 'flak' ? `Flugabwehr (${result.flakCount})` : step.by === 'attacker' ? 'Angreifer' : 'Gegner';
+  const who = step.by === 'flak' ? `Planetenabwehr (${result.flakCount})` : step.by === 'attacker' ? 'Angreifer' : 'Gegner';
   const detail = step.roll === null
     ? 'trifft immer'
     : `braucht ≤ ${step.offense}, würfelt ${step.roll}`;
@@ -83,7 +83,7 @@ export function CombatView({ result, stats, onDone }: { result: CombatResult; st
         <div class="vs">VS</div>
         <Fighter ean={result.defenderEan} def={defDef} max={Math.max(defMax, result.defenderDefBefore)} dead={done && result.destroyed.includes(result.defenderEan)} />
       </div>
-      {result.kind === 'airVsBuilding' && <div class="small muted">Flugabwehr beim Gegner: {result.flakCount}</div>}
+      {result.kind === 'airVsBuilding' && <div class="small muted">Planetenabwehr beim Gegner: {result.flakCount}</div>}
       <div class="log">
         {result.steps.slice(0, shown).map((step, i) => (
           <StepLine key={i} step={step} result={result} rolling={i === shown - 1 && !done} />

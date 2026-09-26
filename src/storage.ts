@@ -1,6 +1,6 @@
 import type { GameState } from './engine/state';
 
-const KEY = 'cnc-kartenspiel-save';
+const KEY = 'domination-save';
 
 export function saveGame(game: GameState | null) {
   try {

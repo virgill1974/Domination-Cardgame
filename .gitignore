@@ -2,3 +2,6 @@ node_modules/
 dist/
 *.log
 .vite/
+
+# Kartengrafik-Entwürfe von Helge Vogt (lokal, groß, enthält fremde Beispielbilder)
+domination_gfx/

@@ -14,9 +14,9 @@ export default defineConfig(({ mode }) => ({
       registerType: 'prompt',
       injectRegister: false,
       manifest: {
-        name: 'CnC – Das Kartenspiel',
-        short_name: 'CnC',
-        description: 'Command & Conquer – Das Kartenspiel: Das Handy ersetzt den Spielkasten.',
+        name: 'Domination – Das Kartenspiel',
+        short_name: 'Domination',
+        description: 'Domination – Das Science-Fiction-Kartenspiel: Das Handy ersetzt den Spielkasten.',
         lang: 'de',
         start_url: './',
         scope: './',

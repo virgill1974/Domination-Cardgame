@@ -24,21 +24,21 @@ export function eventMessages(events: GameEvent[]): Msg[] {
           activatedShown = true;
           msgs.push({
             tone: 'ok', sound: 'activate', title: activated.length === 1 ? 'Aktiviert' : `${activated.length} Karten aktiviert`,
-            body: 'Jetzt ausspielen: Gebäude verdeckt in Reihe 2 oder 3, Einheiten offen in Reihe 1.',
+            body: 'Jetzt ausspielen: Planeten verdeckt in Reihe 2 oder 3, Einheiten offen in Reihe 1.',
             cards: activated,
           });
         }
         break;
       case 'spySatellite':
-        msgs.push({ sound: 'turn', title: 'Spionagesatellit', body: 'Du darfst in dieser Runde eine verdeckte Karte eines Gegners aufdecken.' });
+        msgs.push({ sound: 'turn', title: 'Auge des Raumes', body: 'Du darfst in dieser Runde eine verdeckte Karte eines Gegners aufdecken.' });
         break;
       case 'camouflage':
-        msgs.push({ sound: 'bonus', title: 'Tarnung', body: 'Deine Einheiten dürfen ab jetzt verdeckt ausgespielt werden. Nach einem Angriff werden sie aufgedeckt.' });
+        msgs.push({ sound: 'bonus', title: 'Schwarzer Schleier', body: 'Deine Einheiten dürfen ab jetzt verdeckt ausgespielt werden. Nach einem Angriff werden sie aufgedeckt.' });
         break;
       case 'neuronet':
         msgs.push({
           sound: 'turn', title: 'Neuronetz',
-          body: 'Du darfst in dieser Runde zwei deiner verdeckten Gebäude die Plätze tauschen lassen oder eine eigene Einheit auf ein anderes Feld in Reihe 1 umsetzen. Aufgedeckte Karten bleiben offen, Stapelregeln gelten.',
+          body: 'Du darfst in dieser Runde zwei deiner verdeckten Planeten die Plätze tauschen lassen oder eine eigene Einheit auf ein anderes Feld in Reihe 1 umsetzen. Aufgedeckte Karten bleiben offen, Stapelregeln gelten.',
         });
         break;
       case 'regeneration':

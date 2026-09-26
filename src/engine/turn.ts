@@ -1,5 +1,5 @@
 import {
-  BASE_INCOME, GBA, REACTOR_ENERGY, REACTOR_UPGRADE_BONUS, SPECIAL_MAX_BUILDINGS, SPECIAL_MAX_UNITS,
+  BASE_INCOME, SCARETECH, REACTOR_ENERGY, REACTOR_UPGRADE_BONUS, SPECIAL_MAX_BUILDINGS, SPECIAL_MAX_UNITS,
   SPECIAL_MIN_ROUND, SUPPLY_INCOME, UPG,
 } from './data';
 import { isReactor, isSupply, kindOfEan } from './cards';
@@ -31,7 +31,7 @@ export function beginTurn(s: GameState, rng: Rng): TurnStart {
   s.repairs = 0;
   s.repairBonus = true;
 
-  if (p.energy < 0 && p.faction !== GBA) {
+  if (p.energy < 0 && p.faction !== SCARETECH) {
     p.energy += reactorEnergy(p);
     s.turnActive = false;
     return { events: [{ type: 'overload' }], skipped: true };
@@ -75,8 +75,8 @@ export function beginTurn(s: GameState, rng: Rng): TurnStart {
     if (healed.length) events.push({ type: 'regeneration', count: healed.length });
   }
 
-  // Korrektur 8: Hinweis auf den Spionagesatelliten; BIOTEC Neuronetz analog
-  if (hasCard(p, UPG.usaSpySatellite)) events.push({ type: 'spySatellite' });
+  // Korrektur 8: Hinweis auf den Spionagesatelliten (Auge des Raumes); BIOTEC Neuronetz analog
+  if (hasCard(p, UPG.starwingSpySatellite)) events.push({ type: 'spySatellite' });
   if (hasCard(p, UPG.biotecNeuronet)) events.push({ type: 'neuronet' });
 
   s.turnActive = true;

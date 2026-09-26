@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
-import { CARDS, FACTIONS, GBA, MAX_ATTACKS, MAX_BUYS, MAX_REPAIRS, type Faction } from '../engine/data';
+import { CARDS, FACTIONS, SCARETECH, MAX_ATTACKS, MAX_BUYS, MAX_REPAIRS, type Faction } from '../engine/data';
 import { cardIdOfEan, factionOfEan, kindOfEan } from '../engine/cards';
 import { currentFaction, currentPlayer, ownedSlots, type GameState } from '../engine/state';
 import { Scanner } from '../scanner/Scanner';
@@ -17,8 +17,8 @@ export function Home({ canResume, onNew, onResume, onGuide }: {
     <div class="screen center">
       <div class="stack" style={{ gap: '4px', textAlign: 'center' }}>
         <img class="emblem" src="ui/logo.svg" alt="" />
-        <div class="title">Command &amp; Conquer</div>
-        <h1 class="logo">Das Kartenspiel</h1>
+        <div class="title">Das Kartenspiel</div>
+        <h1 class="logo">Domination</h1>
         <div class="muted small">© 2005 Jochen Feldkötter &amp; Raphael Ludwig</div>
       </div>
       <div class="stack" style={{ marginTop: '24px' }}>
@@ -75,7 +75,7 @@ export function Setup({ onStart, onBack }: { onStart: (seats: Faction[], vpLimit
           ))}
         </div>
         <div class="small muted">
-          {limit === null ? 'Nur die Zerstörung einer gegnerischen Kommandozentrale führt zum Sieg.' : `${limit} Siegpunkte oder zerstörte Kommandozentrale.`}
+          {limit === null ? 'Nur die Zerstörung einer gegnerischen Zentralgestirns führt zum Sieg.' : `${limit} Siegpunkte oder zerstörtes Zentralgestirn.`}
         </div>
       </div>
       <div class="panel stack">
@@ -143,7 +143,7 @@ export function Hud({ game, onAction, onMenu }: { game: GameState; onAction: (a:
         <div class="stats">
           <div class="stat credits"><div class="v">{p.credits}</div><div class="k">Credits</div></div>
           <div class="stat"><div class="v">{p.vp}<span class="muted small">{game.vpLimit ? `/${game.vpLimit}` : ''}</span></div><div class="k">Siegpunkte</div></div>
-          <div class="stat"><div class="v">{f === GBA ? '–' : p.energy}</div><div class="k">Energie</div></div>
+          <div class="stat"><div class="v">{f === SCARETECH ? '–' : p.energy}</div><div class="k">Energie</div></div>
         </div>
         <div class="counters">
           <span>Käufe <b>{game.buys}/{MAX_BUYS}</b></span>
@@ -195,10 +195,10 @@ export function Inventory({ game, onClose }: { game: GameState; onClose: () => v
       </div>
       <div class="stats">
         <div class="stat"><div class="v">{p.stars}</div><div class="k">Siege</div></div>
-        <div class="stat"><div class="v">{p.buildings}</div><div class="k">Gebäude</div></div>
+        <div class="stat"><div class="v">{p.buildings}</div><div class="k">Planeten</div></div>
         <div class="stat"><div class="v">{p.units}</div><div class="k">Einheiten</div></div>
         <div class="stat"><div class="v">{p.upgrades}</div><div class="k">Upgrades</div></div>
-        <div class="stat"><div class="v">{f === GBA ? '–' : p.energy}</div><div class="k">Energie</div></div>
+        <div class="stat"><div class="v">{f === SCARETECH ? '–' : p.energy}</div><div class="k">Energie</div></div>
         <div class="stat"><div class="v">{p.vp}</div><div class="k">Siegpunkte</div></div>
       </div>
       {building.length > 0 && (
@@ -234,7 +234,7 @@ export function Winner({ game, onNew }: { game: GameState; onNew: () => void }) 
   return (
     <div class="screen center" style={factionStyle(f)}>
       <div class="stack" style={{ textAlign: 'center', gap: '8px' }}>
-        <div class="title">{game.winReason === 'headquarters' ? 'Kommandozentrale zerstört!' : 'Siegpunkte erreicht'}</div>
+        <div class="title">{game.winReason === 'headquarters' ? 'Zentralgestirn zerstört!' : 'Siegpunkte erreicht'}</div>
         <div>Gewinner</div>
         <h1 class="faction-name" style={{ fontSize: '48px' }}>{FACTIONS[f]}</h1>
         <div class="muted">{game.players[f].vp} Siegpunkte · Runde {game.round}</div>

@@ -1,15 +1,17 @@
-# CnC – Das Kartenspiel (Web-App)
+# Domination – Das Kartenspiel (Web-App)
 
-Ursprünglich ein Microcontroller-gestütztes Kartenspiel (ATmega644) im Command & Conquer-Universum.
-Physische Spielkarten mit Barcodes, gelesen über eine Reflexlichtschranke in einem selbstgebauten Kasten.
+Science-Fiction-Kartenspiel für 2–4 Spieler. Es entstand 2005 als Microcontroller-gestütztes Kartenspiel (ATmega644) im Command & Conquer-Universum: physische Spielkarten mit Barcodes, gelesen über eine Reflexlichtschranke in einem selbstgebauten Kasten.
+**Domination** verlegt das Spiel in ein eigenes Science-Fiction-Universum: Aus Gebäuden werden Planeten, aus Fußtruppen Aufklärer, aus Fahrzeugen Kampfschiffe und aus Flugzeugen Hyperraumschiffe. Die Regeln bleiben unverändert.
 
 **Jetzt:** Eine Web-App für Handy und Tablet ersetzt den Kasten. Statt des Terminals wird das Handy herumgereicht.
 Die Kamera ersetzt den Barcodeleser. Statt des alten proprietären Formats tragen die Karten echte EAN-8-Barcodes.
 Die Spielmechanik ist 1:1 aus dem Microcontroller-Code übernommen. Abweichungen stehen unter [Abweichungen vom Original](#abweichungen-vom-original).
 
+> Dieses Repo ist eine Kopie von `CnC-web` (inklusive Historie). `CnC-web` bleibt als Command-&-Conquer-Fassung unverändert bestehen.
+
 ## Spielen
 
-**Adresse: https://cnc-web.pages.dev**
+**Adresse: https://domination-cardgame.pages.dev** (sobald das Cloudflare-Pages-Projekt angelegt ist, siehe unten)
 
 Die App läuft im Browser und wird über **Cloudflare Pages** gehostet. Jeder Push auf `main` wird automatisch gebaut und veröffentlicht.
 
@@ -19,11 +21,11 @@ Die App läuft im Browser und wird über **Cloudflare Pages** gehostet. Jeder Pu
 - Die Kamera funktioniert, weil die Seite über HTTPS kommt.
 - **Ton:** Effekte und Hintergrundmusik haben getrennte Regler (**Lautstärke** auf dem Startbildschirm und im Spielmenü ☰). Eigene Musik: `public/sounds/music.mp3`, Details in [`public/sounds/README.md`](public/sounds/README.md).
 
-### Einrichtung von Cloudflare Pages (bereits erledigt, zum Nachschlagen)
+### Einrichtung von Cloudflare Pages
 
-1. Auf GitHub der App **Cloudflare Workers and Pages** Zugriff auf das Repo geben: https://github.com/settings/installations → Configure → Repository access.
+1. Auf GitHub der App **Cloudflare Workers and Pages** Zugriff auf das Repo geben: https://github.com/settings/installations → Configure → Repository access → `Domination-Cardgame` hinzufügen.
 2. Cloudflare: **Workers & Pages** → **Create application** → ganz unten **„Looking to deploy Pages? Get started“**. Der Standard-Assistent legt sonst einen Worker an.
-3. **Import an existing Git repository** → `CnC-web` → Framework „None“, Build-Befehl `npm run build`, Ausgabeordner `dist`. Die Node-Version kommt aus `.node-version`.
+3. **Import an existing Git repository** → `Domination-Cardgame` → Projektname `domination-cardgame`, Framework „None“, Build-Befehl `npm run build`, Ausgabeordner `dist`. Die Node-Version kommt aus `.node-version`.
 4. Richtig eingerichtet ist es, wenn im Build-Log **kein** `npx wrangler deploy` auftaucht.
 
 ## Entwicklung
@@ -42,6 +44,8 @@ npm run dev
 
 **Design:** „Holografisches Glas“, leicht in der Farbe der Fraktion am Zug getönt. Schriften wie im Projekt ModZart_Web: Silkscreen, Space Grotesk, JetBrains Mono. Hintergrund, Glanz-Overlay und Logo liegen als austauschbare Grafiken in [`public/ui/`](public/ui/README.md). Die App-Icons werden mit `npx pwa-assets-generator` aus `public/ui/logo.svg` erzeugt.
 
+**Kartengrafiken von Helge Vogt:** Entwürfe (Photoshop-Vorlagen je Fraktion, Kartenrückseiten, Beispielkarten) liegen lokal in `domination_gfx/`. Der Ordner ist nicht im Repo (große PSD-Dateien, Beispielbilder fremder Künstler). Die finalen Kartenbilder werden später in seinem Stil erstellt.
+
 **Kurzanleitung:** in der App auf dem Startbildschirm, aufklappbar nach Themen (`src/ui/Guide.tsx`).
 
 **Manuelle Kartenauswahl** (nur zum Testen): Sie zeigt standardmäßig nur Karten, die im aktuellen Schritt gültig sind. Mit „Alle Karten zeigen“ lassen sich die Fehlermeldungen testen.
@@ -56,14 +60,29 @@ Beim Drucken „Tatsächliche Größe / 100 %“ wählen.
 
 ## Spielübersicht
 
-© 2005 Jochen Feldkötter & Raphael Ludwig — Quellen: Microcontroller-Code, Anleitung V1.01, Kartenliste 4P
+© 2005 Jochen Feldkötter & Raphael Ludwig — Quellen: Microcontroller-Code, Anleitung V1.01, Kartenliste 4P, Domination-Kartenliste
 
 - **2–4 Spieler**, rundenbasiert, Hot-Seat (ein Gerät)
-- **4 Fraktionen:** USA, China, GBA, BIOTEC
-- **92 einzigartige Kartentypen** (pro Fraktion: 14 Gebäude, 20 Einheiten, 6 Upgrades = 40 Karten)
-- **~160 physische Karten** (viele Karten existieren 2–5× pro Fraktion, z.B. 3× Ranger, 3× Fusionsreaktor)
-- **Gewinnbedingung:** 30/40 Siegpunkte erreichen ODER gegnerische Zentrale zerstören
+- **4 Fraktionen:** Starwing, Lightforce, Scaretech, BIOTEC
+- **92 einzigartige Kartentypen** (pro Fraktion: 9 Planeten, 8 Einheiten, 6 Upgrades)
+- **160 physische Karten** (viele Karten existieren 2–5× pro Fraktion, z. B. 3× Fährtensucher, 3× Protonenmond)
+- **Gewinnbedingung:** 30/40 Siegpunkte erreichen ODER gegnerisches Zentralgestirn zerstören
 - **Spielphasen pro Zug:** Credits kassieren → Überlastung prüfen (ggf. aussetzen) → Sonderaktion → Bauphase (fertige Karten aktivieren) → Aktionen (Kaufen/Angriff/Reparatur/Info/Inventar) → Zug beenden
+
+### Begriffe
+
+| Domination | früher (C&C) |
+|---|---|
+| Starwing / Lightforce / Scaretech | USA / China / GBA |
+| Planet | Gebäude |
+| Zentralgestirn | Kommandozentrale |
+| Aufklärer | Fußeinheit |
+| Kampfschiff | Fahrzeug |
+| Hyperraumschiff | Flugzeug |
+| Planetenabwehr (Planetenschild, Schutzring, Raumbarriere, Deflektor) | Flugabwehr |
+| Energiequelle (Protonenmond, Elektronenmond, Plasmareaktor) | Kraftwerk |
+
+BIOTEC behält vorerst seine Kartennamen (Hive, Helicopter, Panzer …), die Kategorien gelten aber auch dort.
 
 ### Spielfeld (aus Anleitung)
 
@@ -73,206 +92,205 @@ Jeder Spieler hat ein Spielfeld mit **3 Reihen × 7 Feldern**:
 ┌───┬───┬───┬───┬───┬───┬───┐
 │ E │ E │ E │ E │ E │ E │ E │  1. Reihe: Einheiten (offen ausgespielt)
 ├───┼───┼───┼───┼───┼───┼───┤
-│ G │ G │ G │ G │ G │ G │ G │  2. Reihe: Gebäude (verdeckt!)
+│ P │ P │ P │ P │ P │ P │ P │  2. Reihe: Planeten (verdeckt!)
 ├───┼───┼───┼───┼───┼───┼───┤
-│ G │ G │ G │ G │ G │ G │ G │  3. Reihe: Gebäude (verdeckt!)
+│ P │ P │ P │ P │ P │ P │ P │  3. Reihe: Planeten (verdeckt!)
 └───┴───┴───┴───┴───┴───┴───┘
               Spieler
 ```
 
 **Platzierungsregeln:**
 - Einheiten werden **offen** in Reihe 1 gelegt
-- Gebäude werden **verdeckt** in Reihe 2/3 gelegt (erst bei Angriff aufgedeckt)
-- Stacking: max 3 Fußsoldaten, max 2 Fahrzeuge, max 1 Fahrzeug + 1 Fuß, Flugzeuge alleine
-- Gebäude belegen 1–5 Felder je nach Typ (in Kartenliste dokumentiert)
+- Planeten werden **verdeckt** in Reihe 2/3 gelegt (erst bei Angriff aufgedeckt)
+- Stapeln: max. 3 Aufklärer, max. 2 Kampfschiffe, max. 1 Kampfschiff + 1 Aufklärer, Hyperraumschiffe alleine
+- Planeten belegen 1–5 Felder je nach Typ (Spalte „Felder“ in der Kartenliste)
 
 **Angriffsreihenfolge:**
-- Gebäude in Reihe 3 erst angreifbar wenn Reihe 1 + 2 leer
-- Gebäude in Reihe 2 erst angreifbar wenn Reihe 1 leer
-- **Flugzeuge** können eine Reihe überspringen
-- **GBA Tunnelsystem:** Fußeinheiten können Reihe 1 überspringen
-- **GBA Tarnung (Upgrade):** Einheiten verdeckt ausspielen (nach Angriff aufgedeckt)
-- **Sprengstoff-LKW & Terroristen:** Zerstören sich selbst nach Angriff, keine Siegpunkte
+- Planeten in Reihe 3 erst angreifbar, wenn Reihe 1 + 2 leer
+- Planeten in Reihe 2 erst angreifbar, wenn Reihe 1 leer
+- **Hyperraumschiffe** können eine Reihe überspringen
+- **Scaretech Wurmloch:** Aufklärer können Reihe 1 überspringen
+- **Scaretech Schwarzer Schleier (Upgrade):** Einheiten verdeckt ausspielen (nach Angriff aufgedeckt)
+- **Photonenhagel & Erazor:** zerstören sich selbst nach dem Angriff, keine Siegpunkte
 
 ### Kernmechaniken
 
 | Mechanik | Details |
 |---|---|
 | Startkapital | 1600 Credits |
-| Einkommen/Runde | 400 Grund + 400 pro Nachschublager |
+| Einkommen/Runde | 400 Grund + 400 pro Handelsplanet (Handelssystem, Handelssektor, Antimaterieminen, Abt. Kapital) |
 | Max. Käufe/Runde | 3 |
-| Max. Angriffe/Runde | 3 (kostenlos mit Strategiezentrum, sonst 200 Credits) |
+| Max. Angriffe/Runde | 3 (kostenlos mit Sternenparlament/Tribunal des Lichts/Dunklem Rat/Abt. Forschung, sonst 200 Credits) |
 | Max. Reparaturen/Runde | 1 (kostet 200 Credits, +1 Def, mit Upgrade +2 Def) |
-| Energiesystem | Kraftwerke liefern je 3 Energie, jedes Gebäude (außer Kraftwerk) verbraucht 1. GBA braucht keine Energie. |
+| Energiesystem | Energiequellen liefern je 3 Energie, jeder andere Planet verbraucht 1. Scaretech braucht keine Energie. |
 | Kampfwürfel | W6 – Offensive ≥ Wurf = Treffer, dann Schaden von Defensive abziehen |
-| Siegpunkte | Gebäude + Upgrades + Sterne + Orden (Bester Stützpunkt: +5, Beste Streitmacht: +5) |
-| Sonderaktionen | Ab Runde 5, bei wenig Einheiten/Gebäuden (≤7), Zufallsbonus (Credits, Sofort-Aktivierung, Reparatur) |
-| Spionagesatellit | USA-Upgrade: Pro Runde eine verdeckte Gegnerkarte aufdecken |
+| Siegpunkte | Planeten + Upgrades + Sterne + Orden (Bester Stützpunkt: +5, Beste Streitmacht: +5) |
+| Sonderaktionen | Ab Runde 5, bei wenig Einheiten/Planeten (≤7), Zufallsbonus (Credits, Sofort-Aktivierung, Reparatur) |
+| Auge des Raumes | Starwing-Upgrade: Pro Runde eine verdeckte Gegnerkarte aufdecken |
 
-### Fraktions-Vor- & Nachteile (aus Anleitung)
+### Fraktionen
 
-**USA:**
-- ➖ Einheiten & Gebäude teuer
-- ➕ Wirkungsvolle Flugzeuge (überspringen eine Reihe)
-- ➕ Stealth-Fighter: getarnt, ignoriert Flugabwehr
-- ➕ Starke Flugabwehr (Patriot-Batterie)
-- ➖ Kraftwerke nötig (Energiesystem)
-- ➕ Spionagesatellit: 1× pro Runde verdeckte Gegnerkarte aufdecken
-- ➕ 14 verschiedene Gebäude
+**Starwing** (früher USA):
+- ➖ Einheiten & Planeten teuer
+- ➕ Wirkungsvolle Hyperraumschiffe (überspringen eine Reihe)
+- ➕ Nostradamus: getarnt, ignoriert die Planetenabwehr
+- ➕ Starke Planetenabwehr (Planetenschild)
+- ➖ Energiequellen nötig (Energiesystem)
+- ➕ Auge des Raumes: 1× pro Runde verdeckte Gegnerkarte aufdecken
 
-**China:**
+**Lightforce** (früher China):
 - ➕ Ausgewogenes Preis-Leistungs-Verhältnis
-- ➕ Mig (Flugzeug überspringt Reihe)
-- ➕ Mächtigste Fahrzeuge (Weltenherrscher, Infernalgeschütz)
-- ➖ Kraftwerke nötig (Energiesystem)
-- ➕ Nationalismus-Upgrade wertet Fußeinheiten auf
-- ➕ 14 verschiedene Gebäude
+- ➕ Lichtpfeil (Hyperraumschiff überspringt eine Reihe)
+- ➕ Mächtigste Kampfschiffe (Lichtkoloss, Inferno)
+- ➖ Energiequellen nötig (Energiesystem)
+- ➕ Nachtsicht-Upgrade wertet die Aufklärer auf
 
-**GBA:**
-- ➖ Einheiten günstig aber schwach
-- ➕ Tunnelsystem: Fußeinheiten überspringen Reihe 1
-- ➕ Sprengstoff-LKW: trifft fast immer, viel Schaden
-- ➖ Terroristen/LKW zerstören sich selbst, keine Siegpunkte
+**Scaretech** (früher GBA):
+- ➖ Einheiten günstig, aber schwach
+- ➕ Wurmloch: Aufklärer überspringen Reihe 1
+- ➕ Erazor: trifft fast immer, viel Schaden
+- ➖ Photonenhagel/Erazor zerstören sich selbst, keine Siegpunkte
 - ➕ Keine Energie nötig!
-- ➕ Tarnung: Einheiten verdeckt ausspielen
-- ➕ Instandsetzung: Vollreparatur (+2 Def) pro Runde
-- ➖ Nur 12 verschiedene Gebäude
+- ➕ Schwarzer Schleier: Einheiten verdeckt ausspielen
+- ➕ Rekonfiguration: Reparatur +2 Def
 
 **BIOTEC:**
-- Späterer Zusatz, analog zu China aufgebaut
-- ➖ Upgrades noch nicht vollständig designed
-- ➕ Energiesystem wie USA/China (Plasmareaktoren)
-- ➕ Vielfältige Panzer-Einheiten (4 verschiedene Panzertypen)
+- Späterer Zusatz, aufgebaut wie Lightforce, Kartennamen noch aus der alten Fassung
+- ➕ Energiesystem wie Starwing/Lightforce (Plasmareaktoren)
+- ➕ Vielfältige Panzer-Einheiten
+- ➕ Neu entworfene Upgrades (Mutagen, Flüstern, Perpetuum, Chitinpanzer, Neuronetz, Zellregeneration)
 
 ### Kampftypen
 
 1. **Einheit vs Einheit** – Rundenkampf bis einer fällt (beide würfeln abwechselnd)
-2. **Einheit vs Gebäude** – Einmal-Angriff; Gegenangriff nur bei Flugabwehr
-3. **Flugzeug vs Gebäude** – Erst Flugabwehr (Off = Anzahl Türme + 1), dann Flugzeug-Angriff
-4. **Tarnkappenbomber vs Gebäude** – Ignoriert Flugabwehr komplett
-5. **Superwaffe** – Trifft immer, danach 3 Runden Cooldown (Freischaltung zurückgesetzt)
+2. **Einheit vs Planet** – Einmal-Angriff; Gegenangriff nur durch Planetenabwehr
+3. **Hyperraumschiff vs Planet** – Erst Planetenabwehr (Off = Anzahl Abwehrplaneten + 1), dann Angriff des Schiffs
+4. **Getarntes Schiff vs Planet** (Nostradamus, BIOTEC-Helicopter mit Flüstern) – ignoriert die Planetenabwehr komplett
+5. **Superwaffe** (Ionenpulsar, Supernova, Schwarzes Loch, Abt. Forschung) – trifft immer, danach 3 Runden Nachladen
 
 ---
 
 ## Kartenwerte
 
-Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defaultkarten[92]` im Microcontroller-Code:
+Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defaultkarten[92]` im Microcontroller-Code. Die Namen stammen aus [`Unterlagen/Domination_Kartenliste.xls`](Unterlagen/Domination_Kartenliste.xls).
 
 <details>
 <summary>Komplette Kartentabelle (alle 92 Karten)</summary>
 
-**USA (ID 0–22)**
+**Starwing (ID 0–22)**
 
-| ID | Name | Typ | Preis | Runden | Def | Off | Schaden | Freischaltung |
-|---|---|---|---|---|---|---|---|---|
-| 0 | Kommandozentrale | Gebäude | 2000 | 1 | 8 | 0 | 0 | Start |
-| 1 | Kaserne | Gebäude | 600 | 1 | 2 | 0 | 0 | Zentrale |
-| 2 | Fusionsreaktor | Gebäude | 800 | 1 | 2 | 0 | 0 | Zentrale |
-| 3 | Versorgungszentrum | Gebäude | 2000 | 2 | 4 | 0 | 0 | Fusionsreaktor |
-| 4 | Patriot-Batterie | Gebäude | 1000 | 1 | 3 | 3 | 2 | Fusionsreaktor |
-| 5 | Waffenfabrik | Gebäude | 2000 | 2 | 3 | 0 | 0 | Versorgungszentrum |
-| 6 | Flugfeld | Gebäude | 1000 | 3 | 3 | 0 | 0 | Versorgungszentrum |
-| 7 | Strategiezentrum | Gebäude | 2500 | 3 | 3 | 0 | 0 | Waffenfabrik |
-| 8 | Partikelkanone | Gebäude | 3500 | 3 | 4 | 6 | 4 | Strategiezentrum |
-| 9 | Ranger | Einheit | 225 | 1 | 1 | 1 | 1 | Kaserne |
-| 10 | Raketentrooper | Einheit | 300 | 1 | 1 | 2 | 1 | Kaserne |
-| 11 | Panzerjeep | Einheit | 700 | 2 | 2 | 2 | 1 | Waffenfabrik |
-| 12 | Crusader | Einheit | 900 | 2 | 3 | 3 | 1 | Waffenfabrik |
-| 13 | Tomahawk | Einheit | 1100 | 3 | 2 | 4 | 2 | Waffenfabrik |
-| 14 | Paladin | Einheit | 1200 | 2 | 4 | 4 | 3 | Waffenfabrik |
-| 15 | Raptor | Einheit | 1200 | 3 | 3 | 3 | 1 | Flugfeld |
-| 16 | Stealth-Fighter | Einheit | 1400 | 3 | 3 | 3 | 2 | Flugfeld |
-| 17 | Panzerung | Upgrade | 1000 | 0 | – | – | – | Strategiezentrum |
-| 18 | Kontrollstäbe | Upgrade | 800 | 0 | – | – | – | Fusionsreaktor |
-| 19 | Laserzielerfassung | Upgrade | 1500 | 0 | – | – | – | Flugfeld |
-| 20 | Raketenmagazin | Upgrade | 1500 | 0 | – | – | – | Flugfeld |
-| 21 | Spionagesatellit | Upgrade | 500 | 0 | – | – | – | Strategiezentrum |
-| 22 | TOW-Rakete | Upgrade | 1200 | 0 | – | – | – | Waffenfabrik |
+| ID | Name | Typ | Anzahl | Preis | Runden | Def | Off | Schaden | Freischaltung |
+|---|---|---|---|---|---|---|---|---|---|
+| 0 | Zentralgestirn | Planet | 1 | 2000 | 1 | 8 | 0 | 0 | Start |
+| 1 | Aufklärungskomplex | Planet | 1 | 600 | 1 | 2 | 0 | 0 | Zentralgestirn |
+| 2 | Protonenmond | Planet | 3 | 800 | 1 | 2 | 0 | 0 | Zentralgestirn |
+| 3 | Handelssystem | Planet | 2 | 2000 | 2 | 4 | 0 | 0 | Protonenmond |
+| 4 | Planetenschild | Planet | 3 | 1000 | 1 | 3 | 3 | 2 | Protonenmond |
+| 5 | Orbitaldock | Planet | 1 | 2000 | 2 | 3 | 0 | 0 | Handelssystem |
+| 6 | Hyperraumnebel | Planet | 1 | 1000 | 3 | 3 | 0 | 0 | Handelssystem |
+| 7 | Sternenparlament | Planet | 1 | 2500 | 3 | 3 | 0 | 0 | Orbitaldock |
+| 8 | Ionenpulsar | Planet | 1 | 3500 | 3 | 4 | 6 | 4 | Sternenparlament |
+| 9 | Fährtensucher | Aufklärer | 3 | 225 | 1 | 1 | 1 | 1 | Aufklärungskomplex |
+| 10 | Auge des Kolumbus | Aufklärer | 3 | 300 | 1 | 1 | 2 | 1 | Aufklärungskomplex |
+| 11 | Phoenix | Kampfschiff | 3 | 700 | 2 | 2 | 2 | 1 | Orbitaldock |
+| 12 | Pegasus | Kampfschiff | 3 | 900 | 2 | 3 | 3 | 1 | Orbitaldock |
+| 13 | Weißer Golem | Kampfschiff | 2 | 1100 | 3 | 2 | 4 | 2 | Orbitaldock |
+| 14 | Poseidons Fluch | Kampfschiff | 2 | 1200 | 2 | 4 | 4 | 3 | Orbitaldock |
+| 15 | Zeus | Hyperraumschiff | 2 | 1200 | 3 | 3 | 3 | 1 | Hyperraumnebel |
+| 16 | Nostradamus | Hyperraumschiff | 2 | 1400 | 3 | 3 | 3 | 2 | Hyperraumnebel |
+| 17 | Schildgenerator | Upgrade | 1 | 1000 | 0 | – | – | – | Sternenparlament |
+| 18 | Teilchenbeschleuniger | Upgrade | 1 | 800 | 0 | – | – | – | Protonenmond |
+| 19 | Präzisionssprung | Upgrade | 1 | 1500 | 0 | – | – | – | Hyperraumnebel |
+| 20 | Interstellare Macht | Upgrade | 1 | 1500 | 0 | – | – | – | Hyperraumnebel |
+| 21 | Auge des Raumes | Upgrade | 1 | 500 | 0 | – | – | – | Sternenparlament |
+| 22 | Feuerschwinge | Upgrade | 1 | 1200 | 0 | – | – | – | Orbitaldock |
 
-**China (ID 23–45)**
+**Lightforce (ID 23–45)**
 
-| ID | Name | Typ | Preis | Runden | Def | Off | Schaden | Freischaltung |
-|---|---|---|---|---|---|---|---|---|
-| 23 | Kommandozentrale | Gebäude | 2000 | 1 | 8 | 0 | 0 | Start |
-| 24 | Kaserne | Gebäude | 500 | 1 | 2 | 0 | 0 | Zentrale |
-| 25 | Atomreaktor | Gebäude | 1000 | 1 | 3 | 0 | 0 | Zentrale |
-| 26 | Bunker | Gebäude | 700 | 1 | 3 | 2 | 2 | Kaserne |
-| 27 | Versorgungszentrum | Gebäude | 1500 | 2 | 4 | 0 | 0 | Atomreaktor |
-| 28 | Waffenfabrik | Gebäude | 2000 | 2 | 4 | 0 | 0 | Versorgungszentrum |
-| 29 | Flugplatz | Gebäude | 1000 | 3 | 3 | 0 | 0 | Versorgungszentrum |
-| 30 | Propagandazentrum | Gebäude | 2000 | 3 | 3 | 0 | 0 | Waffenfabrik |
-| 31 | Atomraketensilo | Gebäude | 3500 | 3 | 4 | 6 | 4 | Propagandazentrum |
-| 32 | Rotgardist | Einheit | 200 | 1 | 1 | 1 | 1 | Kaserne |
-| 33 | Panzerjäger | Einheit | 300 | 1 | 1 | 2 | 1 | Kaserne |
-| 34 | Faust Maos | Einheit | 900 | 2 | 3 | 3 | 1 | Waffenfabrik |
-| 35 | Drachenpanzer | Einheit | 800 | 2 | 2 | 3 | 1 | Waffenfabrik |
-| 36 | Infernalgeschütz | Einheit | 1000 | 3 | 2 | 4 | 2 | Waffenfabrik |
-| 37 | Weltenherrscher | Einheit | 1800 | 3 | 5 | 5 | 3 | Waffenfabrik |
-| 38 | Nukleargeschütz | Einheit | 1600 | 3 | 2 | 4 | 3 | Waffenfabrik |
-| 39 | Mig | Einheit | 1200 | 3 | 3 | 3 | 2 | Flugplatz |
-| 40 | Nuklearpanzer | Upgrade | 1500 | 0 | – | – | – | Propagandazentrum |
-| 41 | Schwarzes Napalm | Upgrade | 2000 | 0 | – | – | – | Kaserne |
-| 42 | Überlastung | Upgrade | 1000 | 0 | – | – | – | Atomreaktor |
-| 43 | Uran-Rakete | Upgrade | 2000 | 0 | – | – | – | Propagandazentrum |
-| 44 | Nationalismus | Upgrade | 1000 | 0 | – | – | – | Propagandazentrum |
-| 45 | Mig-Panzerung | Upgrade | 500 | 0 | – | – | – | Flugplatz |
+| ID | Name | Typ | Anzahl | Preis | Runden | Def | Off | Schaden | Freischaltung |
+|---|---|---|---|---|---|---|---|---|---|
+| 23 | Zentralgestirn | Planet | 1 | 2000 | 1 | 8 | 0 | 0 | Start |
+| 24 | Drohnenkolonie | Planet | 1 | 500 | 1 | 2 | 0 | 0 | Zentralgestirn |
+| 25 | Elektronenmond | Planet | 3 | 1000 | 1 | 3 | 0 | 0 | Zentralgestirn |
+| 26 | Schutzring | Planet | 3 | 700 | 1 | 3 | 2 | 2 | Drohnenkolonie |
+| 27 | Handelssektor | Planet | 2 | 1500 | 2 | 4 | 0 | 0 | Elektronenmond |
+| 28 | Weltraumwerft | Planet | 1 | 2000 | 2 | 4 | 0 | 0 | Handelssektor |
+| 29 | Warpgate | Planet | 1 | 1000 | 3 | 3 | 0 | 0 | Handelssektor |
+| 30 | Tribunal des Lichts | Planet | 1 | 2000 | 3 | 3 | 0 | 0 | Weltraumwerft |
+| 31 | Supernova | Planet | 1 | 3500 | 3 | 4 | 6 | 4 | Tribunal des Lichts |
+| 32 | Lichtfunke | Aufklärer | 3 | 200 | 1 | 1 | 1 | 1 | Drohnenkolonie |
+| 33 | Strahlenjäger | Aufklärer | 3 | 300 | 1 | 1 | 2 | 1 | Drohnenkolonie |
+| 34 | Sonnenfaust | Kampfschiff | 3 | 900 | 2 | 3 | 3 | 1 | Weltraumwerft |
+| 35 | Glutdrache | Kampfschiff | 3 | 800 | 2 | 2 | 3 | 1 | Weltraumwerft |
+| 36 | Inferno | Kampfschiff | 2 | 1000 | 3 | 2 | 4 | 2 | Weltraumwerft |
+| 37 | Lichtkoloss | Kampfschiff | 2 | 1800 | 3 | 5 | 5 | 3 | Weltraumwerft |
+| 38 | Novakanone | Kampfschiff | 2 | 1600 | 3 | 2 | 4 | 3 | Weltraumwerft |
+| 39 | Lichtpfeil | Hyperraumschiff | 2 | 1200 | 3 | 3 | 3 | 2 | Warpgate |
+| 40 | Sonnenkern | Upgrade | 1 | 1500 | 0 | – | – | – | Tribunal des Lichts |
+| 41 | Effektivierung | Upgrade | 1 | 2000 | 0 | – | – | – | Drohnenkolonie |
+| 42 | Quantensammler | Upgrade | 1 | 1000 | 0 | – | – | – | Elektronenmond |
+| 43 | Donnerschlag | Upgrade | 1 | 2000 | 0 | – | – | – | Tribunal des Lichts |
+| 44 | Nachtsicht | Upgrade | 1 | 1000 | 0 | – | – | – | Tribunal des Lichts |
+| 45 | Lichtgeschwindigkeit | Upgrade | 1 | 500 | 0 | – | – | – | Warpgate |
 
-**GBA (ID 46–68)**
+**Scaretech (ID 46–68)**
 
-| ID | Name | Typ | Preis | Runden | Def | Off | Schaden | Freischaltung |
-|---|---|---|---|---|---|---|---|---|
-| 46 | Kommandocenter | Gebäude | 2000 | 1 | 8 | 0 | 0 | Start |
-| 47 | Kaserne | Gebäude | 500 | 1 | 2 | 0 | 0 | Zentrale |
-| 48 | Geheimlager | Gebäude | 1500 | 3 | 3 | 0 | 0 | Zentrale |
-| 49 | Stinger-Stellung | Gebäude | 900 | 1 | 2 | 2 | 1 | Kaserne |
-| 50 | Waffenhändler | Gebäude | 2500 | 2 | 3 | 0 | 0 | Geheimlager |
-| 51 | Palast | Gebäude | 2500 | 3 | 4 | 0 | 0 | Waffenhändler |
-| 52 | Schwarzmarkt | Gebäude | 2500 | 2 | 3 | 0 | 0 | Palast |
-| 53 | SCUD-Sturm | Gebäude | 3500 | 3 | 4 | 6 | 4 | Palast |
-| 54 | Tunnelsystem | Gebäude | 1500 | 3 | 2 | 0 | 0 | Kaserne |
-| 55 | Rebell | Einheit | 150 | 1 | 1 | 1 | 1 | Kaserne |
-| 56 | Terrorist | Einheit | 250 | 2 | 0 | 3 | 2 | Kaserne |
-| 57 | Kampfjeep | Einheit | 500 | 1 | 2 | 2 | 1 | Waffenhändler |
-| 58 | Scorpion | Einheit | 600 | 1 | 3 | 2 | 1 | Waffenhändler |
-| 59 | Marodeur | Einheit | 900 | 2 | 4 | 3 | 2 | Waffenhändler |
-| 60 | Raketenbuggy | Einheit | 800 | 2 | 1 | 3 | 2 | Waffenhändler |
-| 61 | Sprengstoff-LKW | Einheit | 1000 | 3 | 0 | 5 | 5 | Waffenhändler |
-| 62 | SCUD-Werfer | Einheit | 1200 | 3 | 2 | 4 | 3 | Waffenhändler |
-| 63 | Toxingranaten | Upgrade | 1000 | 0 | – | – | – | Palast |
-| 64 | Spezialmunition | Upgrade | 1000 | 0 | – | – | – | Waffenhändler |
-| 65 | Instandsetzung | Upgrade | 2000 | 0 | – | – | – | Schwarzmarkt |
-| 66 | Buggy-Munition | Upgrade | 800 | 0 | – | – | – | Waffenhändler |
-| 67 | Scorpion-Raketen | Upgrade | 1000 | 0 | – | – | – | Schwarzmarkt |
-| 68 | Tarnung | Upgrade | 2000 | 0 | – | – | – | Palast |
+| ID | Name | Typ | Anzahl | Preis | Runden | Def | Off | Schaden | Freischaltung |
+|---|---|---|---|---|---|---|---|---|---|
+| 46 | Zentralgestirn | Planet | 1 | 2000 | 1 | 8 | 0 | 0 | Start |
+| 47 | Telecluster | Planet | 2 | 500 | 1 | 2 | 0 | 0 | Zentralgestirn |
+| 48 | Antimaterieminen | Planet | 2 | 1500 | 3 | 3 | 0 | 0 | Zentralgestirn |
+| 49 | Raumbarriere | Planet | 3 | 900 | 1 | 2 | 2 | 1 | Telecluster |
+| 50 | Flottenbasis | Planet | 2 | 2500 | 2 | 3 | 0 | 0 | Antimaterieminen |
+| 51 | Dunkler Rat | Planet | 1 | 2500 | 3 | 4 | 0 | 0 | Flottenbasis |
+| 52 | Spionagezentrum | Planet | 1 | 2500 | 2 | 3 | 0 | 0 | Dunkler Rat |
+| 53 | Schwarzes Loch | Planet | 1 | 3500 | 3 | 4 | 6 | 4 | Dunkler Rat |
+| 54 | Wurmloch | Planet | 1 | 1500 | 3 | 2 | 0 | 0 | Telecluster |
+| 55 | Shadow Arm | Aufklärer | 3 | 150 | 1 | 1 | 1 | 1 | Telecluster |
+| 56 | Photonenhagel | Aufklärer | 3 | 250 | 2 | 0 | 3 | 2 | Telecluster |
+| 57 | Schattenschleuder | Kampfschiff | 3 | 500 | 1 | 2 | 2 | 1 | Flottenbasis |
+| 58 | Sternenaxt | Kampfschiff | 3 | 600 | 1 | 3 | 2 | 1 | Flottenbasis |
+| 59 | Damokles | Kampfschiff | 2 | 900 | 2 | 4 | 3 | 2 | Flottenbasis |
+| 60 | Rage | Kampfschiff | 2 | 800 | 2 | 1 | 3 | 2 | Flottenbasis |
+| 61 | Erazor | Kampfschiff | 2 | 1000 | 3 | 0 | 5 | 5 | Flottenbasis |
+| 62 | Doomhammer | Kampfschiff | 2 | 1200 | 3 | 2 | 4 | 3 | Flottenbasis |
+| 63 | Künstliche Intelligenz | Upgrade | 1 | 1000 | 0 | – | – | – | Dunkler Rat |
+| 64 | Assimilation | Upgrade | 1 | 1000 | 0 | – | – | – | Flottenbasis |
+| 65 | Rekonfiguration | Upgrade | 1 | 2000 | 0 | – | – | – | Spionagezentrum |
+| 66 | Rauminvasion | Upgrade | 1 | 800 | 0 | – | – | – | Flottenbasis |
+| 67 | Gravitationsboost | Upgrade | 1 | 1000 | 0 | – | – | – | Spionagezentrum |
+| 68 | Schwarzer Schleier | Upgrade | 1 | 2000 | 0 | – | – | – | Dunkler Rat |
 
 **BIOTEC (ID 69–91)**
 
-| ID | Name | Typ | Preis | Runden | Def | Off | Schaden | Freischaltung |
-|---|---|---|---|---|---|---|---|---|
-| 69 | Konzernführung | Gebäude | 2000 | 1 | 8 | 0 | 0 | Start |
-| 70 | Hive | Gebäude | 500 | 1 | 2 | 0 | 0 | Zentrale |
-| 71 | Plasmareaktor | Gebäude | 1500 | 3 | 3 | 0 | 0 | Zentrale |
-| 72 | Deflektor | Gebäude | 900 | 1 | 2 | 2 | 1 | Hive |
-| 73 | Abt. Kapital | Gebäude | 2500 | 2 | 3 | 0 | 0 | Hive |
-| 74 | Manufaktur | Gebäude | 2500 | 3 | 4 | 0 | 0 | Abt. Kapital |
-| 75 | Helipad | Gebäude | 2500 | 2 | 3 | 0 | 0 | Abt. Kapital |
-| 76 | Abt. Forschung | Gebäude | 3500 | 3 | 4 | 6 | 4 | Manufaktur |
-| 77 | Wumms | Gebäude | 1500 | 3 | 2 | 0 | 0 | Abt. Forschung |
-| 78 | Einheit 5 | Einheit (Fuß) | 150 | 1 | 1 | 1 | 1 | Hive |
-| 79 | Mutant | Einheit (Fuß) | 250 | 1 | 1 | 1 | 2 | Hive |
-| 80 | Tyrant | Einheit (Fuß) | 500 | 2 | 2 | 3 | 2 | Hive |
-| 81 | Extend | Einheit (Fuß) | 600 | 2 | 3 | 3 | 3 | Hive |
-| 82 | Agressor Panzer | Einheit (Fahr.) | 900 | 2 | 4 | 3 | 2 | Manufaktur |
-| 83 | Artillerie Panzer | Einheit (Fahr.) | 800 | 2 | 1 | 3 | 2 | Manufaktur |
-| 84 | Regenerat. Panzer | Einheit (Fahr.) | 1000 | 3 | 3 | 5 | 5 | Manufaktur |
-| 85 | Helicopter | Einheit (Flug) | 1200 | 3 | 2 | 4 | 3 | Helipad |
-| 86 | Mutagen | Upgrade | 1000 | 0 | – | – | – | Hive |
-| 87 | Flüstern | Upgrade | 1200 | 0 | – | – | – | Helipad |
-| 88 | Perpetuum | Upgrade | 1000 | 0 | – | – | – | Plasmareaktor |
-| 89 | Chitinpanzer | Upgrade | 1500 | 0 | – | – | – | Abt. Forschung |
-| 90 | Neuronetz | Upgrade | 1000 | 0 | – | – | – | Abt. Forschung |
-| 91 | Zellregeneration | Upgrade | 2000 | 0 | – | – | – | Abt. Forschung |
+| ID | Name | Typ | Anzahl | Preis | Runden | Def | Off | Schaden | Freischaltung |
+|---|---|---|---|---|---|---|---|---|---|
+| 69 | Konzernführung | Planet | 1 | 2000 | 1 | 8 | 0 | 0 | Start |
+| 70 | Hive | Planet | 1 | 500 | 1 | 2 | 0 | 0 | Konzernführung |
+| 71 | Plasmareaktor | Planet | 3 | 1500 | 3 | 3 | 0 | 0 | Konzernführung |
+| 72 | Deflektor | Planet | 3 | 900 | 1 | 2 | 2 | 1 | Hive |
+| 73 | Abt. Kapital | Planet | 2 | 2500 | 2 | 3 | 0 | 0 | Hive |
+| 74 | Manufaktur | Planet | 1 | 2500 | 3 | 4 | 0 | 0 | Abt. Kapital |
+| 75 | Helipad | Planet | 1 | 2500 | 2 | 3 | 0 | 0 | Abt. Kapital |
+| 76 | Abt. Forschung | Planet | 1 | 3500 | 3 | 4 | 6 | 4 | Manufaktur |
+| 77 | Wumms | Planet | 1 | 1500 | 3 | 2 | 0 | 0 | Abt. Forschung |
+| 78 | Einheit 5 | Aufklärer | 2 | 150 | 1 | 1 | 1 | 1 | Hive |
+| 79 | Mutant | Aufklärer | 2 | 250 | 1 | 1 | 1 | 2 | Hive |
+| 80 | Tyrant | Aufklärer | 2 | 500 | 2 | 2 | 3 | 2 | Hive |
+| 81 | Extend | Aufklärer | 2 | 600 | 2 | 3 | 3 | 3 | Hive |
+| 82 | Agressor Panzer | Kampfschiff | 3 | 900 | 2 | 4 | 3 | 2 | Manufaktur |
+| 83 | Artillerie Panzer | Kampfschiff | 3 | 800 | 2 | 1 | 3 | 2 | Manufaktur |
+| 84 | Regenerat. Panzer | Kampfschiff | 3 | 1000 | 3 | 3 | 5 | 5 | Manufaktur |
+| 85 | Helicopter | Hyperraumschiff | 3 | 1200 | 3 | 2 | 4 | 3 | Helipad |
+| 86 | Mutagen | Upgrade | 1 | 1000 | 0 | – | – | – | Hive |
+| 87 | Flüstern | Upgrade | 1 | 1200 | 0 | – | – | – | Helipad |
+| 88 | Perpetuum | Upgrade | 1 | 1000 | 0 | – | – | – | Plasmareaktor |
+| 89 | Chitinpanzer | Upgrade | 1 | 1500 | 0 | – | – | – | Abt. Forschung |
+| 90 | Neuronetz | Upgrade | 1 | 1000 | 0 | – | – | – | Abt. Forschung |
+| 91 | Zellregeneration | Upgrade | 1 | 2000 | 0 | – | – | – | Abt. Forschung |
 
+> **Namen ohne Eintrag in der Kartenliste** (Vorschläge, noch zu bestätigen): Feuerschwinge (22), Lichtfunke (32), Strahlenjäger (33), Sonnenfaust (34), Glutdrache (35), Inferno (36), Lichtkoloss (37), Novakanone (38), Lichtpfeil (39), Sonnenkern (40).
+>
 > BIOTEC-Upgrades 86–91 hießen im Original „Update 1–6“ (alle Abt. Forschung, 1000/1000/2000/800/1000/2000 Credits, ohne Wirkung). Namen, Preise und Voraussetzungen sind eine Neuentwicklung. „Perpetuum“ und „Flüstern“ und ihre Position im Baum stammen aus `CnC_Techtrees_4p.ppt`.
 
 </details>
@@ -281,29 +299,29 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 
 | ID | Name | Effekt |
 |---|---|---|
-| 17 | USA: Panzerung | Crusader Def +1 (→4), Paladin Def +1 (→5) |
-| 18 | USA: Kontrollstäbe | Energie-Upgrade: jedes Kraftwerk +2 Energie extra |
-| 19 | USA: Laserzielerfassung | Raptor Off +1 (→4), Stealth Off +1 (→4) |
-| 20 | USA: Raketenmagazin | Raptor Schaden +1 (→2), Stealth Schaden +1 (→3) |
-| 21 | USA: Spionagesatellit | Im Original ohne Effekt. Die App erinnert jeden Zug: eine verdeckte Gegnerkarte aufdecken |
-| 22 | USA: TOW-Rakete | Panzerjeep Off +1 (→3) |
-| 40 | China: Nuklearpanzer | Faust Maos Schaden +1 (→2) |
-| 41 | China: Schwarzes Napalm | Drachenpanzer Schaden +1 (→2) |
-| 42 | China: Überlastung | Energie-Upgrade: jedes Kraftwerk +2 Energie extra |
-| 43 | China: Uran-Rakete | Infernalgeschütz Schaden +1 (→3), Nukleargeschütz +1 (→4) |
-| 44 | China: Nationalismus | Rotgardist Off +1 (→2), Panzerjäger Off +1 (→3) |
-| 45 | China: Mig-Panzerung | Mig Def +1 (→4) |
-| 63 | GBA: Toxingranaten | Scorpion Schaden +1 (→2), Marodeur Schaden +1 (→3) |
-| 64 | GBA: Spezialmunition | Rebell Schaden +1 (→2), Kampfjeep Schaden +1 (→2) |
-| 65 | GBA: Instandsetzung | Reparatur-Upgrade: Reparatur heilt +2 statt +1 |
-| 66 | GBA: Buggy-Munition | Raketenbuggy Schaden +1 (→3) |
-| 67 | GBA: Scorpion-Raketen | Scorpion Off +1 (→3) |
-| 68 | GBA: Tarnung | Im Original ohne Effekt. Die App weist nach dem Kauf darauf hin, dass Einheiten verdeckt ausgespielt werden dürfen |
+| 17 | Starwing: Schildgenerator | Pegasus Def +1 (→4), Poseidons Fluch Def +1 (→5) |
+| 18 | Starwing: Teilchenbeschleuniger | Energie-Upgrade: jeder Protonenmond +2 Energie extra |
+| 19 | Starwing: Präzisionssprung | Zeus Off +1 (→4), Nostradamus Off +1 (→4) |
+| 20 | Starwing: Interstellare Macht | Zeus Schaden +1 (→2), Nostradamus Schaden +1 (→3) |
+| 21 | Starwing: Auge des Raumes | Im Original ohne Effekt. Die App erinnert jeden Zug: eine verdeckte Gegnerkarte aufdecken |
+| 22 | Starwing: Feuerschwinge | Phoenix Off +1 (→3) |
+| 40 | Lightforce: Sonnenkern | Sonnenfaust Schaden +1 (→2) |
+| 41 | Lightforce: Effektivierung | Glutdrache Schaden +1 (→2) |
+| 42 | Lightforce: Quantensammler | Energie-Upgrade: jeder Elektronenmond +2 Energie extra |
+| 43 | Lightforce: Donnerschlag | Inferno Schaden +1 (→3), Novakanone Schaden +1 (→4) |
+| 44 | Lightforce: Nachtsicht | Lichtfunke Off +1 (→2), Strahlenjäger Off +1 (→3) |
+| 45 | Lightforce: Lichtgeschwindigkeit | Lichtpfeil Def +1 (→4) |
+| 63 | Scaretech: Künstliche Intelligenz | Sternenaxt Schaden +1 (→2), Damokles Schaden +1 (→3) |
+| 64 | Scaretech: Assimilation | Shadow Arm Schaden +1 (→2), Schattenschleuder Schaden +1 (→2) |
+| 65 | Scaretech: Rekonfiguration | Reparatur-Upgrade: Reparatur heilt +2 statt +1 |
+| 66 | Scaretech: Rauminvasion | Rage Schaden +1 (→3) |
+| 67 | Scaretech: Gravitationsboost | Sternenaxt Off +1 (→3) |
+| 68 | Scaretech: Schwarzer Schleier | Im Original ohne Effekt. Die App weist nach dem Kauf darauf hin, dass Einheiten verdeckt ausgespielt werden dürfen |
 | 86 | BIOTEC: Mutagen | Einheit 5 Off +1 (→2), Mutant Off +1 (→2) |
-| 87 | BIOTEC: Flüstern | Helicopter wird von Flugabwehr nicht erfasst (Kampf wie Stealth-Fighter) |
-| 88 | BIOTEC: Perpetuum | Energie-Upgrade: jeder Plasmareaktor +2 Energie (wie Kontrollstäbe/Überlastung) |
+| 87 | BIOTEC: Flüstern | Helicopter wird von der Planetenabwehr nicht erfasst (Kampf wie Nostradamus) |
+| 88 | BIOTEC: Perpetuum | Energie-Upgrade: jeder Plasmareaktor +2 Energie (wie Teilchenbeschleuniger/Quantensammler) |
 | 89 | BIOTEC: Chitinpanzer | Agressor Panzer Def +1 (→5), Regenerat. Panzer Def +1 (→4), auch bereits gebaute |
-| 90 | BIOTEC: Neuronetz | Spielfeld: einmal pro Runde zwei eigene verdeckte Gebäude tauschen oder eine eigene Einheit in Reihe 1 umsetzen (Stapelregeln gelten, aufgedeckte Karten bleiben offen). Die App erinnert zu Zugbeginn |
+| 90 | BIOTEC: Neuronetz | Spielfeld: einmal pro Runde zwei eigene verdeckte Planeten tauschen oder eine eigene Einheit in Reihe 1 umsetzen (Stapelregeln gelten, aufgedeckte Karten bleiben offen). Die App erinnert zu Zugbeginn |
 | 91 | BIOTEC: Zellregeneration | Zu Beginn jedes eigenen Zuges +1 Defensive für alle beschädigten Einheiten (bis zum Maximum) |
 
 ---
@@ -319,7 +337,7 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 ### Barcodes
 
 Jede **physische** Karte hat eine eigene Nummer 000–159 (wie im Original), mehrere Nummern zeigen über `kartenzeiger[]` auf denselben Kartentyp.
-Der EAN-8-Code ist `0000` + dreistellige Nummer + Prüfziffer, z. B. Karte 7 → `00000079`.
+Der EAN-8-Code ist `0000` + dreistellige Nummer + Prüfziffer, z. B. Karte 7 → `00000079`. Die Nummern sind dieselben wie in der C&C-Fassung und in der Spalte „Kartennummer“ der Domination-Kartenliste.
 Die alten Barcodes (Balkenbreiten für die Lichtschranke) sind mit Handykameras nicht lesbar, deshalb werden die Karten neu gedruckt oder mit Etiketten überklebt.
 
 Der alte Generator in `Tools/` zeichnete die Barcodes mit zu kleiner Ruhezone (~3,7 statt 7 Module) und unscharfen Bruchteil-Pixeln.
@@ -331,7 +349,7 @@ Ein Test dekodiert alle 160 Codes mit ZXing.
 ```
 index.html, src/main.tsx      Web-App (Vite + TypeScript + Preact)
 src/engine/                   Spiellogik ohne UI, 1:1 aus dem Microcontroller-Code
-  data.ts                       Kartenwerte, kartenzeiger[], Konstanten
+  data.ts                       Kartenwerte und -namen, kartenzeiger[], Konstanten
   ean.ts, cards.ts              EAN-8, Fraktion/Kartenart je physischer Karte
   state.ts, turn.ts             Spielzustand, Zugbeginn (Einkommen, Überlastung, Sonderaktion, Bauphase)
   buy.ts, combat.ts, actions.ts Kaufen + Upgrades, 5 Kampftypen, Reparatur/Info
@@ -341,73 +359,51 @@ src/scanner/                  Kamera + Barcode-Erkennung, manuelle Auswahl
 src/ui/                       Bildschirme, Kampfansicht, Platzhalter-Grafiken
 src/print/                    Kartendrucker (Tools/generate_barcodes.html)
 public/cards/                 Kartenbilder <ID>.png (Checkliste in README.md)
-Altes Projekt/                Originalunterlagen
+Unterlagen/                   Domination-Kartenliste (neue Namen)
+Altes Projekt/                Originalunterlagen der C&C-Fassung (Regelreferenz)
 ```
 
 ## Abweichungen vom Original
 
 Die Mechanik folgt dem Microcontroller-Code. Folgende Programmierfehler bzw. fehlende Regeln wurden bewusst geändert:
 
-1. **Superwaffe zählt nur einmal als Gebäude.** Im Original wurde sie bei jeder Reaktivierung nach dem Nachladen erneut gezählt (+1 Siegpunkt pro Ladezyklus).
-2. **Energie-Upgrades** (Kontrollstäbe, Überlastung) geben den Sofortbonus nur für aktivierte Reaktoren. Im Original brachte ein Reaktor im Bau +2 sofort und +5 bei Fertigstellung.
-3. **Flugabwehr gegen Flugzeuge** zählt nur aktivierte Stellungen, nicht solche im Bau.
-4. **Gebäudekauf bei Energie ≤ 0 gesperrt.** Im Original nur bei genau 0.
-5. **Überlastung:** Ein Reaktor, der wegen Energiemangel wieder aufgebaut wird, bekommt seine volle Defensive statt pauschal 3 (ein USA-Fusionsreaktor hat maximal 2).
+1. **Superwaffe zählt nur einmal als Planet.** Im Original wurde sie bei jeder Reaktivierung nach dem Nachladen erneut gezählt (+1 Siegpunkt pro Ladezyklus).
+2. **Energie-Upgrades** (Teilchenbeschleuniger, Quantensammler) geben den Sofortbonus nur für aktivierte Energiequellen. Im Original brachte eine Energiequelle im Bau +2 sofort und +5 bei Fertigstellung.
+3. **Planetenabwehr gegen Hyperraumschiffe** zählt nur aktivierte Abwehrplaneten, nicht solche im Bau.
+4. **Planetenkauf bei Energie ≤ 0 gesperrt.** Im Original nur bei genau 0.
+5. **Überlastung:** Eine Energiequelle, die wegen Energiemangel wieder aufgebaut wird, bekommt ihre volle Defensive statt pauschal 3 (ein Protonenmond hat maximal 2).
 6. **Volles Inventar** (40 Karten) meldet „nicht mehr möglich!“ statt in fremden Speicher zu schreiben.
-7. **Spionagesatellit:** Erinnerung zu Zugbeginn, dass eine verdeckte Gegnerkarte aufgedeckt werden darf.
-8. **Tarnung:** Hinweis nach dem Kauf, dass Einheiten verdeckt ausgespielt werden dürfen.
-9. Jedes neue Spiel startet mit frischen Kartenwerten. Im Original wurde z. B. die Mig-Panzerung bei einem Neustart ohne Stromreset nicht zurückgesetzt.
+7. **Auge des Raumes** (Spionagesatellit): Erinnerung zu Zugbeginn, dass eine verdeckte Gegnerkarte aufgedeckt werden darf.
+8. **Schwarzer Schleier** (Tarnung): Hinweis nach dem Kauf, dass Einheiten verdeckt ausgespielt werden dürfen.
+9. Jedes neue Spiel startet mit frischen Kartenwerten. Im Original wurde z. B. Lichtgeschwindigkeit (Mig-Panzerung) bei einem Neustart ohne Stromreset nicht zurückgesetzt.
 10. **BIOTEC-Upgrades** (86–91) haben Namen, Preise, Voraussetzungen und Wirkungen bekommen. Im Original waren sie unfertig und wirkungslos.
 
 Bewusst **wie im Original** belassen:
 - Sonderaktion tritt mit 4/6 Wahrscheinlichkeit ein (der Kommentar im Code sagt 1:3).
-- Orden ab 5 Gebäuden bzw. 5 Siegen (die Anleitung sagt „mehr als 6“).
+- Orden ab 5 Planeten bzw. 5 Siegen (die Anleitung sagt „mehr als 6“).
 - Startkapital 1600 (die Anleitung sagt 5000).
-- Terrorist und Sprengstoff-LKW haben Defensive 0 und werden dadurch nach jedem Angriff zerstört. Sie erhalten nie einen Stern.
+- Photonenhagel und Erazor haben Defensive 0 und werden dadurch nach jedem Angriff zerstört. Sie erhalten nie einen Stern.
 - Bei Einheit vs Einheit schlagen beide in jeder Runde zu, auch wenn der Gegner gerade gefallen ist. Beide können fallen.
-- Eine Flugabwehrstellung schlägt bei einem Bodenangriff auch dann zurück, wenn sie dabei zerstört wurde.
+- Ein Abwehrplanet schlägt bei einem Angriff von Einheiten auch dann zurück, wenn er dabei zerstört wurde.
+- Antimaterieminen brauchen 3 Runden Bauzeit (die Domination-Kartenliste nennt 2, der Code gewinnt).
 
 ---
 
-### Mehrfachkarten (physisches Deck)
+### BIOTEC Einheiten (Detail aus der alten Kartenliste)
 
-Viele Kartentypen existieren mehrfach im physischen Deck (aus EAN-Liste & Kartenliste):
-
-| Fraktion | Typ | Beispiel | Anzahl im Deck |
-|---|---|---|---|
-| USA | Fusionsreaktor | 3× (Haupt + 2 weitere) |
-| USA | Patriot-Batterie | 3× |
-| USA | Ranger | 3× |
-| USA | Raketentrooper | 3× |
-| USA | Panzerjeep/Crusader | je 3× |
-| USA | Tomahawk/Paladin/Raptor/Stealth | je 2× |
-| GBA | Geheimlager | 2× (= 2 Nachschublager) |
-| GBA | Stinger-Stellung | 3× |
-| GBA | Rebell/Terrorist/Kampfjeep/Scorpion | je 3× |
-| China | Atomreaktor | 3× |
-| China | Bunker | 3× |
-| China | Rotgardist/Panzerjäger/Faust Maos/Drachenpanzer | je 3× |
-| BIOTEC | Plasmareaktor | 3× |
-| BIOTEC | Deflektor | 3× |
-| BIOTEC | Einheit 5/Mutant/Tyrant/Agressor | je 2–3× |
-
-> Jede physische Karte hat eine eigene EAN-Nummer (000–159), aber mehrere EAN-Nummern können auf denselben Kartentyp zeigen (via `kartenzeiger[]` im Code).
-
-### BIOTEC Einheiten (Detail aus Kartenliste)
-
-Die Kartenliste enthält bei BIOTEC teils andere Namen und Werte als der Code. Die Kartenliste zeigt, dass BIOTEC *deutlich mehr* Einheiten-Varianten hat als die anderen Fraktionen:
+Die alte Kartenliste enthält bei BIOTEC teils andere Namen und Werte als der Code:
 
 | Kartenliste-Name | Code-Name | Typ | Preis | Def | Off | Schaden | Voraussetzung |
 |---|---|---|---|---|---|---|---|
-| Einheit 5 (×2) | Einheit 5 | Fuß | 200 | 1 | 1 | 1 | Hive |
-| Mutant (×2) | Mutant | Fuß | 230 | 1 | 2 | 1 | Hive |
-| Tyrant (×2) | Tyrant | Fuß | 300 | 1 | 3 | 2 | Hive |
-| Agressor (×2) | – | Fahr. | 400 | 3 | 3 | 3 | Hive |
-| Panzer 1 (×3) | Agressor Panzer | Fahr. | 800–900 | 3 | 3 | 1 | Manufaktur |
-| Panzer 2 (×3) | Artillerie Panzer | Fahr. | 800–1000 | 2 | 3 | 2 | Manufaktur |
-| Panzer 3 (×3) | Regenerat. Panzer | Fahr. | 1600–1800 | 3 | 4 | 3 | Manufaktur |
-| Panzer 4 (×1) | – | Fahr. | 2000 | 5 | 5 | 5 | Manufaktur |
-| Helicopter (×2) | Helicopter | Flug | 1200 | 3 | 3 | 2 | Helipad |
+| Einheit 5 (×2) | Einheit 5 | Aufklärer | 200 | 1 | 1 | 1 | Hive |
+| Mutant (×2) | Mutant | Aufklärer | 230 | 1 | 2 | 1 | Hive |
+| Tyrant (×2) | Tyrant | Aufklärer | 300 | 1 | 3 | 2 | Hive |
+| Agressor (×2) | – | Kampfschiff | 400 | 3 | 3 | 3 | Hive |
+| Panzer 1 (×3) | Agressor Panzer | Kampfschiff | 800–900 | 3 | 3 | 1 | Manufaktur |
+| Panzer 2 (×3) | Artillerie Panzer | Kampfschiff | 800–1000 | 2 | 3 | 2 | Manufaktur |
+| Panzer 3 (×3) | Regenerat. Panzer | Kampfschiff | 1600–1800 | 3 | 4 | 3 | Manufaktur |
+| Panzer 4 (×1) | – | Kampfschiff | 2000 | 5 | 5 | 5 | Manufaktur |
+| Helicopter (×2) | Helicopter | Hyperraumschiff | 1200 | 3 | 3 | 2 | Helipad |
 
 > **Hinweis:** Die Werte im Code (defaultkarten[]) und der Kartenliste weichen teilweise ab. Die Web-App verwendet die Code-Werte, da sie die tatsächlich getestete Spielbalance darstellen.
 > Auch die Zuordnung unterscheidet sich: Die Karte „Panzer 4“ (Nummer 151) zeigt im Code auf den Helicopter, „Agressor“ (140/141) auf „Extend“.
@@ -416,20 +412,21 @@ Die Kartenliste enthält bei BIOTEC teils andere Namen und Werte als der Code. D
 
 ## Offene Punkte / TODO
 
-- [x] **BIOTEC Upgrades 1–6:** neu entworfen (Mutagen, Flüstern, Perpetuum, Chitinpanzer, Neuronetz, Zellregeneration), siehe Upgrade-Tabelle. Das Energie-Upgrade der Kartenliste ist „Perpetuum“.
-- [x] **USA Spionagesatellit / GBA Tarnung:** Als Hinweis in der App umgesetzt (Aufdecken bzw. verdeckt Ausspielen passiert am Tisch)
-- [x] **Startkapital:** ~~Anleitung sagt 5000, Code hat 1600~~ → **1600 ist korrekt** (Anleitung veraltet)
-- [x] **EAN-8 Zuordnung:** alle 160 physischen Karten haben echte EAN-8-Codes (Kartendrucker)
-- [ ] **Kartenbilder:** Kommen später neu, bis dahin Platzhalter-Grafiken (farbcodiert nach Fraktion + Kartentyp-Icon). Dateien unter `public/cards/`
+- [ ] **Namen bestätigen:** Lightforce-Einheiten 32–39 und die Upgrades 22 und 40 haben Vorschlagsnamen (in der Kartenliste noch leer)
+- [ ] **BIOTEC:** in das Domination-Universum übertragen (Namen, evtl. Fraktionsname)
+- [ ] **Kartenbilder:** im Stil der Entwürfe von Helge Vogt (`domination_gfx/`), bis dahin Platzhalter-Grafiken. Dateien unter `public/cards/`
+- [ ] **Cloudflare Pages:** Projekt `domination-cardgame` anlegen (siehe oben)
 - [ ] **Techtree-Grafiken:** Freischaltungs-Bäume pro Fraktion als UI-Ansicht
 - [ ] **BIOTEC Einheiten:** Werte-Diskrepanzen zwischen Code und Kartenliste abgleichen
-- [x] **Hosting:** Cloudflare Pages, installierbar und offline spielbar
+- [x] **BIOTEC Upgrades 1–6:** neu entworfen, siehe Upgrade-Tabelle
+- [x] **Auge des Raumes / Schwarzer Schleier:** als Hinweis in der App umgesetzt (Aufdecken bzw. verdeckt Ausspielen passiert am Tisch)
+- [x] **EAN-8 Zuordnung:** alle 160 physischen Karten haben echte EAN-8-Codes (Kartendrucker)
 
 ---
 
 ## Altes Projekt
 
-Der Ordner `Altes Projekt/` enthält die originalen Unterlagen:
+Der Ordner `Altes Projekt/` enthält die originalen Unterlagen der C&C-Fassung. Sie bleiben die Regelreferenz:
 
 | Datei | Inhalt |
 |---|---|
@@ -445,5 +442,5 @@ Der Ordner `Altes Projekt/` enthält die originalen Unterlagen:
 | `CnC_Struktur.ppt` | Programmstruktur |
 | `CnC_Anweisungssheet_4p.ppt` | Kurzanleitung – enthält Anweisungsblatt-Grafik (1037×718) + Einheiten-Thumbnails |
 
-> **Hinweis:** Die .doc/.xls-Dateien sind mit Office-Passwort verschlüsselt (`hindu12`).
-> Die .ppt-Dateien enthalten eingebettete C&C-Screenshots als Thumbnails (zu klein als Kartenbilder, aber nützlich als Referenz).
+> **Hinweis:** Die .doc/.xls-Dateien sind mit Office-Passwort verschlüsselt (`hindu12`). `Unterlagen/Domination_Kartenliste.xls` ist nicht verschlüsselt.
+> Die .ppt-Dateien enthalten eingebettete C&C-Screenshots als Thumbnails (nur als Referenz, nicht für das Spiel verwenden).

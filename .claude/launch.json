@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "cnc-dev",
+      "name": "domination-dev",
       "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
-      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--mode", "http", "--port", "5174"],
-      "port": 5174
+      "runtimeArgs": ["node_modules/vite/bin/vite.js", "--mode", "http", "--port", "5175"],
+      "port": 5175
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { CARDS, GBA, MAX_BUYS, NO_REQUIREMENT, REACTOR_UPGRADE_BONUS, UPG } from './data';
+import { CARDS, SCARETECH, MAX_BUYS, NO_REQUIREMENT, REACTOR_UPGRADE_BONUS, UPG } from './data';
 import { cardIdOfEan, factionOfEan, isReactor, kindOfEan } from './cards';
 import type { GameEvent } from './events';
 import type { ErrorCode } from './messages';
@@ -28,7 +28,7 @@ export function buyCheck(s: GameState, ean: number): ErrorCode | null {
   if (!unlocked) return 'locked';
   if (p.credits < card.price) return 'noCredits';
   // Korrektur 4: Energie <= 0 statt == 0
-  if (p.faction !== GBA && consumesEnergy(ean) && p.energy <= 0) return 'noEnergy';
+  if (p.faction !== SCARETECH && consumesEnergy(ean) && p.energy <= 0) return 'noEnergy';
   // Korrektur 6: volles Inventar statt Speicherüberlauf
   if (!p.slots.includes(null)) return 'notPossible';
   return null;
@@ -63,58 +63,58 @@ function applyUpgrade(s: GameState, p: Player, id: number): GameEvent[] {
     ownedSlots(p).filter((slot) => slot.active && slotCardId(slot) === reactorId).length * REACTOR_UPGRADE_BONUS;
 
   switch (id) {
-    case UPG.usaArmor:
+    case UPG.starwingArmor:
       raiseDef(12); raiseDef(14);
       st[12].def = 4; st[14].def = 5;
       break;
-    case UPG.usaControlRods:
+    case UPG.starwingControlRods:
       p.energyUpgrade = true;
       p.energy += reactorBonus(2);
       break;
-    case UPG.usaLaser:
+    case UPG.starwingLaser:
       st[15].off = 4; st[16].off = 4;
       break;
-    case UPG.usaRocketPods:
+    case UPG.starwingRocketPods:
       st[15].dmg = 2; st[16].dmg = 3;
       break;
-    case UPG.usaTow:
+    case UPG.starwingTow:
       st[11].off = 3;
       break;
-    case UPG.gbaToxin:
+    case UPG.scaretechToxin:
       st[58].dmg = 2; st[59].dmg = 3;
       break;
-    case UPG.gbaSpecialAmmo:
+    case UPG.scaretechSpecialAmmo:
       st[55].dmg = 2; st[57].dmg = 2;
       break;
-    case UPG.gbaAutorepair:
+    case UPG.scaretechAutorepair:
       p.repairUpgrade = true;
       s.repairBonus = true;
       break;
-    case UPG.gbaBuggyAmmo:
+    case UPG.scaretechBuggyAmmo:
       st[60].dmg = 3;
       break;
-    case UPG.gbaScorpionRocket:
+    case UPG.scaretechScorpionRocket:
       st[58].off = 3;
       break;
-    case UPG.gbaCamouflage:
+    case UPG.scaretechCamouflage:
       return [{ type: 'camouflage' }];
-    case UPG.chinaNuclearTank:
+    case UPG.lightforceNuclearTank:
       st[34].dmg = 2;
       break;
-    case UPG.chinaBlackNapalm:
+    case UPG.lightforceBlackNapalm:
       st[35].dmg = 2;
       break;
-    case UPG.chinaOvercharge:
+    case UPG.lightforceOvercharge:
       p.energyUpgrade = true;
       p.energy += reactorBonus(25);
       break;
-    case UPG.chinaUraniumShells:
+    case UPG.lightforceUraniumShells:
       st[36].dmg = 3; st[38].dmg = 4;
       break;
-    case UPG.chinaNationalism:
+    case UPG.lightforceNationalism:
       st[32].off = 2; st[33].off = 3;
       break;
-    case UPG.chinaMigArmor:
+    case UPG.lightforceMigArmor:
       raiseDef(39);
       st[39].def = 4;
       break;

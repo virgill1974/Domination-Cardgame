@@ -4,9 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Web-App port of the card game "Command & Conquer – Das Kartenspiel" (2005). A phone/tablet replaces a self-built ATmega644 terminal (light-barrier barcode reader, 2×20 LCD, 7 buttons) and is passed around the table (hot-seat). The camera reads EAN-8 barcodes on the physical cards. Board, rows and card placement stay physical; the app only does what the terminal did.
+Web app for the sci-fi card game **"Domination – Das Kartenspiel"**. It began in 2005 as "Command & Conquer – Das Kartenspiel"; this repo is a copy of `CnC-web` (history included) re-skinned into an own universe to avoid C&C licensing. `CnC-web` stays untouched as the C&C version; don't port changes back unless asked. A phone/tablet replaces a self-built ATmega644 terminal (light-barrier barcode reader, 2×20 LCD, 7 buttons) and is passed around the table (hot-seat). The camera reads EAN-8 barcodes on the physical cards. Board, rows and card placement stay physical; the app only does what the terminal did.
 
 **The reference for all game rules is `Altes Projekt/CnC_Microcontroller_code.txt`.** Mechanics are ported 1:1; intentional deviations are listed in README.md under "Abweichungen vom Original". When changing a rule, keep that list in sync. Engine comments cite original line numbers (e.g. `Z. 1943–2483`). Where the manual (`.doc`) and the code disagree, the code wins. UI text and the user are German.
+
+**Universe & naming** (`Unterlagen/Domination_Kartenliste.xls` is the source for names; README.md has the full table and a glossary):
+- Factions: Starwing (was USA), Lightforce (China), Scaretech (GBA), BIOTEC (unchanged for now, incl. its card names). Code identifiers follow: `STARWING`, `LIGHTFORCE`, `SCARETECH`, `UPG.starwing*` etc. UPG keys keep their mechanic names (`starwingSpySatellite` = „Auge des Raumes“).
+- UI terms: Gebäude → **Planet**, Kommandozentrale → **Zentralgestirn**, Fußeinheit → **Aufklärer**, Fahrzeug → **Kampfschiff**, Flugzeug → **Hyperraumschiff**, Flugabwehr → **Planetenabwehr**, Kraftwerk → **Energiequelle**. Engine internals (`building`, `isFlak`, `AIRCRAFT`, German test names) still use the old mechanic words; only user-visible text must use the new ones.
+- Names without an XLS entry are proposals (Feuerschwinge 22, Lightforce 32–40); README lists them.
+- Never reintroduce C&C names, logos or sounds in anything user-visible.
+- `domination_gfx/` (git-ignored, local only): card design drafts by Helge Vogt (PSD templates, backs, demo cards). They are drafts; final card art will be generated later in his style. Its `Beispielbilder/` are third-party DeviantArt images, never ship them.
 
 ## Commands
 
@@ -22,11 +29,11 @@ npm run preview -- --mode http   # serve dist/ to test PWA behaviour (service wo
 npx pwa-assets-generator         # regenerate app icons in public/ui/ from public/ui/logo.svg
 ```
 
-`.claude/launch.json` starts the dev server in http mode on port 5174 for the Browser pane.
+`.claude/launch.json` starts the dev server in http mode on port 5175 for the Browser pane (CnC-web uses 5174).
 
 ## Deployment & PWA
 
-- Hosted on **Cloudflare Pages** at https://cnc-web.pages.dev, connected to this private GitHub repo. Every push to `main` deploys (`npm run build` → `dist`, Node from `.node-version`). There is no deploy script.
+- Hosted on **Cloudflare Pages** at https://domination-cardgame.pages.dev (project to be created by the user, see README), connected to the private GitHub repo virgill1974/Domination-Cardgame. Every push to `main` deploys (`npm run build` → `dist`, Node from `.node-version`). There is no deploy script.
   - It is a Pages project, not a Worker. Don't add `wrangler.jsonc` or a `wrangler deploy` step; the user explicitly wants Pages.
   - Pages serves `index.html` (200) for missing files. The card-art and sound fallbacks rely on load/decode failing, not on a 404.
 - `vite-plugin-pwa` (generateSW, `registerType: 'prompt'`) precaches everything needed to play offline (`workbox.globPatterns` in `vite.config.ts`: app, zxing `.wasm`, fonts, `public/ui`, `public/cards`, `public/sounds`). New asset types must be added there or they won't work offline.

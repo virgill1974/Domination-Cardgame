@@ -9,8 +9,7 @@ export type SoundName = (typeof SOUND_NAMES)[number];
 type Synth = (c: BaseAudioContext, out: AudioNode, t: number) => void;
 export type Channel = 'sfx' | 'music';
 
-const STORAGE_KEY = 'cnc-kartenspiel-volume';
-const LEGACY_KEY = 'cnc-kartenspiel-sound';
+const STORAGE_KEY = 'domination-volume';
 const MAX_GAIN = 1.2;
 const volumes = readVolumes();
 let ctx: AudioContext | null = null;
@@ -20,8 +19,7 @@ const samples = new Map<SoundName, AudioBuffer | null>();
 function readVolumes(): Record<Channel, number> {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null');
-    if (typeof saved?.sfx === 'number' && typeof saved?.music === 'number') return saved;
-    if (localStorage.getItem(LEGACY_KEY) === 'off') return { sfx: 0, music: 0 };
+    if (typeof saved?.sfx === 'number' && typeof saved?.music === 'number') return saved;
   } catch {
     // ohne Speicher gelten die Standardwerte
   }
