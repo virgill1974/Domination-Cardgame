@@ -79,7 +79,7 @@ export function CombatView({ result, stats, onDone }: { result: CombatResult; st
     }
     if (done && result.destroyed.length && result.kind !== 'superweapon') {
       play('explosion', single ? 0.8 : 0);
-      setTimeout(() => glitch('tear', 2.1), single ? 800 : 0);
+      setTimeout(() => glitch('rgb', 2.2), single ? 800 : 0);
     }
   }, [shown]);
 

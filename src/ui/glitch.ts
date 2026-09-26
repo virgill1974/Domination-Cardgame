@@ -1,10 +1,10 @@
 // Glitch-Effekte: zufällig alle 10–20 s (Startbildschirm, Einrichtung, Partie) und gezielt bei Kampfereignissen.
 // Setzt nur data-glitch, --glitch-strength und --glitch-ms auf <html>; das Aussehen steht in theme.css („Glitch“).
 // Nie bei laufender Kamera (Scanner), im Hintergrund oder mit „Bewegung reduzieren“.
-export type Glitch = 'rgb' | 'tear' | 'scan' | 'noise';
+export type Glitch = 'rgb' | 'scan' | 'noise';
 
-const KINDS: Glitch[] = ['rgb', 'tear', 'scan', 'noise'];
-const DURATION: Record<Glitch, number> = { rgb: 340, tear: 420, scan: 620, noise: 480 };
+const KINDS: Glitch[] = ['rgb', 'scan', 'noise'];
+const DURATION: Record<Glitch, number> = { rgb: 340, scan: 620, noise: 480 };
 const BURST_CHANCE = 0.4; // zufällige Glitches kommen oft als Doppelschlag
 
 let busy = false;
