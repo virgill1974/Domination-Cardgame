@@ -4,7 +4,7 @@ import {
 } from './data';
 import { isReactor, isSupply, kindOfEan } from './cards';
 import type { GameEvent } from './events';
-import { currentPlayer, d6, ownedSlots, slotCardId, type GameState, type Player, type Rng } from './state';
+import { currentPlayer, d6, hasCard, ownedSlots, slotCardId, type GameState, type Player, type Rng } from './state';
 import { mainCheck } from './victory';
 
 export const reactorEnergy = (p: Player) => REACTOR_ENERGY + (p.energyUpgrade ? REACTOR_UPGRADE_BONUS : 0);
@@ -67,8 +67,17 @@ export function beginTurn(s: GameState, rng: Rng): TurnStart {
 
   if (s.round === 1) p.energy = 1;
 
-  // Korrektur 8: Hinweis auf den Spionagesatelliten
-  if (ownedSlots(p).some((slot) => slotCardId(slot) === UPG.usaSpySatellite)) events.push({ type: 'spySatellite' });
+  // BIOTEC Zellregeneration: beschädigte aktive Einheiten +1 Defensive, gedeckelt
+  if (hasCard(p, UPG.biotecRegeneration)) {
+    const healed = ownedSlots(p).filter((slot) =>
+      slot.active && kindOfEan(slot.ean) === 'unit' && slot.def < s.stats[slotCardId(slot)].def);
+    healed.forEach((slot) => slot.def++);
+    if (healed.length) events.push({ type: 'regeneration', count: healed.length });
+  }
+
+  // Korrektur 8: Hinweis auf den Spionagesatelliten; BIOTEC Neuronetz analog
+  if (hasCard(p, UPG.usaSpySatellite)) events.push({ type: 'spySatellite' });
+  if (hasCard(p, UPG.biotecNeuronet)) events.push({ type: 'neuronet' });
 
   s.turnActive = true;
   events.push(...mainCheck(s));

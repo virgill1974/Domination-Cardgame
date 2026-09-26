@@ -107,7 +107,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
           [0, 'Teuer, aber starke Flugzeuge. Der Stealth-Fighter ignoriert die Flugabwehr, die Patriot-Batterie ist mächtig. Der Spionagesatellit deckt jede Runde eine gegnerische Karte auf.'],
           [1, 'Ausgewogene Preise, die mächtigsten Fahrzeuge (Weltenherrscher, Infernalgeschütz). Die Mig überspringt eine Reihe, Nationalismus stärkt Fußtruppen.'],
           [2, 'Günstig, aber schwächer. Keine Energie nötig, das Tunnelsystem lässt Fußtruppen Reihe 1 überspringen. Mit Tarnung spielst du Einheiten verdeckt aus. Terrorist und Sprengstoff-LKW zerstören sich beim Angriff selbst.'],
-          [3, 'Später Zusatz, ähnlich wie China aufgebaut, viele Panzertypen. Die Upgrades haben noch keine Wirkung.'],
+          [3, 'Bio-Konzern mit vielen Panzertypen. Mit Flüstern entgeht der Helicopter der Flugabwehr, Zellregeneration heilt Einheiten jede Runde. Mit dem Neuronetz darfst du einmal pro Runde zwei eigene Gebäude tauschen oder eine Einheit umsetzen.'],
         ] as Array<[Faction, string]>).map(([f, text]) => (
           <div key={f} class="faction-bar" style={{ ...factionStyle(f), paddingLeft: '10px' }}>
             <div class="faction-name">{FACTIONS[f]}</div>

@@ -6,5 +6,7 @@ export type GameEvent =
   | { type: 'activated'; ean: number }
   | { type: 'spySatellite' }
   | { type: 'camouflage' }
+  | { type: 'neuronet' }
+  | { type: 'regeneration'; count: number }
   | { type: 'medal'; medal: 'bestBase' | 'bestArmy' }
   | { type: 'winner'; faction: Faction; reason: 'points' | 'headquarters' };

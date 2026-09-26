@@ -118,6 +118,20 @@ function applyUpgrade(s: GameState, p: Player, id: number): GameEvent[] {
       raiseDef(39);
       st[39].def = 4;
       break;
+    // BIOTEC (Neuentwicklung). Flüstern wirkt im Kampf, Zellregeneration zu Zugbeginn.
+    case UPG.biotecMutagen:
+      st[78].off = 2; st[79].off = 2;
+      break;
+    case UPG.biotecPerpetuum:
+      p.energyUpgrade = true;
+      p.energy += reactorBonus(71);
+      break;
+    case UPG.biotecChitin:
+      raiseDef(82); raiseDef(84);
+      st[82].def = 5; st[84].def = 4;
+      break;
+    case UPG.biotecNeuronet:
+      return [{ type: 'neuronet' }];
   }
   return [];
 }

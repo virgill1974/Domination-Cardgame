@@ -107,3 +107,6 @@ export function ownedSlots(p: Player): Slot[] {
 }
 
 export const slotCardId = (slot: Slot) => cardIdOfEan(slot.ean);
+
+/** Besitzt der Spieler eine Karte dieses Typs (Upgrades sind ab Kauf aktiv)? */
+export const hasCard = (p: Player, cardId: number) => ownedSlots(p).some((slot) => slotCardId(slot) === cardId);

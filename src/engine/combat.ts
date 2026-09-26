@@ -1,11 +1,13 @@
 import {
-  ATTACK_PRICE, FLAK_DAMAGE, FLAK_OFFENSIVE, GBA, MAX_ATTACKS, STEALTH, SUPERWEAPON_RECHARGE,
+  ATTACK_PRICE, FLAK_DAMAGE, FLAK_OFFENSIVE, GBA, HELICOPTER, MAX_ATTACKS, STEALTH, SUPERWEAPON_RECHARGE, UPG,
 } from './data';
 import {
   cardIdOfEan, factionOfEan, isAircraft, isCenter, isFlak, isHeadquarters, isReactor, isSuperweapon, kindOfEan,
 } from './cards';
 import type { ErrorCode } from './messages';
-import { currentFaction, currentPlayer, d6, findSlot, ownedSlots, slotCardId, type GameState, type Player, type Rng, type Slot } from './state';
+import {
+  currentFaction, currentPlayer, d6, findSlot, hasCard, ownedSlots, slotCardId, type GameState, type Player, type Rng, type Slot,
+} from './state';
 import { reactorEnergy } from './turn';
 
 export type CombatKind = 'unitVsUnit' | 'unitVsBuilding' | 'airVsBuilding' | 'stealthVsBuilding' | 'superweapon';
@@ -112,6 +114,8 @@ export function attack(s: GameState, attackerEan: number, defenderEan: number, r
   };
   const attStats = s.stats[attId];
   const defStats = s.stats[defId];
+  // BIOTEC "Flüstern": der Helicopter wird wie der Stealth-Fighter nicht von Flugabwehr erfasst
+  const stealthy = attId === STEALTH || (attId === HELICOPTER && hasCard(me, UPG.biotecWhisper));
 
   if (defKind === 'unit' && attKind === 'unit') {
     result.kind = 'unitVsUnit';
@@ -119,14 +123,14 @@ export function attack(s: GameState, attackerEan: number, defenderEan: number, r
       strike('attacker', attStats.off, attStats.dmg, def);
       strike('defender', defStats.off, defStats.dmg, att);
     } while (att.def > 0 && def.def > 0);
-  } else if (defKind === 'building' && isAircraft(attId)) {
+  } else if (defKind === 'building' && isAircraft(attId) && !stealthy) {
     result.kind = 'airVsBuilding';
     // Korrektur 3: nur aktivierte Flugabwehr schießt
     const flak = ownedSlots(owner).filter((slot) => slot.active && isFlak(slotCardId(slot))).length;
     result.flakCount = flak;
     if (flak > 0) strike('flak', flak + FLAK_OFFENSIVE, flak + FLAK_DAMAGE, att);
     if (att.def > 0) strike('attacker', attStats.off, attStats.dmg, def);
-  } else if (defKind === 'building' && attId === STEALTH) {
+  } else if (defKind === 'building' && stealthy) {
     result.kind = 'stealthVsBuilding';
     strike('attacker', attStats.off, attStats.dmg, def);
   } else if (isSuperweapon(attId)) {

@@ -23,6 +23,12 @@ export const UPGRADE_EFFECTS: Record<number, string> = {
   66: 'Raketenbuggy: Schaden +1',
   67: 'Scorpion: Offensive +1',
   68: 'Einheiten dürfen verdeckt ausgespielt werden',
+  86: 'Einheit 5 & Mutant: Offensive +1',
+  87: 'Helicopter wird von Flugabwehr nicht erfasst',
+  88: 'Jeder Plasmareaktor versorgt 2 Gebäude mehr',
+  89: 'Agressor & Regenerat. Panzer: Defensive +1',
+  90: 'Pro Runde 2 eigene Gebäude tauschen oder 1 Einheit umsetzen',
+  91: 'Zu Zugbeginn: beschädigte Einheiten Defensive +1',
 };
 
 export const upgradeEffect = (id: number) => UPGRADE_EFFECTS[id] ?? 'Effekt noch nicht festgelegt';

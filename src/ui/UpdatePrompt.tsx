@@ -25,9 +25,11 @@ export function UpdatePrompt() {
   if (needRefresh) {
     return (
       <div class="toast glass" role="status">
-        <div class="grow small">Neue Version verfügbar. Der Spielstand bleibt erhalten.</div>
-        <button class="btn ghost" onClick={() => setNeedRefresh(false)}>Später</button>
-        <button class="btn primary" onClick={update}>Aktualisieren</button>
+        <div class="small">Neue Version verfügbar. Der Spielstand bleibt erhalten.</div>
+        <div class="btn-row">
+          <button class="btn cancel" onClick={() => setNeedRefresh(false)}>Später</button>
+          <button class="btn primary" onClick={update}>Aktualisieren</button>
+        </div>
       </div>
     );
   }

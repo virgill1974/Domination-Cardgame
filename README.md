@@ -266,12 +266,14 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 | 83 | Artillerie Panzer | Einheit (Fahr.) | 800 | 2 | 1 | 3 | 2 | Manufaktur |
 | 84 | Regenerat. Panzer | Einheit (Fahr.) | 1000 | 3 | 3 | 5 | 5 | Manufaktur |
 | 85 | Helicopter | Einheit (Flug) | 1200 | 3 | 2 | 4 | 3 | Helipad |
-| 86 | Update 1 | Upgrade | 1000 | 0 | – | – | – | Abt. Forschung |
-| 87 | Update 2 | Upgrade | 1000 | 0 | – | – | – | Abt. Forschung |
-| 88 | Update 3 | Upgrade | 2000 | 0 | – | – | – | Abt. Forschung |
-| 89 | Update 4 | Upgrade | 800 | 0 | – | – | – | Abt. Forschung |
-| 90 | Update 5 | Upgrade | 1000 | 0 | – | – | – | Abt. Forschung |
-| 91 | Update 6 | Upgrade | 2000 | 0 | – | – | – | Abt. Forschung |
+| 86 | Mutagen | Upgrade | 1000 | 0 | – | – | – | Hive |
+| 87 | Flüstern | Upgrade | 1200 | 0 | – | – | – | Helipad |
+| 88 | Perpetuum | Upgrade | 1000 | 0 | – | – | – | Plasmareaktor |
+| 89 | Chitinpanzer | Upgrade | 1500 | 0 | – | – | – | Abt. Forschung |
+| 90 | Neuronetz | Upgrade | 1000 | 0 | – | – | – | Abt. Forschung |
+| 91 | Zellregeneration | Upgrade | 2000 | 0 | – | – | – | Abt. Forschung |
+
+> BIOTEC-Upgrades 86–91 hießen im Original „Update 1–6“ (alle Abt. Forschung, 1000/1000/2000/800/1000/2000 Credits, ohne Wirkung). Namen, Preise und Voraussetzungen sind eine Neuentwicklung. „Perpetuum“ und „Flüstern“ und ihre Position im Baum stammen aus `CnC_Techtrees_4p.ppt`.
 
 </details>
 
@@ -297,7 +299,12 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 | 66 | GBA: Buggy-Munition | Raketenbuggy Schaden +1 (→3) |
 | 67 | GBA: Scorpion-Raketen | Scorpion Off +1 (→3) |
 | 68 | GBA: Tarnung | Im Original ohne Effekt. Die App weist nach dem Kauf darauf hin, dass Einheiten verdeckt ausgespielt werden dürfen |
-| 86–91 | BIOTEC: Update 1–6 | _(Alle 6 nicht implementiert im Original)_ |
+| 86 | BIOTEC: Mutagen | Einheit 5 Off +1 (→2), Mutant Off +1 (→2) |
+| 87 | BIOTEC: Flüstern | Helicopter wird von Flugabwehr nicht erfasst (Kampf wie Stealth-Fighter) |
+| 88 | BIOTEC: Perpetuum | Energie-Upgrade: jeder Plasmareaktor +2 Energie (wie Kontrollstäbe/Überlastung) |
+| 89 | BIOTEC: Chitinpanzer | Agressor Panzer Def +1 (→5), Regenerat. Panzer Def +1 (→4), auch bereits gebaute |
+| 90 | BIOTEC: Neuronetz | Spielfeld: einmal pro Runde zwei eigene verdeckte Gebäude tauschen oder eine eigene Einheit in Reihe 1 umsetzen (Stapelregeln gelten, aufgedeckte Karten bleiben offen). Die App erinnert zu Zugbeginn |
+| 91 | BIOTEC: Zellregeneration | Zu Beginn jedes eigenen Zuges +1 Defensive für alle beschädigten Einheiten (bis zum Maximum) |
 
 ---
 
@@ -350,6 +357,7 @@ Die Mechanik folgt dem Microcontroller-Code. Folgende Programmierfehler bzw. feh
 7. **Spionagesatellit:** Erinnerung zu Zugbeginn, dass eine verdeckte Gegnerkarte aufgedeckt werden darf.
 8. **Tarnung:** Hinweis nach dem Kauf, dass Einheiten verdeckt ausgespielt werden dürfen.
 9. Jedes neue Spiel startet mit frischen Kartenwerten. Im Original wurde z. B. die Mig-Panzerung bei einem Neustart ohne Stromreset nicht zurückgesetzt.
+10. **BIOTEC-Upgrades** (86–91) haben Namen, Preise, Voraussetzungen und Wirkungen bekommen. Im Original waren sie unfertig und wirkungslos.
 
 Bewusst **wie im Original** belassen:
 - Sonderaktion tritt mit 4/6 Wahrscheinlichkeit ein (der Kommentar im Code sagt 1:3).
@@ -408,8 +416,7 @@ Die Kartenliste enthält bei BIOTEC teils andere Namen und Werte als der Code. D
 
 ## Offene Punkte / TODO
 
-- [ ] **BIOTEC Upgrades 1–6:** Im Original nicht implementiert, die Effekte müssen noch designed werden. Bis dahin sind sie in der App kaufbar (Siegpunkt), aber ohne Wirkung.
-- [ ] **BIOTEC Upgrade 3:** In Kartenliste definiert als "Jeder Plasmareaktor kann 2 Gebäude zusätzlich versorgen" (= Energie-Upgrade, analog zu USA Kontrollstäbe / China Überlastung)
+- [x] **BIOTEC Upgrades 1–6:** neu entworfen (Mutagen, Flüstern, Perpetuum, Chitinpanzer, Neuronetz, Zellregeneration), siehe Upgrade-Tabelle. Das Energie-Upgrade der Kartenliste ist „Perpetuum“.
 - [x] **USA Spionagesatellit / GBA Tarnung:** Als Hinweis in der App umgesetzt (Aufdecken bzw. verdeckt Ausspielen passiert am Tisch)
 - [x] **Startkapital:** ~~Anleitung sagt 5000, Code hat 1600~~ → **1600 ist korrekt** (Anleitung veraltet)
 - [x] **EAN-8 Zuordnung:** alle 160 physischen Karten haben echte EAN-8-Codes (Kartendrucker)

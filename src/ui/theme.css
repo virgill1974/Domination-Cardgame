@@ -351,11 +351,12 @@ a.btn { color: var(--text); text-decoration: none; }
 
 /* Update-Hinweis der installierten App */
 .toast {
-  position: fixed; z-index: 30; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%);
-  width: calc(100% - 32px); max-width: 440px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+  position: fixed; z-index: 30; left: 16px; right: 16px; margin: 0 auto; max-width: 440px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  padding: 14px; display: flex; flex-direction: column; gap: 12px;
   animation: pop 0.25s ease-out;
 }
-.toast .btn { min-height: 40px; padding: 6px 14px; }
+.toast .btn { min-height: 44px; }
 
 @media (prefers-reduced-motion: reduce) {
   body::after, .emblem, .scanner .frame::after { animation: none; }

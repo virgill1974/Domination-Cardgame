@@ -35,6 +35,18 @@ export function eventMessages(events: GameEvent[]): Msg[] {
       case 'camouflage':
         msgs.push({ sound: 'bonus', title: 'Tarnung', body: 'Deine Einheiten dürfen ab jetzt verdeckt ausgespielt werden. Nach einem Angriff werden sie aufgedeckt.' });
         break;
+      case 'neuronet':
+        msgs.push({
+          sound: 'turn', title: 'Neuronetz',
+          body: 'Du darfst in dieser Runde zwei deiner verdeckten Gebäude die Plätze tauschen lassen oder eine eigene Einheit auf ein anderes Feld in Reihe 1 umsetzen. Aufgedeckte Karten bleiben offen, Stapelregeln gelten.',
+        });
+        break;
+      case 'regeneration':
+        msgs.push({
+          tone: 'ok', sound: 'repair', title: 'Zellregeneration',
+          body: `${e.count === 1 ? '1 beschädigte Einheit' : `${e.count} beschädigte Einheiten`} +1 Defensive.`,
+        });
+        break;
       case 'medal':
         msgs.push({
           tone: 'ok', sound: 'medal', title: 'Orden erhalten',

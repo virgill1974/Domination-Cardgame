@@ -63,7 +63,15 @@ export const UPG = {
   gbaBuggyAmmo: 66,
   gbaScorpionRocket: 67,
   gbaCamouflage: 68,
+  biotecMutagen: 86,
+  biotecWhisper: 87,
+  biotecPerpetuum: 88,
+  biotecChitin: 89,
+  biotecNeuronet: 90,
+  biotecRegeneration: 91,
 } as const;
+
+export const HELICOPTER = 85;
 
 export type UnitClass = 'foot' | 'vehicle' | 'air';
 
@@ -172,12 +180,13 @@ const ROWS: Row[] = [
   ['Artillerie Panzer', 800, 2, 1, 3, 2, 74, 'vehicle'],
   ['Regenerat. Panzer', 1000, 3, 3, 5, 5, 74, 'vehicle'],
   ['Helicopter', 1200, 3, 2, 4, 3, 75, 'air'],
-  ['Update 1', 1000, 0, 0, 0, 0, 76],
-  ['Update 2', 1000, 0, 0, 0, 0, 76],
-  ['Update 3', 2000, 0, 0, 0, 0, 76],
-  ['Update 4', 800, 0, 0, 0, 0, 76],
-  ['Update 5', 1000, 0, 0, 0, 0, 76],
-  ['Update 6', 2000, 0, 0, 0, 0, 76],
+  // BIOTEC-Upgrades: im Original ohne Wirkung ("Update 1–6"), Neuentwicklung nach dem Technologiebaum
+  ['Mutagen', 1000, 0, 0, 0, 0, 70],
+  ['Flüstern', 1200, 0, 0, 0, 0, 75],
+  ['Perpetuum', 1000, 0, 0, 0, 0, 71],
+  ['Chitinpanzer', 1500, 0, 0, 0, 0, 76],
+  ['Neuronetz', 1000, 0, 0, 0, 0, 76],
+  ['Zellregeneration', 2000, 0, 0, 0, 0, 76],
 ];
 
 export const CARDS: readonly CardType[] = ROWS.map(([name, price, rounds, def, off, dmg, requires, unitClass], id) => ({

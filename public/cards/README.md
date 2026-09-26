@@ -110,9 +110,9 @@ Der Dateiname endet immer auf `.png`. Die Endung ist nur der Name: Browser zeige
 | `83.png` | Artillerie Panzer | Fahrzeug | 3 | [ ] |
 | `84.png` | Regenerat. Panzer | Fahrzeug | 3 | [ ] |
 | `85.png` | Helicopter | Lufteinheit | 3 | [ ] |
-| `86.png` | Update 1 | Upgrade | 1 | [ ] |
-| `87.png` | Update 2 | Upgrade | 1 | [ ] |
-| `88.png` | Update 3 | Upgrade | 1 | [ ] |
-| `89.png` | Update 4 | Upgrade | 1 | [ ] |
-| `90.png` | Update 5 | Upgrade | 1 | [ ] |
-| `91.png` | Update 6 | Upgrade | 1 | [ ] |
+| `86.png` | Mutagen | Upgrade | 1 | [ ] |
+| `87.png` | Flüstern | Upgrade | 1 | [ ] |
+| `88.png` | Perpetuum | Upgrade | 1 | [ ] |
+| `89.png` | Chitinpanzer | Upgrade | 1 | [ ] |
+| `90.png` | Neuronetz | Upgrade | 1 | [ ] |
+| `91.png` | Zellregeneration | Upgrade | 1 | [ ] |

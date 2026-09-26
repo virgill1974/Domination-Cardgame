@@ -42,6 +42,10 @@ npx pwa-assets-generator         # regenerate app icons in public/ui/ from publi
 - **Actions** (`buy`, `attack`, `repair`, `info`) re-run every validation step themselves and return `{ error?: ErrorCode, ... }`. The step-wise helpers (`buyScan`, `attackScanAttacker`, `attackConfirmAttacker`, …) exist so the UI can report errors at the same moment the terminal did (after scan vs after OK). Keep the original check order.
 - **`beginTurn`** = C `einstiegspunkt` (income, overload skip, special action, build phase). **`mainCheck`** = C `hauptanzeige` (medals, VP, win) and must run after every action. The UI calls it when a flow closes.
 - `Slot.counted` tracks whether a card is in `buildings`/`units` (fix for recharging superweapons). The fuzz test asserts counters equal counted slots.
+- BIOTEC upgrades 86–91 are a **new design** (the original had "Update 1–6" without effect). The table is in README.md.
+  - Mutagen, Perpetuum and Chitinpanzer live in `applyUpgrade`.
+  - Flüstern is the `stealthy` check in `combat.ts`.
+  - Zellregeneration and the Neuronetz hint run in `beginTurn`.
 - Randomness is injected (`Rng`). Tests use `dice(...)`, `noDice`, `started()`, `give()` from `testutil.ts`.
 
 **`src/ui/`: Preact.**

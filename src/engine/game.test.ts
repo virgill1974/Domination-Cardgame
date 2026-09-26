@@ -393,6 +393,88 @@ describe('Kampf', () => {
   });
 });
 
+describe('BIOTEC-Upgrades (Neuentwicklung)', () => {
+  const biotec = () => {
+    const s = started([BIOTEC, USA]);
+    s.players[BIOTEC].credits = 10000;
+    return s;
+  };
+
+  it('Mutagen: Einheit 5 und Mutant Offensive +1, Voraussetzung Hive', () => {
+    const s = biotec();
+    expect(buy(s, 154).error).toBeUndefined();
+    expect(s.stats[78].off).toBe(2);
+    expect(s.stats[79].off).toBe(2);
+  });
+
+  it('Perpetuum: +2 Energie je aktivem Plasmareaktor, später +5 je Reaktor', () => {
+    const s = biotec();
+    give(s, BIOTEC, 123, false);
+    const energy = s.players[BIOTEC].energy;
+    buy(s, 156);
+    expect(s.players[BIOTEC].energy).toBe(energy + 2);
+    expect(s.players[BIOTEC].energyUpgrade).toBe(true);
+  });
+
+  it('Chitinpanzer: Agressor und Regenerat. Panzer Defensive +1, auch bereits gebaute', () => {
+    const s = biotec();
+    expect(buy(s, 157).error).toBe('locked');
+    give(s, BIOTEC, 132);
+    const agressor = give(s, BIOTEC, 142);
+    const regen = give(s, BIOTEC, 148);
+    regen.def = 2;
+    buy(s, 157);
+    expect(agressor.def).toBe(5);
+    expect(regen.def).toBe(3);
+    expect(s.stats[82].def).toBe(5);
+    expect(s.stats[84].def).toBe(4);
+  });
+
+  it('Flüstern: Helicopter greift Gebäude an, ohne dass die Flugabwehr schießt', () => {
+    const setup = () => {
+      const s = biotec();
+      give(s, BIOTEC, 151);
+      give(s, USA, 5);
+      give(s, USA, 7);
+      return s;
+    };
+    const without = setup();
+    expect(attack(without, 151, 5, dice(6, 6)).result).toMatchObject({ kind: 'airVsBuilding', flakCount: 1 });
+
+    const withUpgrade = setup();
+    give(withUpgrade, BIOTEC, 131);
+    expect(buy(withUpgrade, 155).error).toBeUndefined();
+    const { result } = attack(withUpgrade, 151, 5, dice(6));
+    expect(result).toMatchObject({ kind: 'stealthVsBuilding', flakCount: 0 });
+    expect(result!.steps).toHaveLength(1);
+  });
+
+  it('Zellregeneration: zu Zugbeginn beschädigte Einheiten +1, gedeckelt, keine Gebäude', () => {
+    const s = biotec();
+    give(s, BIOTEC, 132);
+    buy(s, 159);
+    const tyrant = give(s, BIOTEC, 138);
+    tyrant.def = 1;
+    const full = give(s, BIOTEC, 139);
+    const hq = s.players[BIOTEC].slots[37]!;
+    hq.def = 7;
+    beginTurn(s, noDice);
+    const { events } = beginTurn(s, noDice);
+    expect(events).toContainEqual({ type: 'regeneration', count: 1 });
+    expect(tyrant.def).toBe(2);
+    expect(full.def).toBe(2);
+    expect(hq.def).toBe(7);
+  });
+
+  it('Neuronetz: Hinweis nach dem Kauf und zu jedem Zugbeginn', () => {
+    const s = biotec();
+    give(s, BIOTEC, 132);
+    expect(buy(s, 158).events).toEqual([{ type: 'neuronet' }]);
+    beginTurn(s, noDice);
+    expect(beginTurn(s, noDice).events).toContainEqual({ type: 'neuronet' });
+  });
+});
+
 describe('Prüffunktionen für die Kartenauswahl', () => {
   it('buyCheck liefert für jede Karte denselben Fehler wie buy und ändert nichts', () => {
     const s = started([USA, CHINA]);
