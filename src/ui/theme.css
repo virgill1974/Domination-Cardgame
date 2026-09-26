@@ -349,64 +349,86 @@ a.btn { color: var(--text); text-decoration: none; }
 }
 .toast .btn { min-height: 44px; }
 
-/* Glitch (glitch.ts setzt data-glitch auf <html>). Nur .screen bewegen, nie #app: ein transform dort
-   würde fixierte Overlays (Dialoge, Kamera) mitverschieben. Keine großflächigen Filter (Handy-Leistung). */
-:root { --glitch-strength: 1; }
+/* Glitch (glitch.ts setzt data-glitch, --glitch-strength und --glitch-ms auf <html>). Nur .screen bewegen, nie #app:
+   ein transform dort würde fixierte Overlays (Dialoge, Kamera) mitverschieben. Keine großflächigen Filter (Handy-Leistung). */
+:root { --glitch-strength: 1; --glitch-ms: 400ms; }
 .glitch-layer { position: fixed; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; }
 .glitch-layer::before, .glitch-layer::after { content: ''; position: absolute; inset: 0; opacity: 0; }
 
-[data-glitch='rgb'] .screen { animation: glitch-jitter 0.22s steps(2) 1; }
-[data-glitch='rgb'] .screen :is(h1, h2, .title, .faction-name, .stat .v, .card-name) {
-  text-shadow: calc(-2px * var(--glitch-strength)) 0 rgba(255, 40, 80, 0.85), calc(2px * var(--glitch-strength)) 0 rgba(0, 230, 255, 0.85);
+[data-glitch='rgb'] .screen { animation: glitch-jitter var(--glitch-ms) steps(1) 1; }
+[data-glitch='rgb'] .screen :is(h1, h2, .title, .faction-name, .stat .v, .card-name, .btn) {
+  text-shadow: calc(-3px * var(--glitch-strength)) 0 rgba(255, 40, 80, 0.9), calc(3px * var(--glitch-strength)) 0 rgba(0, 230, 255, 0.9);
 }
-[data-glitch='rgb'] .screen :is(.cf-win img, .art) {
-  filter: drop-shadow(calc(-3px * var(--glitch-strength)) 0 rgba(255, 40, 80, 0.7)) drop-shadow(calc(3px * var(--glitch-strength)) 0 rgba(0, 230, 255, 0.7));
+[data-glitch='rgb'] .screen :is(.cf-win img, .art, .emblem, .handoff .back) {
+  filter: drop-shadow(calc(-5px * var(--glitch-strength)) 0 rgba(255, 40, 80, 0.8)) drop-shadow(calc(5px * var(--glitch-strength)) 0 rgba(0, 230, 255, 0.8));
+}
+[data-glitch='rgb'] .glitch-layer::after {
+  background: linear-gradient(transparent 40%, rgba(0, 230, 255, 0.25) 40% 43%, transparent 43% 71%, rgba(255, 40, 80, 0.25) 71% 72.5%, transparent 72.5%);
+  animation: glitch-flash var(--glitch-ms) steps(1) 1;
 }
 @keyframes glitch-jitter {
-  0% { transform: translate(calc(-3px * var(--glitch-strength)), 1px); }
-  50% { transform: translate(calc(3px * var(--glitch-strength)), -1px); }
+  0% { transform: translate(calc(-5px * var(--glitch-strength)), 2px) skewX(calc(2deg * var(--glitch-strength))); }
+  25% { transform: translate(calc(6px * var(--glitch-strength)), -1px); }
+  50% { transform: translate(calc(-3px * var(--glitch-strength)), 1px) skewX(calc(-3deg * var(--glitch-strength))); }
+  75% { transform: translate(calc(4px * var(--glitch-strength)), 0); }
   100% { transform: none; }
 }
+@keyframes glitch-flash { 0%, 50% { opacity: 1; } 25%, 75% { opacity: 0.3; } 100% { opacity: 0; } }
 
-[data-glitch='tear'] .screen { animation: glitch-tear 0.26s steps(1) 1; }
+[data-glitch='tear'] .screen { animation: glitch-tear var(--glitch-ms) steps(1) 1; }
 [data-glitch='tear'] .glitch-layer::before {
-  opacity: 0.55;
-  background:
-    linear-gradient(transparent 18%, rgba(255, 40, 80, 0.5) 18% 20%, transparent 20% 57%, rgba(0, 230, 255, 0.45) 57% 58.5%, transparent 58.5%);
-  animation: glitch-bars 0.26s steps(1) 1;
+  opacity: 0.7;
+  background: linear-gradient(transparent 14%, rgba(255, 40, 80, 0.55) 14% 17%, transparent 17% 41%, rgba(255, 255, 255, 0.25) 41% 42%,
+    transparent 42% 57%, rgba(0, 230, 255, 0.5) 57% 59.5%, transparent 59.5% 83%, rgba(255, 40, 80, 0.4) 83% 84%, transparent 84%);
+  animation: glitch-bars var(--glitch-ms) steps(1) 1;
 }
 @keyframes glitch-tear {
-  0% { clip-path: inset(12% 0 64% 0); transform: translateX(calc(14px * var(--glitch-strength))); }
-  25% { clip-path: inset(48% 0 30% 0); transform: translateX(calc(-18px * var(--glitch-strength))); }
-  50% { clip-path: inset(70% 0 8% 0); transform: translateX(calc(10px * var(--glitch-strength))); }
-  75% { clip-path: inset(0 0 0 0); transform: translateX(calc(-4px * var(--glitch-strength))); }
+  0% { clip-path: inset(10% 0 62% 0); transform: translateX(calc(22px * var(--glitch-strength))); }
+  17% { clip-path: inset(46% 0 28% 0); transform: translateX(calc(-28px * var(--glitch-strength))); }
+  33% { clip-path: inset(0 0 72% 0); transform: translateX(calc(12px * var(--glitch-strength))) skewX(-8deg); }
+  50% { clip-path: inset(68% 0 6% 0); transform: translateX(calc(-18px * var(--glitch-strength))); }
+  67% { clip-path: inset(24% 0 40% 0); transform: translateX(calc(9px * var(--glitch-strength))); }
+  83% { clip-path: inset(0 0 0 0); transform: translateX(calc(-5px * var(--glitch-strength))); }
   100% { clip-path: none; transform: none; }
 }
-@keyframes glitch-bars { 50% { transform: translateY(23%); } }
+@keyframes glitch-bars { 33% { transform: translateY(19%); } 67% { transform: translateY(-11%); } }
 
+[data-glitch='scan'] .screen { animation: glitch-wobble var(--glitch-ms) ease-in-out 1; }
 [data-glitch='scan'] .glitch-layer::before {
-  opacity: calc(0.7 * var(--glitch-strength)); inset: auto 0 auto 0; height: 18vh; top: -20vh;
+  opacity: min(1, calc(0.65 * var(--glitch-strength))); inset: auto 0 auto 0; height: 26vh; top: -28vh;
   background:
-    repeating-linear-gradient(transparent 0 2px, rgba(0, 0, 0, 0.35) 2px 3px),
-    linear-gradient(transparent, rgba(190, 240, 255, 0.22) 45%, rgba(255, 255, 255, 0.4) 50%, rgba(190, 240, 255, 0.22) 55%, transparent);
-  animation: glitch-scan 0.48s linear 1;
+    repeating-linear-gradient(transparent 0 2px, rgba(0, 0, 0, 0.4) 2px 3px),
+    linear-gradient(transparent, rgba(190, 240, 255, 0.25) 40%, rgba(255, 255, 255, 0.55) 50%, rgba(190, 240, 255, 0.25) 60%, transparent);
+  animation: glitch-scan var(--glitch-ms) linear 1;
 }
-@keyframes glitch-scan { to { transform: translateY(125vh); } }
+[data-glitch='scan'] .glitch-layer::after {
+  opacity: 0.5; background: repeating-linear-gradient(transparent 0 2px, rgba(0, 0, 0, 0.28) 2px 4px);
+}
+@keyframes glitch-scan { to { transform: translateY(135vh); } }
+@keyframes glitch-wobble { 40% { transform: translateX(calc(3px * var(--glitch-strength))) scaleY(1.01); } 60% { transform: translateX(calc(-3px * var(--glitch-strength))); } }
 
-[data-glitch='noise'] .screen { animation: glitch-flicker 0.32s steps(4) 1; }
+[data-glitch='noise'] .screen { animation: glitch-flicker var(--glitch-ms) steps(1) 1; }
 [data-glitch='noise'] .glitch-layer::after {
   background:
-    repeating-radial-gradient(circle at 17% 32%, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 4px),
-    linear-gradient(90deg, rgba(255, 40, 80, 0.1), rgba(0, 230, 255, 0.1));
+    repeating-radial-gradient(circle at 17% 32%, rgba(255, 255, 255, 0.2) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 4px),
+    linear-gradient(90deg, rgba(255, 40, 80, 0.16), rgba(0, 230, 255, 0.16));
   background-size: 7px 9px, 100% 100%, 100% 100%;
-  animation: glitch-noise 0.32s steps(4) 1;
+  animation: glitch-noise var(--glitch-ms) steps(1) 1;
 }
-@keyframes glitch-flicker { 25% { opacity: 0.82; } 50% { opacity: 1; } 75% { opacity: 0.88; } }
+@keyframes glitch-flicker {
+  0% { opacity: 0.55; transform: translateX(calc(-3px * var(--glitch-strength))); }
+  20% { opacity: 1; transform: none; }
+  40% { opacity: 0.35; transform: translateX(calc(4px * var(--glitch-strength))); }
+  60% { opacity: 0.9; transform: none; }
+  80% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
 @keyframes glitch-noise {
-  0% { opacity: calc(0.9 * var(--glitch-strength)); background-position: 0 0, 0 0, 0 0; }
-  33% { opacity: calc(0.5 * var(--glitch-strength)); background-position: 3px 5px, 0 2px, 0 0; }
-  66% { opacity: calc(0.8 * var(--glitch-strength)); background-position: -4px 2px, 0 -1px, 0 0; }
+  0% { opacity: min(1, calc(0.7 * var(--glitch-strength))); background-position: 0 0, 0 0, 0 0; }
+  25% { opacity: min(1, calc(0.35 * var(--glitch-strength))); background-position: 3px 5px, 0 2px, 0 0; }
+  50% { opacity: min(1, calc(0.6 * var(--glitch-strength))); background-position: -4px 2px, 0 -1px, 0 0; }
+  75% { opacity: min(1, calc(0.45 * var(--glitch-strength))); background-position: 2px -3px, 0 1px, 0 0; }
   100% { opacity: 0; }
 }
 

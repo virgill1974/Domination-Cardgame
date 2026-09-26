@@ -74,8 +74,10 @@ export function App() {
   // Die Kampfmusik schaltet die Kampfansicht selbst (setCombatMusic).
   const track: Track | null = view !== 'game' ? 'menu' : game && game.winner === null ? 'game' : null;
   useEffect(() => setMusicTrack(track), [track]);
-  // Zufällige Glitches nur während der laufenden Partie (glitch.ts, nie bei Kamera)
-  useEffect(() => setGlitchActive(track === 'game'), [track]);
+  // Zufällige Glitches auf Startbildschirm, Einrichtung und in der laufenden Partie (nicht in der Kurzanleitung
+  // und beim Sieg); glitch.ts sperrt sie bei offener Kamera
+  const glitchOn = view === 'home' || view === 'setup' || track === 'game';
+  useEffect(() => setGlitchActive(glitchOn), [glitchOn]);
 
   const replace = (next: GameState | null) => {
     gameRef.current = next;

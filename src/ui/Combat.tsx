@@ -70,16 +70,16 @@ export function CombatView({ result, stats, onDone }: { result: CombatResult; st
     if (single && step) {
       if (step.roll === null) {
         play('superweapon');
-        glitch('noise', 1.4);
+        glitch('noise', 2.3);
       } else {
         play('dice');
         play(step.hit ? 'hit' : 'miss', 0.4);
-        if (step.hit) setTimeout(() => glitch('rgb', 0.6), 400);
+        if (step.hit) setTimeout(() => glitch('rgb', 1.3), 400);
       }
     }
     if (done && result.destroyed.length && result.kind !== 'superweapon') {
       play('explosion', single ? 0.8 : 0);
-      setTimeout(() => glitch('tear', 1.2), single ? 800 : 0);
+      setTimeout(() => glitch('tear', 2.1), single ? 800 : 0);
     }
   }, [shown]);
 
