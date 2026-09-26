@@ -13,7 +13,7 @@ import { errorMsg, eventMessages } from './eventMessages';
 import { AttackFlow, BuyFlow, InfoFlow, RepairFlow, type FlowProps } from './flows';
 import { Handoff, Home, Hud, Inventory, Setup, Winner, type Action } from './screens';
 import { play, unlockAudio } from './sound';
-import { kickMusic, setMusicActive } from './music';
+import { kickMusic, setMusicTrack, type Track } from './music';
 import { VolumeButton } from './VolumeControl';
 import { UpdatePrompt } from './UpdatePrompt';
 
@@ -69,9 +69,10 @@ export function App() {
   const [dialog, setDialog] = useState<'menu' | 'end' | 'quit' | null>(null);
   useWakeLock(view === 'game');
   useUiSounds(queue[0]);
-  // Musik während der Partie; beim Sieg blendet sie aus, damit die Fanfare frei steht
-  const musicOn = view === 'game' && !!game && game.winner === null;
-  useEffect(() => setMusicActive(musicOn), [musicOn]);
+  // Menü-Musik auf Start, Einrichtung und Anleitung, eigene Musik in der Partie; beim Sieg Stille für die Fanfare.
+  // Die Kampfmusik schaltet die Kampfansicht selbst (setCombatMusic).
+  const track: Track | null = view !== 'game' ? 'menu' : game && game.winner === null ? 'game' : null;
+  useEffect(() => setMusicTrack(track), [track]);
 
   const replace = (next: GameState | null) => {
     gameRef.current = next;

@@ -25,8 +25,16 @@ Nur Sounds mit passender Lizenz verwenden, keine Originalsounds aus kommerzielle
 
 ## Hintergrundmusik
 
-`music.mp3` läuft während der Partie in Schleife, auf dem Startbildschirm und beim Sieg nicht.
-Fehlt die Datei, spielt die App eine selbst erzeugte, ruhige Sci-Fi-Klangfläche.
-Die Datei darf bis 20 MB groß sein und wird für das Offline-Spiel mit auf dem Handy gespeichert. Für einen sauberen Übergang am Schleifenende sollte der Anfang nahtlos an das Ende passen.
+Drei Stücke laufen in Schleife und blenden beim Wechsel weich ineinander über:
+
+| Datei | Wann | ohne Datei |
+|---|---|---|
+| `menu.mp3` | Startbildschirm, Spieleinrichtung, Kurzanleitung | erzeugte, getragene Klangfläche (Dm – B♭ – F – C) |
+| `music.mp3` | während der Partie | erzeugte, ruhige Sci-Fi-Klangfläche (Am – F – C – G) |
+| `combat.mp3` | solange die Kampfansicht läuft, danach zurück zur Partie-Musik | erzeugter Action-Loop (138 BPM, Beat, Bass, Arpeggio) |
+
+Beim Sieg ist Stille, damit die Fanfare frei steht.
+Jede Datei darf bis 20 MB groß sein und wird für das Offline-Spiel mit auf dem Handy gespeichert. Für einen sauberen Übergang am Schleifenende sollte der Anfang nahtlos an das Ende passen.
+Auch hier gilt: nur Musik mit passender Lizenz (z. B. CC0 oder selbst komponiert).
 
 Effekte und Musik haben getrennte Regler im Dialog **Lautstärke** (Startbildschirm und Spielmenü ☰).

@@ -105,7 +105,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 **Asset fallbacks (drop-in, no code change):**
 - Images: `public/cards/<cardTypeId>.png` (picture window ratio 512:299), generated SVG placeholder if missing (`src/ui/cardArt.ts`). The printer page resolves images with base `../cards/`.
 - Sounds: `public/sounds/<name>.mp3`, else synthesized via Web Audio (`src/ui/sound.ts`).
-- Music: `public/sounds/music.mp3` loops during the game (`src/ui/music.ts`), else a generated ambient pad.
+- Music (`src/ui/music.ts`): three looping tracks with crossfade: `menu.mp3` (home, setup, guide), `music.mp3` (game), `combat.mp3` (while `CombatView` is mounted, via `setCombatMusic`). Silence at the winner screen. Missing files fall back to generated music: two `Ambient` pads (menu, game) and the `CombatLoop` step sequencer (138 BPM, look-ahead scheduling).
   - It is routed through a `MediaElementAudioSourceNode` into the music bus, because iOS ignores `<audio>.volume`.
   - `sound.ts` has two gain buses (`sfx`, `music`) with volumes persisted in localStorage. The UI is `VolumeControl.tsx`, rendered via portal so its fixed overlay isn't trapped inside a dialog (a `backdrop-filter`/`transform` ancestor would do that).
   - Browsers may reject `play()` without a gesture. `kickMusic()` runs on every pointerdown to retry.

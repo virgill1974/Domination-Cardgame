@@ -5,6 +5,7 @@ import type { CombatKind, CombatResult, CombatStep } from '../engine/combat';
 import type { CardStats } from '../engine/state';
 import { CardArt, DefBar, Die, factionStyle } from './components';
 import { play } from './sound';
+import { setCombatMusic } from './music';
 
 const KIND_LABEL: Record<CombatKind, string> = {
   unitVsUnit: 'Einheit vs Einheit',
@@ -48,6 +49,12 @@ export function CombatView({ result, stats, onDone }: { result: CombatResult; st
   const [shown, setShown] = useState(0);
   const done = shown >= result.steps.length;
   const prevShown = useRef(0);
+
+  // Kampfmusik, solange die Kampfansicht offen ist
+  useEffect(() => {
+    setCombatMusic(true);
+    return () => setCombatMusic(false);
+  }, []);
 
   useEffect(() => {
     if (done) return;
