@@ -461,8 +461,7 @@ Die alte Kartenliste enthält bei BIOTEC teils andere Namen und Werte als der Co
 - [ ] **BIOTEC:** in das Domination-Universum übertragen (Namen, evtl. Fraktionsname)
 - [x] **Kartenbilder:** mit Stable Diffusion lokal im Stil von Helge Vogt erzeugt (`Tools/card-art/`, siehe „Kartenbilder erzeugen“)
 - [ ] **Cloudflare Pages:** Projekt `domination-cardgame` anlegen (siehe oben)
-- [x] **Techtree-Grafiken:** `Unterlagen/Domination_Techtrees.pdf`, erzeugt aus `Tools/techtree.html`
-- [ ] **Techtree in der App:** Freischaltungs-Baum als Ansicht im Spiel
+- [x] **Techtree-Grafiken:** `Unterlagen/Domination_Techtrees.pdf`, erzeugt aus `Tools/techtree.html` (gedrucktes Spielmaterial, bewusst nicht in der App)
 - [ ] **BIOTEC Einheiten:** Werte-Diskrepanzen zwischen Code und Kartenliste abgleichen
 - [x] **BIOTEC Upgrades 1–6:** neu entworfen, siehe Upgrade-Tabelle
 - [x] **Auge des Raumes / Schwarzer Schleier:** als Hinweis in der App umgesetzt (Aufdecken bzw. verdeckt Ausspielen passiert am Tisch)

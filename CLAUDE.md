@@ -102,7 +102,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
   - Backs come from `cardBackHtml()` (`cardFace.ts`/`.css`): faction frame texture, `back.webp` in the bevel rim, card type as a big badge (emblem plus "Planet/Einheit/Upgrade") and corner emblems top-left and bottom-right (rotated).
   - Back sheets mirror each row of 3 (`mirroredBacks`) for long-edge duplex; incomplete rows are padded with empty cells.
 
-**Tech trees (`Tools/techtree.html` + `src/print/techtree.ts`/`.css`)**, a third Vite entry, rendered to `Unterlagen/Domination_Techtrees.pdf`:
+**Tech trees (`Tools/techtree.html` + `src/print/techtree.ts`/`.css`)**, a third Vite entry, rendered to `Unterlagen/Domination_Techtrees.pdf`: printed game material; the user does not want the tree inside the app.
 - Layout of the old `CnC_Techtrees_4p.ppt`: one A4-landscape page per faction. Planets form the centre column by `requires` depth. Units and upgrades unlocked by a planet sit left or right of it (units first, upgrades below, at most 4 per row).
 - Computed from `CARDS[].requires`, so regenerate the PDF after rule changes (print → save as PDF, background graphics on, no margins).
 - `fit()` shrinks tiles (`--k`) until a tree fits the page (BIOTEC and Lightforce get 0.92).
