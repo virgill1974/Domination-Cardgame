@@ -79,13 +79,13 @@ export const SUBJECTS = {
   45: 'an arrow-shaped fighter ship at light speed leaving long light streaks',
   // ---- Scaretech: Planeten ----
   46: 'a sinister fortress built into a dark dying star, the heart of a galaxy',
-  47: 'a cluster of dark relay stations launching unmanned scouts',
-  48: 'an asteroid mining colony extracting glowing antimatter crystals',
-  49: 'a metallic defensive barrier belt of spiked debris in space',
+  47: 'a cluster of dark orbital relay space stations with long antennas, launching tiny scout drones into space',
+  48: 'an asteroid mining colony with huge drilling rigs extracting glowing violet antimatter crystals from an asteroid',
+  49: 'a ring of spiked metal space mines and debris forming a defensive barrier belt around a planet',
   50: 'a grim military fleet base carved into an asteroid, rusty warships docked',
   51: 'a dark council chamber of hooded figures aboard a space station, ominous glow',
   52: 'a shadowy spy center analysing data on countless glowing screens',
-  53: 'a black hole superweapon devouring a planet',
+  53: 'a gigantic swirling black hole with a glowing accretion disk tearing apart a planet',
   54: 'an artificial wormhole jump zone with drones passing through',
   // ---- Scaretech: Einheiten ----
   55: 'a small shadowy scout drone with a mechanical grabbing arm',
@@ -102,7 +102,7 @@ export const SUBJECTS = {
   65: 'robotic arms and crossed wrenches repairing a damaged battleship',
   66: 'a swarm of small rocket ships invading a planet',
   67: 'an axe-shaped warship slingshotting around a gravity well',
-  68: 'a fleet vanishing behind a black nebula veil',
+  68: 'a warship fleet fading into a dark black nebula veil, cloaked, only glowing engine lights visible',
   // ---- BIOTEC: Planeten ----
   69: 'a gleaming biotech corporate headquarters tower with organic green glass domes',
   70: 'an organic insect-like hive structure breeding creatures, glowing green pods',
@@ -150,7 +150,13 @@ export const SPECIALS = {
   },
 };
 
+// Scaretechs Stilvorlage (Totenkopf) schiebt sonst Figuren und Gesichter in Planeten- und Upgrade-Motive
+const FACTION_NEGATIVE = { scaretech: 'people, soldiers, humanoid figures, faces, skull' };
+
+/** Einheiten dürfen Figuren zeigen (Aufklärer), Planeten und Upgrades nicht */
 export const promptFor = (id) => {
   const faction = FACTION_KEYS[Math.floor(id / 23)];
-  return { faction, positive: `${SUBJECTS[id]}, ${FACTION_STYLE[faction]}, ${COMMON}`, negative: NEGATIVE };
+  const isUnit = id % 23 >= 9 && id % 23 < 17;
+  const extra = !isUnit && FACTION_NEGATIVE[faction] ? `, ${FACTION_NEGATIVE[faction]}` : '';
+  return { faction, positive: `${SUBJECTS[id]}, ${FACTION_STYLE[faction]}, ${COMMON}`, negative: NEGATIVE + extra };
 };
