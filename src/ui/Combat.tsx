@@ -3,7 +3,7 @@ import { CARDS } from '../engine/data';
 import { cardIdOfEan, factionOfEan } from '../engine/cards';
 import type { CombatKind, CombatResult, CombatStep } from '../engine/combat';
 import type { CardStats } from '../engine/state';
-import { CardArt, DefBar, Die, factionStyle } from './components';
+import { CardArt, DefBar, DefValue, Die, factionStyle } from './components';
 import { play } from './sound';
 import { setCombatMusic } from './music';
 import { glitch } from './glitch';
@@ -25,7 +25,7 @@ function Fighter({ ean, def, max, dead }: { ean: number; def: number; max: numbe
       <CardArt id={cardIdOfEan(ean)} />
       <div class="n">{name(ean)}</div>
       <DefBar def={def} max={max} />
-      <div class="small muted">Def {def} / {max}</div>
+      <div class="small muted"><DefValue def={def} max={max} /></div>
     </div>
   );
 }
@@ -98,16 +98,15 @@ export function CombatView({ result, stats, onDone }: { result: CombatResult; st
         <Fighter ean={result.defenderEan} def={defDef} max={Math.max(defMax, result.defenderDefBefore)} dead={done && result.destroyed.includes(result.defenderEan)} />
       </div>
       {result.kind === 'airVsBuilding' && <div class="small muted">Planetenabwehr beim Gegner: {result.flakCount}</div>}
+      {/* Auswertung und Knopf oben, darunter das Protokoll mit dem jüngsten Wurf zuerst: nichts rutscht aus dem Bild */}
+      {done ? <Summary result={result} /> : null}
+      {done
+        ? <button class="btn primary block" onClick={onDone}>OK</button>
+        : <button class="btn block" onClick={() => setShown(result.steps.length)}>Überspringen</button>}
       <div class="log">
         {result.steps.slice(0, shown).map((step, i) => (
           <StepLine key={i} step={step} result={result} rolling={i === shown - 1 && !done} />
-        ))}
-      </div>
-      {done ? <Summary result={result} /> : null}
-      <div style={{ marginTop: 'auto' }}>
-        {done
-          ? <button class="btn primary block" onClick={onDone}>OK</button>
-          : <button class="btn block" onClick={() => setShown(result.steps.length)}>Überspringen</button>}
+        )).reverse()}
       </div>
     </div>
   );

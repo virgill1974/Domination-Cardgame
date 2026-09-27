@@ -114,17 +114,17 @@ table.planets td:nth-child(3) { width: 45%; }
 .board .label small { font-family: 'Space Grotesk Variable', sans-serif; font-size: 6.8pt; opacity: 0.8; }
 .board .cell { aspect-ratio: 652 / 899; border-radius: 1mm; display: flex; flex-direction: column; justify-content: center; gap: 1mm; }
 .board .cell.empty { border: 0.3mm dashed rgba(255, 255, 255, 0.35); }
-.board .cell small { font-size: 5.8pt; color: #f2f5f7; text-align: center; line-height: 1.1; }
+.board .cell small { position: relative; z-index: 1; font-size: 5.8pt; color: #f2f5f7; text-align: center; line-height: 1.1; }
 .board .cell .back .cb { width: 100%; }
-.board .stack { position: relative; height: 12mm; }
+.board .stack { position: relative; aspect-ratio: 100 / 72; }
 .board .stack img {
   position: absolute; left: 0; width: 88%; aspect-ratio: 512 / 299; object-fit: cover; border: 0.4mm solid #000; border-radius: 0.6mm;
   box-shadow: 0 0.5mm 1mm rgba(0, 0, 0, 0.6);
 }
 .board .stack img:nth-child(1) { top: 0; }
-.board .stack img:nth-child(2) { top: 2.5mm; left: 6%; }
-.board .stack img:nth-child(3) { top: 5mm; left: 12%; }
-.board .stack.two img:nth-child(2) { top: 3.5mm; }
+.board .stack img:nth-child(2) { top: 14%; left: 6%; }
+.board .stack img:nth-child(3) { top: 28%; left: 12%; }
+.board .stack.two img:nth-child(2) { top: 22%; }
 .board figcaption, .backs-row figcaption { margin-top: 1.5mm; font-size: 8.5pt; color: #4a5058; }
 
 /* Fraktionen */

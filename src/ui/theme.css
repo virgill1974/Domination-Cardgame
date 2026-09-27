@@ -211,6 +211,14 @@ a.btn { color: var(--text); text-decoration: none; }
 .kv .k { font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; }
 .kv .v { font-size: 17px; }
 
+/* Kartensymbole (Helge) als Maske in Textfarbe: Defensive, Offensive, Schaden, Runden, Kartenart */
+.card-icon {
+  display: inline-block; flex: 0 0 auto; width: 1.25em; height: 1.25em; vertical-align: -0.25em; background: currentColor;
+  -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat;
+}
+.icon-val { display: inline-flex; align-items: center; gap: 0.3em; }
+.kv .v .card-icon { margin-right: 0.3em; }
+
 .defbar { height: 8px; border-radius: 2px; background: rgba(0, 0, 0, 0.35); box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6); overflow: hidden; }
 .defbar > i { display: block; height: 100%; background: linear-gradient(90deg, #1fb877, var(--ok)); transition: width 0.4s; }
 .defbar.low > i { background: linear-gradient(90deg, var(--err), var(--warn)); }
@@ -223,7 +231,9 @@ a.btn { color: var(--text); text-decoration: none; }
 .list-item[data-unavailable] { opacity: 0.5; }
 .check { display: flex; align-items: center; gap: 10px; color: var(--muted); cursor: pointer; }
 .check input { width: 20px; height: 20px; accent-color: var(--accent-line); }
-.list-item .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--fc); border: 2px solid rgba(0, 0, 0, 0.6); flex: 0 0 12px; }
+/* Kartenart wie im schwarzen Oval der Karte, Symbol in Fraktionsfarbe */
+.list-item .kind { display: flex; flex: 0 0 40px; height: 28px; padding: 4px 7px; border-radius: 50%; background: #050505; color: var(--fc); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); }
+.list-item .kind .card-icon { width: 100%; height: 100%; }
 
 /* Meldungen */
 .overlay {

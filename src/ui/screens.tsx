@@ -4,7 +4,7 @@ import { CARDS, FACTIONS, SCARETECH, MAX_ATTACKS, MAX_BUYS, MAX_REPAIRS, type Fa
 import { cardIdOfEan, factionOfEan, kindOfEan } from '../engine/cards';
 import { currentFaction, currentPlayer, ownedSlots, type GameState } from '../engine/state';
 import { Scanner } from '../scanner/Scanner';
-import { CardArt, DefBar, Icon, factionBack, factionStyle } from './components';
+import { CardArt, DefBar, DefValue, Icon, factionBack, factionStyle } from './components';
 import { play } from './sound';
 import { VolumeButton } from './VolumeControl';
 
@@ -215,7 +215,7 @@ export function Inventory({ game, onClose }: { game: GameState; onClose: () => v
         <div class="list inventory">
           {active.map((s) => {
             const max = game.stats[cardIdOfEan(s.ean)].def;
-            return row(s.ean, <><DefBar def={s.def} max={max} /><span class="small muted">Def {s.def}/{max}{s.active ? '' : ' · lädt nach'}</span></>);
+            return row(s.ean, <><DefBar def={s.def} max={max} /><span class="small muted"><DefValue def={s.def} max={max}>{s.active ? '' : ' · lädt nach'}</DefValue></span></>);
           })}
         </div>
       </div>

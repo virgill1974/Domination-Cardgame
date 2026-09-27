@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { CARDS, CARD_OF_EAN, FACTION_COLORS, PHYSICAL_CARDS, type Faction } from '../engine/data';
-import { factionOfEan } from '../engine/cards';
+import { factionOfEan, kindOfEan } from '../engine/cards';
+import { KIND_EMBLEM } from '../ui/assets';
+import { CardIcon } from '../ui/components';
 import { isStartCard } from '../ui/cardText';
 import { scanFeedback, startCameraScan, type CameraScan } from './detector';
 
@@ -115,7 +117,7 @@ function ManualPicker({ title, factions, available, onPick, onBack, onCancel }: 
           {shown.map((ean) => (
             <button key={ean} class="list-item" style={{ '--fc': FACTION_COLORS[factionOfEan(ean)] }} onClick={() => onPick(ean)}
               data-unavailable={available && !available(ean) ? '' : undefined}>
-              <span class="dot" />
+              <span class="kind"><CardIcon name={KIND_EMBLEM[kindOfEan(ean)]} /></span>
               <span>{CARDS[CARD_OF_EAN[ean]].name}</span>
               {isStartCard(ean) && <span class="badge start">Startkarte</span>}
             </button>

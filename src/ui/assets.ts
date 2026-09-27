@@ -12,3 +12,6 @@ export const uiAsset = (path: string, base = '') => absolute(`${base}ui/${path}`
 export const factionKey = (f: Faction | null): FactionKey => (f === null ? 'neutral' : FACTION_KEYS[f]);
 export const factionAsset = (f: Faction | null, file: string, base = '') => uiAsset(`factions/${factionKey(f)}/${file}`, base);
 export const helgeIcon = (name: string, base = '') => uiAsset(`helge/${name}.png`, base);
+
+/** Piktogramm der Kartenart (Planet, Einheit, Upgrade) wie auf Kartenvorder- und -rückseite */
+export const KIND_EMBLEM = { building: 'emblem-planet', unit: 'emblem-ship', upgrade: 'emblem-gear' } as const;

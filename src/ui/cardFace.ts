@@ -2,7 +2,7 @@ import { CARDS } from '../engine/data';
 import { cardIdOfEan, factionOfEan, kindOfEan } from '../engine/cards';
 import { eanForIndex } from '../engine/ean';
 import { ean8Svg } from '../print/barcodeSvg';
-import { factionAsset, helgeIcon } from './assets';
+import { KIND_EMBLEM, factionAsset, helgeIcon } from './assets';
 import { cardArtUrl, placeholderDataUri } from './cardArt';
 import { DESCRIPTIONS, KIND_LABEL, categoryLabel, isStartCard, requirementName, rulesFor, upgradeEffect } from './cardText';
 
@@ -13,7 +13,7 @@ export interface CardFaceOptions {
   footer?: 'barcode' | 'none';
 }
 
-const EMBLEM = { building: 'emblem-planet', unit: 'emblem-ship', upgrade: 'emblem-gear' } as const;
+const EMBLEM = KIND_EMBLEM;
 
 const esc = (text: string | number) =>
   String(text).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);

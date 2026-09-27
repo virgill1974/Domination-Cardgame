@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { CARDS, FACTION_COLORS, FACTIONS, type Faction } from '../engine/data';
 import { cardIdOfEan, factionOfEan } from '../engine/cards';
-import { factionAsset } from './assets';
+import { factionAsset, helgeIcon } from './assets';
 import { cardArtUrl, placeholderDataUri } from './cardArt';
 import { cardFaceHtml } from './cardFace';
 import { isStartCard, typeLabel } from './cardText';
@@ -36,15 +36,25 @@ export function CardArt({ id, class: cls = 'art' }: { id: number; class?: string
   );
 }
 
+/** Piktogramm aus Helges Kartensymbolen (Maske, nimmt die Textfarbe an) */
+export function CardIcon({ name, class: cls = '' }: { name: string; class?: string }) {
+  return <i class={`card-icon ${cls}`} style={{ '--m': `url('${helgeIcon(name)}')` }} aria-hidden="true" />;
+}
+
+/** Defensive mit dem Kartensymbol statt „Def“ */
+export function DefValue({ def, max, children }: { def: number; max: number; children?: ComponentChildren }) {
+  return <span class="icon-val" title="Defensive"><CardIcon name="icon-def" />{def} / {max}{children}</span>;
+}
+
 export function DefBar({ def, max }: { def: number; max: number }) {
   const pct = max > 0 ? Math.round((def / max) * 100) : 0;
   return <div class={`defbar ${pct <= 34 ? 'low' : ''}`}><i style={{ width: `${pct}%` }} /></div>;
 }
 
-export function KV({ items }: { items: Array<[string, string | number]> }) {
+export function KV({ items }: { items: Array<[string, string | number, icon?: string]> }) {
   return (
     <div class="kv">
-      {items.map(([k, v]) => <div key={k}><div class="k">{k}</div><div class="v">{v}</div></div>)}
+      {items.map(([k, v, icon]) => <div key={k}><div class="k">{k}</div><div class="v">{icon && <CardIcon name={icon} />}{v}</div></div>)}
     </div>
   );
 }

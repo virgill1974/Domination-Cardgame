@@ -10,7 +10,7 @@ import {
 import { info, infoScan, ownCardScan, repair, repairCheck } from '../engine/actions';
 import type { ErrorCode } from '../engine/messages';
 import { Scanner } from '../scanner/Scanner';
-import { CardView, DefBar, KV, type Msg } from './components';
+import { CardIcon, CardView, DefBar, KV, type Msg } from './components';
 import { errorMsg, eventMessages } from './eventMessages';
 import { CombatView } from './Combat';
 
@@ -46,7 +46,7 @@ function OwnState({ game, ean }: { game: GameState; ean: number }) {
   const max = game.stats[cardIdOfEan(ean)].def;
   return (
     <div class="panel stack" style={{ gap: '6px' }}>
-      <div class="row spread small"><span>Defensive</span><b>{slot.def} / {max}</b></div>
+      <div class="row spread small"><span class="icon-val"><CardIcon name="icon-def" />Defensive</span><b>{slot.def} / {max}</b></div>
       <DefBar def={slot.def} max={max} />
       {slot.remaining > 0 && <div class="small muted">Noch {slot.remaining} Runde(n) bis zur Aktivierung</div>}
     </div>
@@ -210,10 +210,10 @@ export function InfoFlow(props: FlowProps) {
       <div class="title">Daten anzeigen</div>
       <CardView ean={ean}>
         <div class="panel stack" style={{ gap: '6px' }}>
-          <div class="row spread small"><span>Defensive</span><b>{data.def} / {data.maxDef}</b></div>
+          <div class="row spread small"><span class="icon-val"><CardIcon name="icon-def" />Defensive</span><b>{data.def} / {data.maxDef}</b></div>
           <DefBar def={data.def} max={data.maxDef} />
         </div>
-        <KV items={[['Offensive', data.off], ['Schaden', data.dmg], ['Runden', data.rounds]]} />
+        <KV items={[['Offensive', data.off, 'icon-off'], ['Schaden', data.dmg, 'icon-dmg'], ['Runden', data.rounds, 'icon-time']]} />
       </CardView>
       <button class="btn primary block" style={{ marginTop: 'auto' }} onClick={close}>OK</button>
     </div>
