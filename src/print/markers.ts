@@ -1,15 +1,18 @@
 // Siegmarker „Beste Streitmacht“ und „Bester Stützpunkt“ als goldene Münzen (Kartendrucker und Anleitung).
-// Reines Vektor-SVG ohne Filter, damit der Druck scharf und das PDF klein bleibt. Vorder- und Rückseite sind gleich.
+// Helges Kartenaufbau in Gold: schwarzer Rand, Metallring aus der Rahmentextur, verwitterte Platte in der Mitte,
+// schwarzes Oval mit dem Kartenart-Emblem wie oben links auf den Karten. Texturen: Tools/gold-textures.mjs.
+// Vorder- und Rückseite sind gleich.
 import { MEDAL_MIN_BUILDINGS, MEDAL_MIN_STARS, MEDAL_POINTS } from '../engine/data';
+import { KIND_EMBLEM, helgeIcon, uiAsset } from '../ui/assets';
 
 export type MarkerKind = 'army' | 'base';
 
-const INK = '#3d2a0a';
-const SHINE = 'rgba(255, 246, 205, 0.85)';
+const INK = '#3a2606';
+const CREAM = '#fff3cf';
 
-const MARKERS: Record<MarkerKind, { title: string; min: number; what: string }> = {
-  army: { title: 'BESTE STREITMACHT', min: MEDAL_MIN_STARS, what: 'STERNEN' },
-  base: { title: 'BESTER STÜTZPUNKT', min: MEDAL_MIN_BUILDINGS, what: 'PLANETEN' },
+const MARKERS: Record<MarkerKind, { title: string; min: number; what: string; emblem: string }> = {
+  army: { title: 'BESTE STREITMACHT', min: MEDAL_MIN_STARS, what: 'STERNEN', emblem: KIND_EMBLEM.unit },
+  base: { title: 'BESTER STÜTZPUNKT', min: MEDAL_MIN_BUILDINGS, what: 'PLANETEN', emblem: KIND_EMBLEM.building },
 };
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -25,83 +28,67 @@ function star(x: number, y: number, r: number) {
   return `<polygon points="${pts.join(' ')}"/>`;
 }
 
-/** Kleiner Planet mit Ring um (x, y) */
-const planet = (x: number, y: number, r: number) =>
-  `<circle cx="${x}" cy="${y}" r="${r}"/><ellipse cx="${x}" cy="${y}" rx="${r2(r * 1.9)}" ry="${r2(r * 0.45)}" fill="none" stroke-width="${r2(r * 0.35)}" transform="rotate(-18 ${x} ${y})"/>`;
+/** Positionen der Zählsymbole im flachen Bogen über dem Oval: so viele braucht man mindestens */
+const countRow = (n: number) => Array.from({ length: n }, (_, i) => {
+  const t = i - (n - 1) / 2;
+  return [r2(100 + t * 14), r2(52 + t * t * 1.3)] as const;
+});
 
-/** Fünf Symbole im flachen Bogen über dem Emblem: so viele braucht man mindestens */
-const countRow = (n: number, draw: (x: number, y: number) => string) =>
-  Array.from({ length: n }, (_, i) => {
-    const t = i - (n - 1) / 2;
-    return draw(r2(100 + t * 13), r2(50 + t * t * 1.1));
-  }).join('');
-
-/** Streitmacht: Raumjäger vor zwei gekreuzten Klingen */
-const BLADE = '<path d="M100 58 L104 66 L104 116 L96 116 L96 66 Z"/><rect x="89" y="115" width="22" height="4" rx="1.5"/><rect x="97.5" y="119" width="5" height="9" rx="1"/>';
-const ARMY_EMBLEM = `
-  <g transform="rotate(-40 100 92)">${BLADE}</g>
-  <g transform="rotate(40 100 92)">${BLADE}</g>
-  <path d="M100 68 L105 82 L107 93 L123 105 L123 111 L107 108 L104 115 L100 112 L96 115 L93 108 L77 111 L77 105 L93 93 L95 82 Z" stroke="#e4b44e" stroke-width="3.5" stroke-linejoin="round" paint-order="stroke"/>
-  <path d="M100 76 L102.5 86 L100 97 L97.5 86 Z" fill="#f3d27a"/>`;
-
-/** Stützpunkt: Festung mit drei Türmen auf einem beringten Planeten */
-const BASE_EMBLEM = `
-  <ellipse cx="100" cy="106" rx="38" ry="8" fill="none" stroke-width="3.6" transform="rotate(-10 100 106)"/>
-  <circle cx="100" cy="106" r="17"/>
-  <path d="M62 106 A38 8 0 0 0 138 106" fill="none" stroke-width="3.6" transform="rotate(-10 100 106)"/>
-  <path d="M80 94 V78 H78 V72 H82 V75 H85 V72 H89 V75 H92 V72 H96 V78 H94 V84 H92 V64 H90 V58 H94 V61 H97.6 V58 H102.4 V61 H106 V58 H110 V64 H108 V84 H106 V78 H104 V72 H108 V75 H111 V72 H115 V75 H118 V72 H122 V78 H120 V94 Z"/>
-  <path d="M97 94 V87 A3 3 0 0 1 103 87 V94 Z" fill="#f3d27a"/>`;
+/** Lichtkante wie Helges Fasen: oben links hell, unten rechts dunkel (erhaben) bzw. umgekehrt (vertieft) */
+const bevelGrad = (id: string, raised: boolean) => {
+  const [a, b] = raised ? ['rgba(255,247,214,.95)', 'rgba(20,10,0,.75)'] : ['rgba(20,10,0,.75)', 'rgba(255,247,214,.9)'];
+  return `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset=".1" stop-color="${a}"/><stop offset=".5" stop-color="rgba(0,0,0,0)"/><stop offset=".9" stop-color="${b}"/></linearGradient>`;
+};
 
 let uid = 0;
 
-/** Münze Ø 50 mm (viewBox 200 = 50 mm), size überschreibt die Druckgröße */
-export function markerSvg(kind: MarkerKind, size = '50mm'): string {
+/** Münze Ø 50 mm (viewBox 200 = 50 mm). base ist das Präfix zu public/ (Seiten unter Tools/: '../') */
+export function markerSvg(kind: MarkerKind, size = '50mm', base = '../'): string {
   const m = MARKERS[kind];
   const id = `mk${kind}${uid++}`;
-  const knurl = Array.from({ length: 150 }, (_, i) => {
-    const [x1, y1] = polar(91, i * 2.4);
-    const [x2, y2] = polar(98.5, i * 2.4);
-    return `M${x1} ${y1}L${x2} ${y2}`;
-  }).join('');
+  const metal = uiAsset('gold/metal.jpg', base);
+  const plate = uiAsset('gold/plate.jpg', base);
+  const emblem = helgeIcon(m.emblem, base);
   // Umschrift: oben im Uhrzeigersinn (Buchstaben nach außen), unten gegen den Uhrzeigersinn (nach innen)
-  const [tx1, ty1] = polar(70, 168);
-  const [tx2, ty2] = polar(70, 12);
-  const [bx1, by1] = polar(79, 146);
-  const [bx2, by2] = polar(79, 34);
-  const emblem = kind === 'army' ? ARMY_EMBLEM : BASE_EMBLEM;
-  const icons = kind === 'army' ? countRow(m.min, (x, y) => star(x, y, 5.2)) : countRow(m.min, (x, y) => planet(x, y, 2.6));
-  const relief = `${icons}${emblem}
-    <text x="100" y="131" font-family="Silkscreen, monospace" font-size="9.5" text-anchor="middle">AB ${m.min} ${m.what}</text>
-    <text x="100" y="142.5" font-family="'Space Grotesk Variable', sans-serif" font-weight="700" font-size="9" text-anchor="middle">und die meisten</text>`;
+  const [tx1, ty1] = polar(80, 166);
+  const [tx2, ty2] = polar(80, 14);
+  const [bx1, by1] = polar(88.5, 142);
+  const [bx2, by2] = polar(88.5, 38);
+  const rimText = (path: string, text: string) =>
+    `<text font-size="13.5" fill="#1a0f00" transform="translate(.9 1.2)"><textPath href="#${id}${path}" startOffset="50%">${text}</textPath></text>
+    <text font-size="13.5" fill="${CREAM}"><textPath href="#${id}${path}" startOffset="50%">${text}</textPath></text>`;
+  const icons = countRow(m.min).map(([x, y]) => kind === 'army'
+    ? star(x, y, 5.6)
+    : `<g transform="translate(${r2(x - 6)} ${r2(y - 6)}) scale(.12)"><rect width="100" height="100" mask="url(#${id}e)"/></g>`).join('');
+  const relief = `${icons}
+    <text x="100" y="132" font-family="Silkscreen, monospace" font-size="10" text-anchor="middle">AB ${m.min} ${m.what}</text>
+    <text x="100" y="144" font-family="'Space Grotesk Variable', sans-serif" font-weight="700" font-size="9.5" text-anchor="middle">und die meisten</text>`;
   return `<svg class="coin" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="${size}" height="${size}" role="img" aria-label="${m.title}">
   <defs>
-    <linearGradient id="${id}r" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fff4c2"/><stop offset=".28" stop-color="#e7b64a"/><stop offset=".55" stop-color="#9b6a16"/>
-      <stop offset=".75" stop-color="#f1cf72"/><stop offset="1" stop-color="#7d5210"/>
-    </linearGradient>
-    <linearGradient id="${id}b" x1="1" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#f5d57a"/><stop offset=".5" stop-color="#c8922e"/><stop offset="1" stop-color="#a7741c"/>
-    </linearGradient>
-    <radialGradient id="${id}f" cx=".38" cy=".32" r=".8">
-      <stop offset="0" stop-color="#fff6c8"/><stop offset=".45" stop-color="#eec35a"/><stop offset="1" stop-color="#b07c1e"/>
-    </radialGradient>
-    <path id="${id}t" d="M${tx1} ${ty1}A70 70 0 1 1 ${tx2} ${ty2}"/>
-    <path id="${id}u" d="M${bx1} ${by1}A79 79 0 0 0 ${bx2} ${by2}"/>
+    <clipPath id="${id}c"><circle cx="100" cy="100" r="97.5"/></clipPath>
+    <clipPath id="${id}p"><circle cx="100" cy="100" r="70"/></clipPath>
+    <mask id="${id}e" maskContentUnits="userSpaceOnUse"><image href="${emblem}" width="100" height="100"/></mask>
+    <mask id="${id}o" maskContentUnits="userSpaceOnUse"><image href="${emblem}" x="77" y="71" width="46" height="46"/></mask>
+    ${bevelGrad(`${id}hi`, true)}${bevelGrad(`${id}lo`, false)}
+    <linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b8"/><stop offset=".55" stop-color="#e2ac3c"/><stop offset="1" stop-color="#a86f14"/></linearGradient>
+    <radialGradient id="${id}s" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="rgba(255,250,225,.45)"/><stop offset=".6" stop-color="rgba(255,250,225,0)"/><stop offset="1" stop-color="rgba(40,20,0,.3)"/></radialGradient>
+    <path id="${id}t" d="M${tx1} ${ty1}A80 80 0 1 1 ${tx2} ${ty2}"/>
+    <path id="${id}u" d="M${bx1} ${by1}A88.5 88.5 0 0 0 ${bx2} ${by2}"/>
   </defs>
-  <circle cx="100" cy="100" r="99" fill="url(#${id}r)" stroke="#5a3a08" stroke-width="1"/>
-  <path d="${knurl}" stroke="#6b470c" stroke-opacity=".75" stroke-width="1.1"/>
-  <circle cx="100" cy="100" r="90" fill="url(#${id}b)" stroke="${INK}" stroke-width="1.6"/>
-  <circle cx="100" cy="100" r="86.5" fill="none" stroke="${SHINE}" stroke-width=".8"/>
-  <g font-family="Silkscreen, monospace" text-anchor="middle">
-    <text font-size="14.5" fill="${SHINE}" transform="translate(.6 .8)"><textPath href="#${id}t" startOffset="50%">${m.title}</textPath></text>
-    <text font-size="14.5" fill="${INK}"><textPath href="#${id}t" startOffset="50%">${m.title}</textPath></text>
-    <text font-size="14.5" fill="${SHINE}" transform="translate(.6 .8)"><textPath href="#${id}u" startOffset="50%">+${MEDAL_POINTS} SIEGPUNKTE</textPath></text>
-    <text font-size="14.5" fill="${INK}"><textPath href="#${id}u" startOffset="50%">+${MEDAL_POINTS} SIEGPUNKTE</textPath></text>
-  </g>
-  ${[180, 0].map((deg) => { const [x, y] = polar(75, deg); return `<g fill="${INK}">${star(x, y, 4.5)}</g>`; }).join('')}
-  <circle cx="100" cy="100" r="64" fill="url(#${id}f)" stroke="${INK}" stroke-width="1.8"/>
-  <circle cx="100" cy="100" r="61" fill="none" stroke="${SHINE}" stroke-width=".7"/>
-  <g fill="${SHINE}" stroke="${SHINE}" stroke-width="0" transform="translate(.7 .9)">${relief}</g>
-  <g fill="${INK}" stroke="${INK}" stroke-width="0">${relief}</g>
+  <circle cx="100" cy="100" r="100" fill="#000"/>
+  <image href="${metal}" x="2.5" y="2.5" width="195" height="195" preserveAspectRatio="xMidYMid slice" clip-path="url(#${id}c)"/>
+  <circle cx="100" cy="100" r="97.5" fill="url(#${id}s)"/>
+  <circle cx="100" cy="100" r="96" fill="none" stroke="url(#${id}hi)" stroke-width="3"/>
+  <g font-family="Silkscreen, monospace" text-anchor="middle">${rimText('t', m.title)}${rimText('u', `+${MEDAL_POINTS} SIEGPUNKTE`)}</g>
+  ${[180, 0].map((deg) => { const [x, y] = polar(84, deg); return `<g fill="#1a0f00" transform="translate(.8 1)">${star(x, y, 4.6)}</g><g fill="${CREAM}">${star(x, y, 4.6)}</g>`; }).join('')}
+  <circle cx="101.2" cy="102" r="72.5" fill="rgba(0,0,0,.55)"/>
+  <circle cx="100" cy="100" r="72" fill="#120a00"/>
+  <image href="${plate}" x="22" y="22" width="156" height="156" preserveAspectRatio="xMidYMid slice" clip-path="url(#${id}p)"/>
+  <circle cx="100" cy="100" r="70" fill="url(#${id}s)" opacity=".45"/>
+  <circle cx="100" cy="100" r="68.8" fill="none" stroke="url(#${id}hi)" stroke-width="2.4"/>
+  <g fill="rgba(255,248,215,.85)" transform="translate(.7 .9)">${relief}</g>
+  <g fill="${INK}">${relief}</g>
+  <ellipse cx="100" cy="94" rx="30" ry="20.5" fill="#050505" stroke="url(#${id}lo)" stroke-width="1.6"/>
+  <rect x="77" y="71" width="46" height="46" fill="url(#${id}g)" mask="url(#${id}o)"/>
 </svg>`;
 }

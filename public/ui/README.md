@@ -23,6 +23,10 @@ Herkunft je Fraktion:
   - `npm run gfx` überschreibt sie nicht, solange `Tools/card-art/selection.json` eine Wahl für `biotec-back` enthält.
 - **neutral** (generiert): entsättigtes Gunmetal für Start, Setup und Kurzanleitung.
 
+## `gold/`
+
+`metal.jpg` (Rahmentextur) und `plate.jpg` (Platte) in Gold für die Siegmarker-Münzen (`src/print/markers.ts`). Erzeugt mit `node Tools/gold-textures.mjs` aus `factions/neutral/` über eine Farbrampe.
+
 ## `helge/`
 
 Weiße Symbolmasken, die per CSS `mask` eingefärbt werden, freigestellt aus Helges Scaretech-Vorlagen:
