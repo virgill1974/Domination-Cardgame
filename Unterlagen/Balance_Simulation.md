@@ -1,6 +1,6 @@
 # Balance-Simulation Domination
 
-Erzeugt am 27.9.2026 mit dem Balance-Simulator (`npm run sim`, Tools/sim/). Die Partien laufen über die echte Spiel-Engine der App. Spielfeld, verdeckte Planeten und die Entscheidungen übernehmen Strategie-Bots (Modell und Grenzen in Abschnitt 8).
+Erzeugt am 27.9.2026 mit dem Balance-Simulator (`npm run sim`, Tools/sim/). Die Partien laufen über die echte Spiel-Engine der App. Spielfeld, verdeckte Planeten und die Entscheidungen übernehmen Strategie-Bots (Modell und Grenzen in Abschnitt 9).
 
 ## Kurzfassung
 
@@ -16,9 +16,10 @@ Erzeugt am 27.9.2026 mit dem Balance-Simulator (`npm run sim`, Tools/sim/). Die 
 
 - **Stärkste Fraktion: Lightforce** (1,28), **schwächste: Scaretech** (0,65).
 - Am deutlichsten ist die Abweichung bei **4 Spielern**: Scaretech gewinnt 13 % der entschiedenen Partien (fair: 25 %).
-- Auffälligste Karte: **Extend** (Biotec, 600 Credits, 3/3/2) mit dem höchsten Kampfwert je Credit im Spiel (1,09 je 1000 Credits, beste Einheit einer anderen Fraktion: Damokles mit 0,77), schon über den Startplaneten Hive zu haben (Abschnitt 7).
+- Auffälligste Karte: **Extend** (Biotec, 600 Credits, 3/3/2) mit dem höchsten Kampfwert je Credit im Spiel (1,09 je 1000 Credits, beste Einheit einer anderen Fraktion: Damokles mit 0,77), schon über den Startplaneten Hive zu haben (Abschnitt 8).
+- Am ausgeglichensten von den getesteten Änderungen: **K1: Lichtkoloss, Antimat., Flottenb.** (mittlere Abweichung von fair 0,02 statt 0,23). Damit liegen alle Fraktionen zwischen 0,97 und 1,03, also nahe bei fair (Abschnitt 6).
 - Wer anfängt, hat einen Vorteil: Bei 4 Spielern gewinnt Platz 1 28 %, Platz 4 nur 22 % (Abschnitt 2).
-- **Überlastung mit der neuen Regel** (gerettete Energiequelle wird verdeckt neu ausgelegt): Selbst wenn eine Fraktion ihre Energiequelle anfangs in Reihe 2 legt, setzt sie höchstens 1,16 Züge je Partie aus, vorher waren es bis zu 3,9 (Abschnitt 6).
+- **Überlastung mit der neuen Regel** (gerettete Energiequelle wird verdeckt neu ausgelegt): Selbst wenn eine Fraktion ihre Energiequelle anfangs in Reihe 2 legt, setzt sie höchstens 1,16 Züge je Partie aus, vorher waren es bis zu 3,9 (Abschnitt 7).
 
 ## 1. Balance mit optimierten Strategien
 
@@ -242,7 +243,43 @@ Der Optimierer (Evolutionsstrategie, 16 Generationen) hat je Fraktion die Einste
 - **Karten, mit denen sie seltener gewinnt:** Hive (−18 Pkt.), Einheit 5 (−1 Pkt.), Mutant (−0 Pkt.)
   - Das ist ein Zusammenhang, keine Ursache: Wer vorn liegt, kauft andere Karten als wer zurückliegt.
 
-## 6. Regel-Auffälligkeiten
+## 6. Was wäre wenn: geänderte Kartenwerte
+
+Dieselben optimierten Bots spielen mit geänderten Kartenwerten (nur im Simulator, alle Sitzordnungen, 2–4 Spieler, alle Siegpunkt-Einstellungen). Ihre Käufe passen sie selbst an; neu optimiert wurden sie nicht. Stärke relativ zu fair wie in der Kurzfassung.
+
+| Änderung | Starwing | Lightforce | Scaretech | Biotec | mittlere Abweichung von fair |
+|---|---|---|---|---|---|
+| heutige Werte | 0,98 | 1,28 | 0,65 | 1,10 | 0,23 |
+| K1: Lichtkoloss, Antimat., Flottenb. | 1,00 | 0,97 | 1,00 | 1,03 | 0,02 |
+| K2: K1 + Strategieplaneten 2000 | 0,98 | 0,94 | 1,07 | 1,00 | 0,05 |
+| K3: K2 + Extend 700 | 0,99 | 1,00 | 1,07 | 0,93 | 0,05 |
+| Lightforce: Handelssektor 2000 | 1,06 | 0,98 | 0,70 | 1,25 | 0,20 |
+| Lightforce: Lichtkoloss 2200 | 1,07 | 1,03 | 0,73 | 1,17 | 0,16 |
+| Lightforce: Schutzring 900 | 0,98 | 1,22 | 0,67 | 1,13 | 0,21 |
+| Scaretech: Antimaterieminen 2 statt 3 Runden | 0,92 | 1,27 | 0,78 | 1,03 | 0,18 |
+| Scaretech: Flottenbasis 2000 statt 2500 | 0,95 | 1,26 | 0,77 | 1,03 | 0,18 |
+| Scaretech: Raumbarriere 700, 3/2/2 | 0,97 | 1,25 | 0,67 | 1,10 | 0,21 |
+| Scaretech: Strategieplaneten 2000 | 0,96 | 1,24 | 0,74 | 1,06 | 0,18 |
+| Scaretech: Shadow Arm 1/2/1 | 0,95 | 1,40 | 0,64 | 1,01 | 0,27 |
+
+*Mittlere Abweichung:* quadratisches Mittel der Abstände aller vier Fraktionen von 1,00; 0 wäre perfekt ausgeglichen.
+
+
+Genaue Änderungen:
+
+- K1: Lichtkoloss, Antimat., Flottenb.: `{"Lichtkoloss":{"price":2200},"Antimaterieminen":{"rounds":2},"Flottenbasis":{"price":2000}}`
+- K2: K1 + Strategieplaneten 2000: `{"Lichtkoloss":{"price":2200},"Antimaterieminen":{"rounds":2},"Flottenbasis":{"price":2000},"Dunkler Rat":{"price":2000},"Spionagezentrum":{"price":2000}}`
+- K3: K2 + Extend 700: `{"Lichtkoloss":{"price":2200},"Antimaterieminen":{"rounds":2},"Flottenbasis":{"price":2000},"Dunkler Rat":{"price":2000},"Spionagezentrum":{"price":2000},"Extend":{"price":700}}`
+- Lightforce: Handelssektor 2000: `{"Handelssektor":{"price":2000}}`
+- Lightforce: Lichtkoloss 2200: `{"Lichtkoloss":{"price":2200}}`
+- Lightforce: Schutzring 900: `{"Schutzring":{"price":900}}`
+- Scaretech: Antimaterieminen 2 statt 3 Runden: `{"Antimaterieminen":{"rounds":2}}`
+- Scaretech: Flottenbasis 2000 statt 2500: `{"Flottenbasis":{"price":2000}}`
+- Scaretech: Raumbarriere 700, 3/2/2: `{"Raumbarriere":{"price":700,"def":3,"dmg":2}}`
+- Scaretech: Strategieplaneten 2000: `{"Dunkler Rat":{"price":2000},"Spionagezentrum":{"price":2000}}`
+- Scaretech: Shadow Arm 1/2/1: `{"Shadow Arm":{"off":2}}`
+
+## 7. Regel-Auffälligkeiten
 
 **Überlastung (geänderte Regel).** Wird eine Energiequelle zerstört und die Energie fällt unter 0, bleibt die Karte im Spiel, bekommt ihre volle Defensive zurück und der Besitzer setzt eine Runde aus. Neu ist: Sie wird dabei **verdeckt neu ausgelegt**. Vorher blieb sie aufgedeckt liegen und konnte jede Runde erneut angegriffen werden; der Besitzer setzte dann immer wieder aus („Überlastungs-Sperre“, im alten Stand bis zu 3,9 ausgesetzte Züge je Partie).
 
@@ -259,7 +296,7 @@ Versuch mit der neuen Regel: Eine Fraktion legt ihre Energiequelle anfangs in Re
 
 **„∞“ zu zweit.** Ohne Siegpunkte gewinnt nur, wer das gegnerische Zentralgestirn zerstört. Zu zweit dauerte das im Schnitt 36 Runden; 1 % der Partien hatten nach 120 Runden noch keinen Sieger, am häufigsten mit Lightforce (2 % ihrer Partien) und Starwing (1 %).
 
-## 7. Kampfwert der Einheiten
+## 8. Kampfwert der Einheiten
 
 Mittlere Siegchance im Einzelgefecht gegen alle Einheiten der anderen Fraktionen (je zur Hälfte als Angreifer und als Verteidiger, Grundwerte ohne Upgrades), exakt berechnet. „je 1000 Credits“ setzt das ins Verhältnis zum Preis; fett = besonders günstig. Einheiten mit Defensive 0 zerstören sich bei jedem Angriff selbst. Startplaneten sind mit * markiert: Ihre Einheiten sind ab Runde 1 kaufbar.
 
@@ -298,7 +335,7 @@ Mittlere Siegchance im Einzelgefecht gegen alle Einheiten der anderen Fraktionen
 | Biotec | Regenerat. Panzer | 1000 | 3/5/5 | Manufaktur | 83 % | **0,83** |
 | Biotec | Helicopter | 1200 | 2/4/3 | Helipad | 59 % | 0,50 |
 
-## 8. Modell und Grenzen
+## 9. Modell und Grenzen
 
 - **Regeln:** Einkommen, Bauzeiten, Energie, Kaufen, alle Kampfarten, Reparatur, Upgrades, Münzen, Siegpunkte und Sonderaktion kommen unverändert aus der App-Engine (`src/engine/`).
 - **Tischregeln** (nicht in der App, im Simulator nachgebaut, `Tools/sim/board.ts`):
@@ -312,7 +349,7 @@ Mittlere Siegchance im Einzelgefecht gegen alle Einheiten der anderen Fraktionen
 - **Grenzen:** Bots bluffen nicht, sprechen sich nicht ab und planen nur einen Zug voraus (plus Sparziel). Menschen spielen anders, besonders mit Absprachen zu dritt oder zu viert. Die Ergebnisse zeigen Tendenzen im Kartenmaterial, keine exakten Siegchancen am Tisch.
 - **Remis:** Partien ohne Sieger nach 120 Runden zählen nicht in die Siegquoten.
 
-## 9. Nachrechnen
+## 10. Nachrechnen
 
 ```bash
 npm run sim -- all                  # Versuche A+B, Optimierung, Balance-Urteil, Bericht
@@ -324,4 +361,4 @@ npm run sim -- final --games 150 --patch werte.json --tag name --label "Text"
 npm run sim -- report
 ```
 
-Umfang dieses Berichts: rund 1.912.000 simulierte Partien.
+Umfang dieses Berichts: rund 2.137.000 simulierte Partien.

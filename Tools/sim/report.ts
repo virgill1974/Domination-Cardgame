@@ -298,8 +298,9 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
       const order = [...best.st].sort((a, b) => b.r - a.r);
       notes.push(`Am ausgeglichensten von den getesteten Änderungen: **${best.v.meta.label ?? JSON.stringify(best.v.meta.patch)}** `
         + `(mittlere Abweichung von fair ${num(deviation(best.st), 2)} statt ${num(deviation(verdict), 2)}). `
-        + `Danach ist ${FACTIONS[order[0].f]} am stärksten (${num(order[0].r, 2)}) und ${FACTIONS[order[3].f]} am schwächsten (${num(order[3].r, 2)}); `
-        + `eine einzelne Änderung reicht also nicht (Abschnitt ${S.whatif}).`);
+        + (deviation(best.st) <= 0.05
+          ? `Damit liegen alle Fraktionen zwischen ${num(order[3].r, 2)} und ${num(order[0].r, 2)}, also nahe bei fair (Abschnitt ${S.whatif}).`
+          : `Danach ist ${FACTIONS[order[0].f]} am stärksten (${num(order[0].r, 2)}) und ${FACTIONS[order[3].f]} am schwächsten (${num(order[3].r, 2)}) (Abschnitt ${S.whatif}).`));
     }
     const four = sumAgg(VPS.map((v) => final.results[`C|4|${v}`]));
     const seatRate = (agg: Agg, i: number) => {
