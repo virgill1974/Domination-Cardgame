@@ -67,6 +67,7 @@ App und Drucker nutzen dasselbe Kartenlayout (`src/ui/cardFace.ts`).
 **Rückseiten** (Modus „Rückseiten“ oder „Beidseitig“): Helges Motiv der Fraktion im Fasenrahmen, also Starwing-Flügel, Lightforce-Blitzfaust, Scaretech-Totenkopf oder Biotec-Helix.
 - **Kartentyp von hinten erkennbar:** großes Abzeichen mit Symbol und Schrift (Planet, Einheit, Upgrade), dazu kleine Symbole oben links und unten rechts für die aufgefächerte Hand.
 - **Duplexdruck:** Die Rückseitenbögen sind zeilenweise gespiegelt. Beim Drucken „beidseitig, Wenden an der langen Kante“ wählen, dann liegt jede Rückseite hinter ihrer Vorderseite. „Beidseitig“ gibt abwechselnd Vorder- und Rückseitenbogen aus (160 Karten auf 18 Blatt).
+**Siegmarker** (Modus „Siegmarker“): die Spielmaterialien „Beste Streitmacht“ und „Bester Stützpunkt“ als goldene Münzen (Ø 50 mm, Vektorgrafik) mit Emblem, Bedingung und „+5 Siegpunkte“. Vorder- und Rückseite sind gleich: je zwei gleiche Münzen ausschneiden und Rücken an Rücken auf Pappe kleben. Ein A4-Bogen enthält je 6 Münzen, also Ersatz. Fertig als [`Unterlagen/Domination_Siegmarker.pdf`](Unterlagen/Domination_Siegmarker.pdf).
 Beim Drucken „Tatsächliche Größe / 100 %“ wählen.
 
 **Technologiebäume:** [`Unterlagen/Domination_Techtrees.pdf`](Unterlagen/Domination_Techtrees.pdf) enthält je Fraktion eine A4-Seite quer, aufgebaut wie die alten C&C-Techtrees.
@@ -180,7 +181,7 @@ Jeder Spieler hat ein Spielfeld mit **3 Reihen × 7 Feldern**:
 | Max. Reparaturen/Runde | 1 (kostet 200 Credits, +1 Def, mit Upgrade +2 Def) |
 | Energiesystem | Energiequellen liefern je 3 Energie, jeder andere Planet verbraucht 1. Scaretech braucht keine Energie. |
 | Kampfwürfel | W6 – Offensive ≥ Wurf = Treffer, dann Schaden von Defensive abziehen |
-| Siegpunkte | Planeten + Upgrades + Sterne + Orden (Bester Stützpunkt: +5, Beste Streitmacht: +5) |
+| Siegpunkte | Planeten + Upgrades + Sterne + Siegmarker (Bester Stützpunkt: +5, Beste Streitmacht: +5) |
 | Sonderaktionen | Ab Runde 5, bei wenig Einheiten/Planeten (≤7), Zufallsbonus (Credits, Sofort-Aktivierung, Reparatur) |
 | Auge des Raumes | Starwing-Upgrade: Pro Runde eine verdeckte Gegnerkarte aufdecken |
 
@@ -475,6 +476,7 @@ Die alte Kartenliste enthält bei Biotec teils andere Namen und Werte als der Co
 - [ ] **Cloudflare Pages:** Projekt `domination-cardgame` anlegen (siehe oben)
 - [x] **Techtree-Grafiken:** `Unterlagen/Domination_Techtrees.pdf`, erzeugt aus `Tools/techtree.html` (gedrucktes Spielmaterial, bewusst nicht in der App)
 - [x] **Spielanleitung:** `Unterlagen/Domination_Anleitung.pdf`, erzeugt aus `Tools/manual.html`
+- [x] **Siegmarker:** `Unterlagen/Domination_Siegmarker.pdf`, goldene Münzen aus dem Kartendrucker (Modus „Siegmarker“)
 - [ ] **Biotec Einheiten:** Werte-Diskrepanzen zwischen Code und Kartenliste abgleichen
 - [x] **Biotec Upgrades 1–6:** neu entworfen, siehe Upgrade-Tabelle
 - [x] **Auge des Raumes / Schwarzer Schleier:** als Hinweis in der App umgesetzt (Aufdecken bzw. verdeckt Ausspielen passiert am Tisch)

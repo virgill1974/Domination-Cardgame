@@ -100,6 +100,10 @@ table.planets td:nth-child(3) { width: 45%; }
 .backs-row .back .cb { width: 30mm; }
 .backs-row figcaption { font-size: 8.5pt; color: #4a5058; }
 
+/* Siegmarker-Münzen (markers.ts) */
+.markers { display: grid; grid-template-columns: 74mm 1fr; gap: 5mm; align-items: center; break-inside: avoid; }
+.markers > div:first-child { display: flex; gap: 4mm; }
+
 /* Spielfeld */
 .board { break-inside: avoid; }
 .board .grid {

@@ -45,6 +45,12 @@ body {
 .cell .cf, .cell .cb { width: 63mm; }
 .cell.empty { outline: none; }
 
+/* Siegmarker: goldene Münzen Ø 50 mm, die gestrichelte Linie 1 mm außerhalb ist die Schnitthilfe */
+.sheet.markers { grid-template-columns: repeat(3, 50mm); grid-auto-rows: 50mm; gap: 12mm 14mm; justify-content: center; grid-template-rows: 8mm; padding: 14mm 0; }
+.sheet-note { grid-column: 1 / -1; align-self: end; height: auto; font-size: 9pt; color: #555; text-align: center; }
+.coin-cell { border-radius: 50%; outline: 0.2mm dashed #999; outline-offset: 1mm; }
+.coin-cell .coin { display: block; }
+
 .label { display: flex; flex-direction: column; align-items: center; justify-content: center; outline: 0.2mm dashed #ddd; }
 .label-name { font-size: 5.5pt; white-space: nowrap; overflow: hidden; max-width: 36mm; }
 

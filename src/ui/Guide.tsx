@@ -89,13 +89,13 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
     ),
   },
   {
-    title: 'Siegpunkte & Orden',
+    title: 'Siegpunkte & Siegmarker',
     body: (
       <ul>
         <li>1 Punkt für jeden aktiven Planeten, jedes Upgrade und jeden gewonnenen Kampf (Stern).</li>
         <li><b>Bester Stützpunkt</b> (ab 5 Planeten, mehr als alle anderen): +5 Punkte.</li>
         <li><b>Beste Streitmacht</b> (ab 5 Siegen, mehr als alle anderen): +5 Punkte.</li>
-        <li>Einen Orden behältst du, bis dich jemand übertrifft.</li>
+        <li>Die goldene Münze behältst du, bis dich jemand übertrifft.</li>
       </ul>
     ),
   },

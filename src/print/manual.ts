@@ -19,6 +19,7 @@ import { cardArtUrl } from '../ui/cardArt';
 import { cardBackHtml, cardFaceHtml } from '../ui/cardFace';
 import { DESCRIPTIONS, rulesFor } from '../ui/cardText';
 import { jpegImages } from './jpeg';
+import { markerSvg } from './markers';
 
 const BASE = '../';
 const F = [0, 1, 2, 3] as Faction[];
@@ -91,7 +92,7 @@ ${h3('1.2', 'Inhalt')}
       <tr><td>Einheiten</td>${F.map((f) => `<td>${count(f, 'unit')}</td>`).join('')}</tr>
       <tr><td>Upgrades</td>${F.map((f) => `<td>${count(f, 'upgrade')}</td>`).join('')}</tr></table></li>
   <li>4 Technologiebäume (eigenes Blatt je Fraktion)</li>
-  <li>2 Marker „Bester Stützpunkt“ und „Beste Streitmacht“</li>
+  <li>2 Siegmarker-Münzen „Beste Streitmacht“ und „Bester Stützpunkt“ (im Kartendrucker unter „Siegmarker“)</li>
   <li>diese Spielanleitung</li>
   <li>außerdem nötig: ein Handy oder Tablet mit Kamera und der App <b>domination-cardgame.pages.dev</b></li>
 </ul>
@@ -215,11 +216,16 @@ ${h2('10', 'Zug beenden')}
 <p>Mit <b>Zug beenden</b> ist der Zug vorbei. Das Gerät geht an den nächsten Spieler; die App zeigt dabei einen Übergabe-Bildschirm, damit niemand die Werte des Vorgängers sieht.</p>
 ${h2('11', 'Siegpunkte')}
 <p>Jeder aktive Planet, jedes gekaufte Upgrade und jeder Stern ist einen Siegpunkt wert.</p>
-<ul>
-  <li><b>Bester Stützpunkt:</b> Wer mindestens ${MEDAL_MIN_BUILDINGS} Planeten und mehr als alle anderen besitzt, erhält den Marker und ${MEDAL_POINTS} Siegpunkte.</li>
-  <li><b>Beste Streitmacht:</b> Wer mindestens ${MEDAL_MIN_STARS} Sterne und mehr als alle anderen besitzt, erhält den Marker und ${MEDAL_POINTS} Siegpunkte.</li>
-</ul>
-<p>Einen Marker behält man, bis ein anderer Spieler mehr erreicht. Die App vergibt die Marker automatisch und meldet es.</p>
+<figure class="markers">
+  <div>${markerSvg('army', '34mm')}${markerSvg('base', '34mm')}</div>
+  <div>
+    <ul>
+      <li><b>Beste Streitmacht:</b> Wer mindestens ${MEDAL_MIN_STARS} Sterne und mehr als alle anderen besitzt, erhält die Münze und ${MEDAL_POINTS} Siegpunkte.</li>
+      <li><b>Bester Stützpunkt:</b> Wer mindestens ${MEDAL_MIN_BUILDINGS} Planeten und mehr als alle anderen besitzt, erhält die Münze und ${MEDAL_POINTS} Siegpunkte.</li>
+    </ul>
+    <p>Eine Münze behält man, bis ein anderer Spieler mehr erreicht. Die App vergibt die Siegmarker automatisch und meldet es; die Münze wandert dann zum neuen Besitzer.</p>
+  </div>
+</figure>
 ${h2('12', 'Spielende')}
 <p>Das Spiel endet, sobald ein Spieler ein gegnerisches <b>Zentralgestirn</b> zerstört oder als Erster die eingestellten Siegpunkte erreicht. Die App zeigt dann den Sieger an.</p>
 ${box(`<b>Startkapital:</b> Jeder Spieler beginnt mit ${START_CREDITS} Credits.`)}`;

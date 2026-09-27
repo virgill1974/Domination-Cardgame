@@ -49,8 +49,8 @@ export function eventMessages(events: GameEvent[]): Msg[] {
         break;
       case 'medal':
         msgs.push({
-          tone: 'ok', sound: 'medal', title: 'Orden erhalten',
-          body: `${e.medal === 'bestBase' ? 'Bester Stützpunkt' : 'Beste Streitmacht'} (+5 Siegpunkte). Nimm dir den Marker.`,
+          tone: 'ok', sound: 'medal', title: 'Siegmarker erhalten',
+          body: `${e.medal === 'bestBase' ? 'Bester Stützpunkt' : 'Beste Streitmacht'} (+5 Siegpunkte). Nimm dir die Münze.`,
         });
         break;
       case 'winner':

@@ -104,7 +104,8 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 **Card printer (`Tools/generate_barcodes.html` + `src/print/`):**
 - It is a second Vite entry, so it is not double-clickable; open it via the dev server.
 - It shares data, the EAN encoder and the card face with the app. It renders SVG barcodes (integer module grid, ≥7-module quiet zone, 0.4 mm/module, 9.5 mm high on cards) on Helge-layout cards (63 mm wide, his 652:899 ratio ≈ 86.9 mm, 9 per A4) or 38×21 mm labels.
-- Modes: fronts, backs, duplex (front sheet, then its back sheet), labels.
+- Modes: fronts, backs, duplex (front sheet, then its back sheet), labels, markers.
+  - Markers: `markerSvg(kind)` in `src/print/markers.ts` draws the "Beste Streitmacht"/"Bester Stützpunkt" gold coins (pure vector, no filters, Ø 50 mm, identical front and back). The user wants a coin, not a medal/order. Values come from `MEDAL_*` in `data.ts`. The manual shows them in chapter 11.
   - Backs come from `cardBackHtml()` (`cardFace.ts`/`.css`): faction frame texture, `back.webp` in the bevel rim, card type as a big badge (emblem plus "Planet/Einheit/Upgrade") and corner emblems top-left and bottom-right (rotated).
   - Back sheets mirror each row of 3 (`mirroredBacks`) for long-edge duplex; incomplete rows are padded with empty cells.
 

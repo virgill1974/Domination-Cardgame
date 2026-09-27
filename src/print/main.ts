@@ -8,10 +8,13 @@ import { factionOfEan } from '../engine/cards';
 import { eanForIndex } from '../engine/ean';
 import { cardBackHtml, cardFaceHtml } from '../ui/cardFace';
 import { ean8Svg } from './barcodeSvg';
+import { markerSvg, type MarkerKind } from './markers';
 
-/** cards: Vorderseiten, backs: Rückseiten, duplex: abwechselnd Vorder- und Rückseitenbogen, labels: Etiketten */
-type Mode = 'cards' | 'backs' | 'duplex' | 'labels';
-const PER_SHEET: Record<Mode, number> = { cards: 9, backs: 9, duplex: 9, labels: 65 };
+/** cards: Vorderseiten, backs: Rückseiten, duplex: abwechselnd Vorder- und Rückseitenbogen, labels: Etiketten, markers: Siegmarker */
+type Mode = 'cards' | 'backs' | 'duplex' | 'labels' | 'markers';
+const PER_SHEET: Record<Exclude<Mode, 'markers'>, number> = { cards: 9, backs: 9, duplex: 9, labels: 65 };
+/** Münzen je Siegmarker auf dem Bogen: 2 ergeben einen Marker (Vorder- und Rückseite), der Rest ist Ersatz */
+const COINS_PER_MARKER = 6;
 const COLS = 3;
 
 let mode: Mode = 'cards';
@@ -42,7 +45,21 @@ function labelHtml(ean: number): string {
   return `<div class="label"><div class="label-name">${esc(CARDS[CARD_OF_EAN[ean]].name)} · ${FACTIONS[factionOfEan(ean)]}</div>${ean8Svg(code, 0.36, 9)}</div>`;
 }
 
+/** Siegmarker: je zwei gleiche Münzen ausschneiden und Rücken an Rücken auf Pappe kleben */
+function markerSheet(): string {
+  const coins = (kind: MarkerKind) => Array.from({ length: COINS_PER_MARKER }, () => `<div class="coin-cell">${markerSvg(kind)}</div>`).join('');
+  return `<section class="sheet markers">
+  <p class="sheet-note">Siegmarker · je zwei gleiche Münzen ausschneiden und Rücken an Rücken auf Pappe kleben (Ersatz inklusive)</p>
+  ${coins('army')}${coins('base')}
+</section>`;
+}
+
 function render() {
+  if (mode === 'markers') {
+    document.getElementById('output')!.innerHTML = markerSheet();
+    document.getElementById('count')!.textContent = `2 Siegmarker, je ${COINS_PER_MARKER} Münzen auf 1 A4-Seite`;
+    return;
+  }
   const eans = Array.from({ length: PHYSICAL_CARDS }, (_, i) => i).filter((ean) => faction < 0 || factionOfEan(ean) === faction);
   const sheets: string[] = [];
   for (let i = 0; i < eans.length; i += PER_SHEET[mode]) {
