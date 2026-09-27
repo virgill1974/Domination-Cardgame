@@ -179,10 +179,13 @@ async function runTune(pool: Pool) {
   const modes = vpArg ? [vpArg === 'inf' ? null : Number(vpArg)] : VP_MODES;
   for (const vp of modes) {
     console.log(`Optimierung für ${vp === null ? '∞' : vp + ' Siegpunkte'}`);
-    const start = saved ? bestArchetypes(saved, vpKey(vp))
+    // --warm: bei den zuletzt optimierten Einstellungen weitermachen (schnelles Nachjustieren nach Wertänderungen)
+    const previous = argv.includes('--warm') ? load<{ best: Record<Faction, BotParams> }>(`tuned-${vpKey(vp)}`) : null;
+    const start = previous ? previous.best : saved ? bestArchetypes(saved, vpKey(vp))
       : ([0, 1, 2, 3].map(() => ({ ...ARCHETYPES.ausgewogen })) as unknown as Record<Faction, BotParams>);
     const result = await tune(pool, start, {
       generations: opt('gens', 16), lambda: opt('lambda', 12), seed: opt('seed', 1), games2: opt('g2', 50), games4: opt('g4', 10), vpLimit: vp,
+      sigma: opt('sigma', previous ? 0.08 : 0.18),
     });
     save(`tuned-${vpKey(vp)}`, { ...result, meta: { patch, vp: vpKey(vp), date: new Date().toISOString() } });
   }

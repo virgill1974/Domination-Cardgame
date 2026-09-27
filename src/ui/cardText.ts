@@ -70,7 +70,7 @@ export function categoryLabel(id: number): string {
 const heart = (galaxy: string) =>
   `Dies ist das Zentrum und gleichzeitig der wunde Punkt der ${galaxy}-Galaxie. Es sollte immer gut bewacht werden.`;
 
-/** Beschreibungen der Planeten aus Unterlagen/Domination_Kartenliste.xls (BIOTEC hat noch keine). */
+/** Beschreibungen der Planeten aus Unterlagen/Domination_Kartenliste.xls; Biotec (dort nicht enthalten) im selben Stil ergänzt. */
 export const DESCRIPTIONS: Record<number, string> = {
   0: heart('Starwing'),
   1: 'Herstellungsort unbemannter Drohnen',
@@ -99,6 +99,15 @@ export const DESCRIPTIONS: Record<number, string> = {
   52: 'Datenauswertungszentrale',
   53: 'Größte Offensivkraft der Scaretech-Galaxie',
   54: 'Künstliche Raumsprungzone für Drohnen',
+  69: heart('Biotec'),
+  70: 'Brutstätte der biologischen Kampfeinheiten',
+  71: 'Energiequelle aus lebendem Plasma',
+  72: 'Organisches Abwehrfeld zur Verteidigung',
+  73: 'Finanzabteilung zur Versorgung des Konzerns',
+  74: 'Fertigungsstätte der Panzerflotte',
+  75: 'Start- und Landeplattform der Helicopter',
+  76: 'Planungs- und Forschungsabteilung des Konzerns',
+  77: 'Größte Offensivkraft des Biotec-Konzerns',
 };
 
 /** Startkarte: wird in Runde 1 aktiviert (Zentralgestirn, erster Produktionsplanet, erste Energiequelle) */
