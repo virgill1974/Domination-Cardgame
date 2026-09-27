@@ -8,7 +8,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
     title: 'Ziel des Spiels',
     body: (
       <p>
-        Gewonnen hat, wer zuerst die eingestellten <b>Siegpunkte</b> (30 oder 40) erreicht oder eine gegnerische
+        Gewonnen hat, wer zuerst die eingestellten <b>Siegpunkte</b> (30 oder 40) erreicht oder ein gegnerisches
         <b> Zentralgestirn zerstört</b>. Bei „∞“ zählt nur die Zerstörung eines Zentralgestirns.
       </p>
     ),

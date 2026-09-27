@@ -1,0 +1,148 @@
+/* Spielanleitung (Tools/manual.html): A4 hoch, heller Papiergrund, Kopfleisten und Titelseite im Helge-Stil */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Space Grotesk Variable', 'Segoe UI', sans-serif; background: #11151c; color: #1b1f24;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+.controls {
+  position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  padding: 12px 16px; background: #1b2230; border-bottom: 1px solid #2c3648; color: #e0e6ee;
+}
+.controls h1 { font-size: 18px; color: #ffd24a; margin-right: 12px; }
+.controls button, .controls a {
+  background: #2a3345; color: #e0e6ee; border: 1px solid #3a465e; border-radius: 6px;
+  padding: 7px 12px; font-size: 14px; cursor: pointer; text-decoration: none;
+}
+.controls #print { background: #2fbf71; border-color: #2fbf71; color: #0b0f14; font-weight: 600; }
+.hint { padding: 8px 16px; color: #8a96a8; font-size: 13px; }
+#output { padding: 16px; }
+
+/* Papier: am Bildschirm eine lange A4-breite Bahn, im Druck verteilt Chrome den Inhalt auf die Seiten */
+.doc {
+  width: 210mm; margin: 0 auto; padding: 16mm 15mm; background: #f7f6f2;
+  font-size: 9.6pt; line-height: 1.45; box-shadow: 0 4px 24px #0008;
+}
+.doc p, .doc ul, .doc ol, .doc table, .doc figure, .doc .box { margin-bottom: 2.6mm; }
+.doc ul, .doc ol { padding-left: 5mm; }
+.doc li { margin-bottom: 0.8mm; }
+.doc b { font-weight: 700; }
+
+/* Titelseite */
+.cover {
+  position: relative; height: 297mm; margin: -16mm -15mm 0; padding: 24mm 18mm 16mm; break-after: page;
+  display: flex; flex-direction: column; align-items: center; text-align: center; color: #eef1f4;
+  background: radial-gradient(120% 80% at 50% 30%, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.55)), var(--tex) 0 0 / 70mm, #22262b;
+}
+.cover .logo { width: 46mm; height: 46mm; filter: drop-shadow(0 2mm 3mm rgba(0, 0, 0, 0.7)); }
+.cover .kicker { margin-top: 8mm; font-family: 'Silkscreen', monospace; font-size: 12pt; letter-spacing: 1.5mm; opacity: 0.8; }
+.cover h1 {
+  font-family: 'Silkscreen', monospace; font-weight: 400; font-size: 44pt; letter-spacing: 1.5mm; line-height: 1;
+  margin-top: 3mm; background: linear-gradient(120deg, #f4f6f9, #a3a9b6 52%, #6b7280); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.cover .sub { margin-top: 4mm; font-size: 12pt; opacity: 0.85; }
+.cover .backs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5mm; margin-top: auto; width: 100%; }
+.cover .backs img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border: 1.2mm solid #000; border-radius: 2.5mm; box-shadow: 0 2mm 4mm rgba(0, 0, 0, 0.6); }
+.cover .backs figcaption { margin-top: 2mm; font-family: 'Silkscreen', monospace; font-size: 10pt; }
+.cover .credits { margin-top: 10mm; font-size: 9pt; opacity: 0.75; }
+
+/* Überschriften */
+h2 {
+  display: flex; align-items: center; gap: 3mm; margin: 6mm 0 3mm; padding: 2.2mm 4mm; break-after: avoid;
+  font-family: 'Silkscreen', monospace; font-weight: 400; font-size: 13pt; letter-spacing: 0.3mm; color: #f2f5f7;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.55)), var(--tex) 0 0 / 70mm, #2b3036;
+  border-left: 1.4mm solid #c9ced6; border-radius: 1mm;
+}
+h2 .num { min-width: 6mm; color: #ffd24a; }
+h3 { display: flex; gap: 2.5mm; margin: 4mm 0 1.6mm; font-size: 11pt; break-after: avoid; }
+h3 .num { font-family: 'Silkscreen', monospace; font-weight: 400; color: #6b7280; }
+h4 { margin: 3mm 0 1.4mm; font-family: 'Silkscreen', monospace; font-weight: 400; font-size: 11pt; break-after: avoid; }
+.appendix { break-before: page; }
+.appendix h2:first-child { margin-top: 0; }
+
+.box {
+  padding: 3mm 4mm; border-radius: 1.5mm; break-inside: avoid;
+  background: linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.1)), var(--plate) center / cover, #c9ced3;
+  border: 0.3mm solid rgba(0, 0, 0, 0.4);
+}
+
+/* Tabellen */
+table { border-collapse: collapse; width: 100%; break-inside: avoid; }
+table.planets { break-inside: auto; }
+tr { break-inside: avoid; }
+table.plain td { padding: 1mm 2.5mm 1mm 0; vertical-align: top; border-bottom: 0.2mm solid #d6d3cb; }
+table.plain td:first-child { white-space: nowrap; }
+table.mini { width: auto; margin: 1.5mm 0 1.5mm; }
+table.mini th, table.mini td { padding: 0.6mm 3mm; text-align: center; border-bottom: 0.2mm solid #d6d3cb; }
+table.mini th { font-family: 'Silkscreen', monospace; font-weight: 400; font-size: 8.5pt; text-shadow: 0 0 0.3mm #000, 0 0 0.3mm #000; }
+table.mini td:first-child { text-align: left; }
+table.planets { font-size: 8pt; line-height: 1.3; margin-bottom: 3mm; }
+table.planets th { text-align: left; padding: 1mm 2mm; background: #2b3036; color: #f2f5f7; font-weight: 600; }
+table.planets td { padding: 1mm 2mm; vertical-align: top; border-bottom: 0.2mm solid #d6d3cb; }
+table.planets td:nth-child(2) { white-space: nowrap; }
+table.planets td:nth-child(3) { width: 45%; }
+.appendix h4 { display: flex; align-items: center; gap: 2mm; }
+.appendix h4::before { content: ''; width: 3mm; height: 3mm; border-radius: 50%; background: var(--fc); box-shadow: 0 0 0 0.3mm #000; }
+
+/* Kartenbeispiele mit nummerierten Markierungen */
+.annotated { display: grid; grid-template-columns: 66mm 1fr; gap: 5mm; align-items: center; break-inside: avoid; }
+.annotated .card-wrap { position: relative; margin: 0 4mm; }
+.annotated .card-wrap .cf { width: 58mm; }
+.pin {
+  position: absolute; z-index: 2; width: 5mm; height: 5mm; transform: translate(-50%, -50%);
+  display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  font-family: 'Silkscreen', monospace; font-weight: 400; font-size: 7pt; color: #1a1000;
+  background: linear-gradient(180deg, #ffe58a, #f0b429); box-shadow: 0 0 0 0.4mm #000, 0 0.6mm 1.2mm rgba(0, 0, 0, 0.6);
+}
+.pin.static { position: static; transform: none; flex: 0 0 5mm; }
+.annotated .legend { list-style: none; padding: 0; }
+.annotated .legend li { display: flex; align-items: center; gap: 2.5mm; margin-bottom: 1.8mm; }
+.backs-row { display: grid; grid-template-columns: repeat(3, 30mm) 1fr; gap: 4mm; align-items: center; break-inside: avoid; }
+.backs-row .back .cb { width: 30mm; }
+.backs-row figcaption { font-size: 8.5pt; color: #4a5058; }
+
+/* Spielfeld */
+.board { break-inside: avoid; }
+.board .grid {
+  display: grid; grid-template-columns: 24mm repeat(7, 1fr); gap: 1.6mm; padding: 3mm; border-radius: 1.5mm;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03)), var(--tex) 0 0 / 60mm, #3a3f45;
+}
+.board .label { display: flex; flex-direction: column; justify-content: center; font-family: 'Silkscreen', monospace; font-size: 8pt; color: #f2f5f7; line-height: 1.2; }
+.board .label small { font-family: 'Space Grotesk Variable', sans-serif; font-size: 6.8pt; opacity: 0.8; }
+.board .cell { aspect-ratio: 652 / 899; border-radius: 1mm; display: flex; flex-direction: column; justify-content: center; gap: 1mm; }
+.board .cell.empty { border: 0.3mm dashed rgba(255, 255, 255, 0.35); }
+.board .cell small { font-size: 5.8pt; color: #f2f5f7; text-align: center; line-height: 1.1; }
+.board .cell .back .cb { width: 100%; }
+.board .stack { position: relative; height: 12mm; }
+.board .stack img {
+  position: absolute; left: 0; width: 88%; aspect-ratio: 512 / 299; object-fit: cover; border: 0.4mm solid #000; border-radius: 0.6mm;
+  box-shadow: 0 0.5mm 1mm rgba(0, 0, 0, 0.6);
+}
+.board .stack img:nth-child(1) { top: 0; }
+.board .stack img:nth-child(2) { top: 2.5mm; left: 6%; }
+.board .stack img:nth-child(3) { top: 5mm; left: 12%; }
+.board .stack.two img:nth-child(2) { top: 3.5mm; }
+.board figcaption, .backs-row figcaption { margin-top: 1.5mm; font-size: 8.5pt; color: #4a5058; }
+
+/* Fraktionen */
+.factions { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 6mm; }
+.faction { display: grid; grid-template-columns: 20mm 1fr; gap: 3mm; break-inside: avoid; }
+.faction img { width: 20mm; aspect-ratio: 3 / 4; object-fit: cover; border: 0.8mm solid #000; border-radius: 1.5mm; }
+.faction h4 { margin-top: 0; color: #1b1f24; }
+.faction h4::before { display: none; }
+.faction .pm { list-style: none; padding: 0; font-size: 8.6pt; }
+.faction .pm li { position: relative; padding-left: 4.2mm; }
+.faction .pm li::before { position: absolute; left: 0; font-weight: 700; }
+.faction .pm li.plus::before { content: '+'; color: #1f8a4c; }
+.faction .pm li.minus::before { content: '–'; color: #b3261e; }
+.tips { columns: 2; column-gap: 7mm; }
+.tips li { break-inside: avoid; }
+
+@page { size: A4 portrait; margin: 15mm 14mm 16mm; }
+@page :first { margin: 0; }
+@media print {
+  body { background: #fff; }
+  .controls, .hint { display: none; }
+  #output { padding: 0; }
+  .doc { width: auto; padding: 0; box-shadow: none; background: #fff; }
+  .cover { margin: 0; }
+}

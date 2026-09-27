@@ -75,6 +75,17 @@ Beim Drucken „Tatsächliche Größe / 100 %“ wählen.
 - **Gestaltung:** grauer Hintergrund für alle Fraktionen, Kartenbilder im Standardrahmen des Designs. Die Kartenart erkennt man am Piktogramm (Planet, Einheit, Upgrade) an der linken Bildkante.
 - **Neu erzeugen:** Die Seite `Tools/techtree.html` (im Dev-Server, verlinkt im Kartendrucker) berechnet die Bäume aus den Voraussetzungen der Kartendaten. Nach Regeländerungen dort „Drucken / PDF“ → „Als PDF speichern“ wählen, mit Hintergrundgrafiken und ohne Ränder.
 
+**Spielanleitung:** [`Unterlagen/Domination_Anleitung.pdf`](Unterlagen/Domination_Anleitung.pdf), A4 hoch, 11 Seiten.
+- **Aufbau:** Gliederung wie die alte C&C-Anleitung (Kapitel 1–12, Anhang A–E), umgeschrieben auf die App: Handy statt Terminal, Kamera statt Kartenleser, 4 Fraktionen.
+- **Inhalt:**
+  - Titelseite mit den vier Rückseiten-Motiven
+  - Spielfeld-Grafik
+  - Beispielkarten (Planet, Einheit, Upgrade) mit nummerierten Erklärungen
+  - Gefechtsregeln
+  - Anhang: Sonderaktionen, Meldungen, Fraktionen, Tipps und eine Planetentabelle mit „schaltet frei“
+- **Werte:** Alle Zahlen und Kartenbilder kommen aus den Spieldaten.
+- **Neu erzeugen:** `Tools/techtree.html` → Link „Spielanleitung“ (`Tools/manual.html`) → „Drucken / PDF“, mit Hintergrundgrafiken und Standardrändern.
+
 **Kartenbilder:** pro Kartentyp eine Datei `public/cards/<ID>.png` (Bildfenster im Format 512:299, 1024×598 px). Fehlende Bilder werden in App und Kartendrucker als Platzhalter gezeichnet. Die Checkliste aller 92 Dateinamen steht in [`public/cards/README.md`](public/cards/README.md).
 
 ### Kartenbilder erzeugen (Stable Diffusion, lokal)
@@ -463,6 +474,7 @@ Die alte Kartenliste enthält bei Biotec teils andere Namen und Werte als der Co
 - [x] **Kartenbilder:** mit Stable Diffusion lokal im Stil von Helge Vogt erzeugt (`Tools/card-art/`, siehe „Kartenbilder erzeugen“)
 - [ ] **Cloudflare Pages:** Projekt `domination-cardgame` anlegen (siehe oben)
 - [x] **Techtree-Grafiken:** `Unterlagen/Domination_Techtrees.pdf`, erzeugt aus `Tools/techtree.html` (gedrucktes Spielmaterial, bewusst nicht in der App)
+- [x] **Spielanleitung:** `Unterlagen/Domination_Anleitung.pdf`, erzeugt aus `Tools/manual.html`
 - [ ] **Biotec Einheiten:** Werte-Diskrepanzen zwischen Code und Kartenliste abgleichen
 - [x] **Biotec Upgrades 1–6:** neu entworfen, siehe Upgrade-Tabelle
 - [x] **Auge des Raumes / Schwarzer Schleier:** als Hinweis in der App umgesetzt (Aufdecken bzw. verdeckt Ausspielen passiert am Tisch)

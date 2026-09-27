@@ -3,7 +3,8 @@
  * als verlustfreie Rohpixel (sonst über 100 MB für wenige Seiten). 400 px Breite reichen für 300 dpi bei 30 mm.
  */
 export function toJpeg(img: HTMLImageElement, width = 400) {
-  if (img.src.startsWith('data:') || !img.naturalWidth) return;
+  // SVGs bleiben (Vektor, oft transparent), JPEG hätte keinen Alphakanal
+  if (img.src.startsWith('data:') || /\.svg($|\?)/.test(img.src) || !img.naturalWidth) return;
   const canvas = document.createElement('canvas');
   canvas.width = Math.min(width, img.naturalWidth);
   canvas.height = Math.round((canvas.width / img.naturalWidth) * img.naturalHeight);

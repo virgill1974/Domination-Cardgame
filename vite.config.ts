@@ -49,6 +49,7 @@ export default defineConfig(({ mode }) => ({
         main: resolve(import.meta.dirname, 'index.html'),
         cards: resolve(import.meta.dirname, 'Tools/generate_barcodes.html'),
         techtree: resolve(import.meta.dirname, 'Tools/techtree.html'),
+        manual: resolve(import.meta.dirname, 'Tools/manual.html'),
       },
     },
   },

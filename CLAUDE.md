@@ -61,6 +61,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - `App.tsx` holds the state machine (home → setup → handoff → HUD/flows → winner). `commit(fn)` structuredClones state, applies the engine call and persists to localStorage.
 - Engine events become queued `Msg` dialogs (`eventMessages.tsx`), optionally with a `sound`.
 - Flows in `flows.tsx` follow the terminal: scan → confirm card → execute.
+- Starting a new game from the home screen while a game is running asks "Spiel wirklich abbrechen?" first (dialog `quit-new`).
 - Button pairs use `.btn-row`: cancel (`.btn.cancel`, dark metal, never red) on the **left** at ⅓ width, main action on the right at ⅔. Both stretch to equal height when pixel text wraps. Red (`.btn.danger`) is reserved for deleting the game ("Spiel abbrechen" and its confirmation).
 
 **Design "Helge-Stil"** (`theme.css`, tokens on `:root`), derived from Helge Vogt's card drafts. The app should look like the printed cards:
@@ -114,6 +115,13 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - `drawArrows()` draws SVG connectors after layout: planet→planet as elbows, planet→group horizontal.
 - Look: neutral Gunmetal background for all factions (user request), standard `rim.webp` frame on every picture; the card kind is shown only by the big pictogram oval at the left picture edge (no type-coloured frames).
 - PDF size: Chrome embeds WebP as lossless pixels (>100 MB), so `toJpeg()` swaps images for 400 px JPEG data URIs (PDF ≈ 4 MB). CSS filters on the SVG make Chrome rasterise the whole page, so arrow shadows are a second dark stroke, not a filter.
+
+**Manual (`Tools/manual.html` + `src/print/manual.ts`/`.css`)**, a fourth Vite entry, rendered to `Unterlagen/Domination_Anleitung.pdf` (A4 portrait, about 11 pages):
+- Structure follows the old `CnC_Anleitung V1.01.doc` (chapters 1–12, appendix A–E), rewritten for the app. All numbers come from `data.ts`/`messages.ts`; card examples use `cardFaceHtml`/`cardBackHtml`; appendix E comes from `DESCRIPTIONS` + `rulesFor` + `requires`.
+- Chrome paginates it via `@page` (first page without margins for the cover).
+- Annotation pins sit outside the card: x < 0 on the left, x > 652 on the right, in template pixels, so they never cover card text.
+- `src/print/jpeg.ts` (`toJpeg`/`jpegImages`), shared with the tech trees, keeps PDFs small. SVGs are skipped, because JPEG would lose their transparency.
+- Regenerate both PDFs after rule or card changes.
 
 **Asset fallbacks (drop-in, no code change):**
 - Images: `public/cards/<cardTypeId>.png` (picture window ratio 512:299), generated SVG placeholder if missing (`src/ui/cardArt.ts`). The printer page resolves images with base `../cards/`.

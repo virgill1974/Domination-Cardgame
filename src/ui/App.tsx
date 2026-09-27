@@ -67,7 +67,7 @@ export function App() {
   const [view, setView] = useState<View>('home');
   const [flow, setFlow] = useState<Flow | null>(null);
   const [queue, setQueue] = useState<Msg[]>([]);
-  const [dialog, setDialog] = useState<'menu' | 'end' | 'quit' | null>(null);
+  const [dialog, setDialog] = useState<'menu' | 'end' | 'quit' | 'quit-new' | null>(null);
   useWakeLock(view === 'game');
   useUiSounds(queue[0]);
   // Menü-Musik auf Start, Einrichtung und Anleitung, eigene Musik in der Partie; beim Sieg Stille für die Fanfare.
@@ -120,7 +120,7 @@ export function App() {
   } else if (view === 'home' || view === 'setup' || !game) {
     screen = view === 'setup'
       ? <Setup onStart={start} onBack={() => setView('home')} />
-      : <Home canResume={!!game} onNew={() => setView('setup')} onResume={() => setView('game')} onGuide={() => setView('guide')} />;
+      : <Home canResume={!!game} onNew={() => (game && game.winner === null ? setDialog('quit-new') : setView('setup'))} onResume={() => setView('game')} onGuide={() => setView('guide')} />;
   } else if (game.winner !== null) {
     screen = <Winner game={game} onNew={() => { replace(null); setView('setup'); }} />;
   } else if (!game.turnActive) {
@@ -171,14 +171,15 @@ export function App() {
           </div>
         </div>
       )}
-      {dialog === 'quit' && (
+      {/* Spiel abbrechen: aus dem Menü (zurück zum Startbildschirm) oder vor „Neues Spiel“ bei laufender Partie */}
+      {(dialog === 'quit' || dialog === 'quit-new') && (
         <div class="overlay">
           <div class="dialog error">
             <h3>Spiel wirklich abbrechen?</h3>
             <div>Der Spielstand wird gelöscht.</div>
             <div class="btn-row">
-              <button class="btn cancel" onClick={() => setDialog('menu')}>Nein</button>
-              <button class="btn danger" onClick={() => { replace(null); setDialog(null); setFlow(null); setView('home'); }}>Abbrechen</button>
+              <button class="btn cancel" onClick={() => setDialog(dialog === 'quit' ? 'menu' : null)}>Nein</button>
+              <button class="btn danger" onClick={() => { replace(null); setDialog(null); setFlow(null); setView(dialog === 'quit-new' ? 'setup' : 'home'); }}>Abbrechen</button>
             </div>
           </div>
         </div>
