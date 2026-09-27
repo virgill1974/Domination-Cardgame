@@ -25,7 +25,7 @@ export const MAX_BUYS = 3;
 export const MAX_REPAIRS = 1;
 export const MEDAL_MIN_BUILDINGS = 5;
 export const MEDAL_MIN_STARS = 5;
-export const SPECIAL_MAX_UNITS = 7;
+export const SPECIAL_MAX_UNITS = 5;
 export const SPECIAL_MAX_BUILDINGS = 7;
 export const SPECIAL_MIN_ROUND = 5;
 export const MEDAL_POINTS = 5;
@@ -131,7 +131,7 @@ const ROWS: Row[] = [
   ['Sonnenfaust', 900, 2, 3, 3, 1, 28, 'vehicle'],
   ['Glutdrache', 800, 2, 2, 3, 1, 28, 'vehicle'],
   ['Inferno', 1000, 3, 2, 4, 2, 28, 'vehicle'],
-  ['Lichtkoloss', 1800, 3, 5, 5, 3, 28, 'vehicle'],
+  ['Lichtkoloss', 2200, 3, 5, 5, 3, 28, 'vehicle'],
   ['Novakanone', 1600, 3, 2, 4, 3, 28, 'vehicle'],
   ['Lichtpfeil', 1200, 3, 3, 3, 2, 29, 'air'],
   ['Sonnenkern', 1500, 0, 0, 0, 0, 30],
@@ -145,7 +145,7 @@ const ROWS: Row[] = [
   ['Telecluster', 500, 1, 2, 0, 0, 46],
   ['Antimaterieminen', 1500, 3, 3, 0, 0, 46],
   ['Raumbarriere', 900, 1, 2, 2, 1, 47],
-  ['Flottenbasis', 2500, 2, 3, 0, 0, 48],
+  ['Flottenbasis', 2100, 2, 3, 0, 0, 48],
   ['Dunkler Rat', 2500, 3, 4, 0, 0, 50],
   ['Spionagezentrum', 2500, 2, 3, 0, 0, 51],
   ['Schwarzes Loch', 3500, 3, 4, 6, 4, 51],

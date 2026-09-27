@@ -216,7 +216,7 @@ Jeder Spieler hat ein Spielfeld mit **3 Reihen × 7 Feldern**:
 | Energiesystem | Energiequellen liefern je 3 Energie, jeder andere Planet verbraucht 1. Scaretech braucht keine Energie. |
 | Kampfwürfel | W6 – Offensive ≥ Wurf = Treffer, dann Schaden von Defensive abziehen |
 | Siegpunkte | Planeten + Upgrades + Sterne + Siegmarker (Bester Stützpunkt: +5, Beste Streitmacht: +5) |
-| Sonderaktionen | Ab Runde 5, bei wenig Einheiten/Planeten (≤7), Zufallsbonus (Credits, Sofort-Aktivierung, Reparatur) |
+| Sonderaktionen | Ab Runde 5, bei höchstens 7 Planeten oder höchstens 5 Einheiten, Zufallsbonus (Credits, Sofort-Aktivierung, Reparatur) |
 | Auge des Raumes | Starwing-Upgrade: Pro Runde eine verdeckte Gegnerkarte aufdecken |
 
 ### Fraktionen
@@ -314,7 +314,7 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 | 34 | Sonnenfaust | Kampfschiff | 3 | 900 | 2 | 3 | 3 | 1 | Weltraumwerft |
 | 35 | Glutdrache | Kampfschiff | 3 | 800 | 2 | 2 | 3 | 1 | Weltraumwerft |
 | 36 | Inferno | Kampfschiff | 2 | 1000 | 3 | 2 | 4 | 2 | Weltraumwerft |
-| 37 | Lichtkoloss | Kampfschiff | 2 | 1800 | 3 | 5 | 5 | 3 | Weltraumwerft |
+| 37 | Lichtkoloss | Kampfschiff | 2 | 2200 | 3 | 5 | 5 | 3 | Weltraumwerft |
 | 38 | Novakanone | Kampfschiff | 2 | 1600 | 3 | 2 | 4 | 3 | Weltraumwerft |
 | 39 | Lichtpfeil | Hyperraumschiff | 2 | 1200 | 3 | 3 | 3 | 2 | Warpgate |
 | 40 | Sonnenkern | Upgrade | 1 | 1500 | 0 | – | – | – | Tribunal des Lichts |
@@ -332,7 +332,7 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 | 47 | Telecluster | Planet | 2 | 500 | 1 | 2 | 0 | 0 | Zentralgestirn |
 | 48 | Antimaterieminen | Planet | 2 | 1500 | 3 | 3 | 0 | 0 | Zentralgestirn |
 | 49 | Raumbarriere | Planet | 3 | 900 | 1 | 2 | 2 | 1 | Telecluster |
-| 50 | Flottenbasis | Planet | 2 | 2500 | 2 | 3 | 0 | 0 | Antimaterieminen |
+| 50 | Flottenbasis | Planet | 2 | 2100 | 2 | 3 | 0 | 0 | Antimaterieminen |
 | 51 | Dunkler Rat | Planet | 1 | 2500 | 3 | 4 | 0 | 0 | Flottenbasis |
 | 52 | Spionagezentrum | Planet | 1 | 2500 | 2 | 3 | 0 | 0 | Dunkler Rat |
 | 53 | Schwarzes Loch | Planet | 1 | 3500 | 3 | 4 | 6 | 4 | Dunkler Rat |
@@ -473,6 +473,9 @@ Die Mechanik folgt dem Microcontroller-Code. Folgende Programmierfehler bzw. feh
 12. **Biotec Extend** macht 2 statt 3 Schaden (Balance-Anpassung nach der Balance-Simulation: 3/3/3 für 600 Credits war ab Runde 1 die mit Abstand stärkste Einheit).
 13. **Überlastung, Tischregel:** Die gerettete Energiequelle wird verdeckt neu ausgelegt (freies Feld in der 2. oder 3. Reihe). Vorher blieb sie aufgedeckt liegen und konnte jede Runde erneut angegriffen werden; der Besitzer setzte dann immer wieder aus („Überlastungs-Sperre“).
 14. **Biotec-Zentrale** heißt wie bei allen Fraktionen „Zentralgestirn“ (vorher „Konzernführung“).
+15. **Lightforce Lichtkoloss** kostet 2200 statt 1800 Credits (Balance-Anpassung nach der Balance-Simulation).
+16. **Scaretech Flottenbasis** kostet 2100 statt 2500 Credits (Balance-Anpassung nach der Balance-Simulation).
+17. **Sonderaktion** gibt es ab Runde 5 bei höchstens 7 Planeten oder höchstens **5** Einheiten (Original: 7). Mit 7 bekam sie praktisch jeder Spieler in jedem Zug; so wirkt sie stärker als Hilfe für Schwächere.
 
 Bewusst **wie im Original** belassen:
 - Sonderaktion tritt mit 4/6 Wahrscheinlichkeit ein (der Kommentar im Code sagt 1:3).

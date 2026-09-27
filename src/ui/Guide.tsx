@@ -42,7 +42,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
       <ol>
         <li><b>Einkommen</b>: 400 Credits + 400 je Handelsplanet (Handelssystem, Handelssektor, Antimaterieminen, Abt. Kapital).</li>
         <li><b>Überlastung</b>: Ist die Energie unter 0, wird die Energiequelle wieder aufgebaut und du setzt aus.</li>
-        <li><b>Sonderaktion</b>: Ab Runde 5, wenn du höchstens 7 Planeten oder 7 Einheiten hast, gibt es oft einen Bonus.</li>
+        <li><b>Sonderaktion</b>: Ab Runde 5, wenn du höchstens 7 Planeten oder höchstens 5 Einheiten hast, gibt es oft einen Bonus.</li>
         <li><b>Aktivierung</b>: Fertig gebaute Karten jetzt ausspielen.</li>
         <li><b>Aktionen</b>: Kaufen, Angreifen, Reparieren in beliebiger Reihenfolge.</li>
         <li><b>Zug beenden</b> und das Handy weitergeben.</li>
