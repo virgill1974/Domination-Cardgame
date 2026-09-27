@@ -169,7 +169,7 @@ const ROWS: Row[] = [
   ['Hive', 500, 1, 2, 0, 0, 69],
   ['Plasmareaktor', 1500, 3, 3, 0, 0, 69],
   ['Deflektor', 900, 1, 2, 2, 1, 70],
-  ['Abt. Kapital', 2500, 2, 3, 0, 0, 70],
+  ['Abt. Kapital', 2400, 2, 3, 0, 0, 70],
   ['Manufaktur', 2500, 3, 4, 0, 0, 73],
   ['Helipad', 2500, 2, 3, 0, 0, 73],
   ['Abt. Forschung', 3500, 3, 4, 6, 4, 74],

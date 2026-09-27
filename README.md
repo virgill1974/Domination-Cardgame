@@ -71,8 +71,8 @@ Beim Drucken „Tatsächliche Größe / 100 %“ wählen.
 
 **Technologiebäume:** [`Unterlagen/Domination_Techtrees.pdf`](Unterlagen/Domination_Techtrees.pdf) enthält je Fraktion eine A4-Seite quer, aufgebaut wie die alten C&C-Techtrees.
 - **Aufbau:** Die Planeten laufen als Kette in der Mitte von oben nach unten, daneben stehen die Einheiten und Upgrades, die ein Planet freischaltet.
-- **Kacheln:** mit Kartenbild und farbigem Rahmen, Planet kräftig, Einheit dunkel, Upgrade hell.
 - **Pfeile:** zeigen, was was freischaltet.
+- **Gestaltung:** grauer Hintergrund für alle Fraktionen, Kartenbilder im Standardrahmen des Designs. Die Kartenart erkennt man am Piktogramm (Planet, Einheit, Upgrade) an der linken Bildkante.
 - **Neu erzeugen:** Die Seite `Tools/techtree.html` (im Dev-Server, verlinkt im Kartendrucker) berechnet die Bäume aus den Voraussetzungen der Kartendaten. Nach Regeländerungen dort „Drucken / PDF“ → „Als PDF speichern“ wählen, mit Hintergrundgrafiken und ohne Ränder.
 
 **Kartenbilder:** pro Kartentyp eine Datei `public/cards/<ID>.png` (Bildfenster im Format 512:299, 1024×598 px). Fehlende Bilder werden in App und Kartendrucker als Platzhalter gezeichnet. Die Checkliste aller 92 Dateinamen steht in [`public/cards/README.md`](public/cards/README.md).
@@ -314,7 +314,7 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 | 70 | Hive | Planet | 1 | 500 | 1 | 2 | 0 | 0 | Konzernführung |
 | 71 | Plasmareaktor | Planet | 3 | 1500 | 3 | 3 | 0 | 0 | Konzernführung |
 | 72 | Deflektor | Planet | 3 | 900 | 1 | 2 | 2 | 1 | Hive |
-| 73 | Abt. Kapital | Planet | 2 | 2500 | 2 | 3 | 0 | 0 | Hive |
+| 73 | Abt. Kapital | Planet | 2 | 2400 | 2 | 3 | 0 | 0 | Hive |
 | 74 | Manufaktur | Planet | 1 | 2500 | 3 | 4 | 0 | 0 | Abt. Kapital |
 | 75 | Helipad | Planet | 1 | 2500 | 2 | 3 | 0 | 0 | Abt. Kapital |
 | 76 | Abt. Forschung | Planet | 1 | 3500 | 3 | 4 | 6 | 4 | Manufaktur |
@@ -422,6 +422,7 @@ Die Mechanik folgt dem Microcontroller-Code. Folgende Programmierfehler bzw. feh
 8. **Schwarzer Schleier** (Tarnung): Hinweis nach dem Kauf, dass Einheiten verdeckt ausgespielt werden dürfen.
 9. Jedes neue Spiel startet mit frischen Kartenwerten. Im Original wurde z. B. Lichtgeschwindigkeit (Mig-Panzerung) bei einem Neustart ohne Stromreset nicht zurückgesetzt.
 10. **Biotec-Upgrades** (86–91) haben Namen, Preise, Voraussetzungen und Wirkungen bekommen. Im Original waren sie unfertig und wirkungslos.
+11. **Biotec Abt. Kapital** kostet 2400 statt 2500 Credits (Balance-Anpassung).
 
 Bewusst **wie im Original** belassen:
 - Sonderaktion tritt mit 4/6 Wahrscheinlichkeit ein (der Kommentar im Code sagt 1:3).

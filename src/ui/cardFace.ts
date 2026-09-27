@@ -38,6 +38,8 @@ export function cardFaceHtml(ean: number, { base = '', footer = 'none' }: CardFa
   ].join('<br>');
   const extra = kind === 'upgrade' ? upgradeEffect(id) : DESCRIPTIONS[id];
   const rules = rulesFor(id).map((r) => `<p class="cf-rule">${esc(r)}</p>`).join('');
+  // Viel Text (Beschreibung + Sonderregeln): etwas kleinere Schrift, damit alles auf die Platte passt
+  const dense = (extra ?? '').length + rulesFor(id).join(' ').length > 100;
 
   const plate = kind === 'upgrade'
     ? `<div class="cf-cost">${icon('icon-cost')}<b>${card.price}</b></div>
@@ -60,7 +62,7 @@ export function cardFaceHtml(ean: number, { base = '', footer = 'none' }: CardFa
   // Startkarten (in Runde 1 aktiv, z. B. die erste Energiequelle) tragen ein Band über dem Bildfenster
   const start = isStartCard(ean) ? '<div class="cf-start">Startkarte</div>' : '';
 
-  return `<article class="cf cf-${kind} cf-${footer === 'barcode' ? 'print' : 'app'}" style="--cf-bg:url('${bg}')">
+  return `<article class="cf cf-${kind} cf-${footer === 'barcode' ? 'print' : 'app'}${dense ? ' cf-dense' : ''}" style="--cf-bg:url('${bg}')">
 <div class="cf-oval">${icon(EMBLEM[kind])}</div>
 <h3 class="cf-name">${esc(card.name)}</h3>
 <div class="cf-win"><img alt="" src="${cardArtUrl(id, `${base}cards/`)}" onerror="this.onerror=null;this.src='${fallback}'">${start}</div>

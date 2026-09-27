@@ -50,6 +50,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - **Actions** (`buy`, `attack`, `repair`, `info`) re-run every validation step themselves and return `{ error?: ErrorCode, ... }`. The step-wise helpers (`buyScan`, `attackScanAttacker`, `attackConfirmAttacker`, …) exist so the UI can report errors at the same moment the terminal did (after scan vs after OK). Keep the original check order.
 - **`beginTurn`** = C `einstiegspunkt` (income, overload skip, special action, build phase). **`mainCheck`** = C `hauptanzeige` (medals, VP, win) and must run after every action. The UI calls it when a flow closes.
 - `Slot.counted` tracks whether a card is in `buildings`/`units` (fix for recharging superweapons). The fuzz test asserts counters equal counted slots.
+- Biotec values are no longer exactly the original: Abt. Kapital costs 2400 (was 2500), listed under "Abweichungen".
 - Biotec upgrades 86–91 are a **new design** (the original had "Update 1–6" without effect). The table is in README.md.
   - Mutagen, Perpetuum and Chitinpanzer live in `applyUpgrade`.
   - Flüstern is the `stealthy` check in `combat.ts`.
@@ -111,6 +112,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - Computed from `CARDS[].requires`, so regenerate the PDF after rule changes (print → save as PDF, background graphics on, no margins).
 - `fit()` shrinks tiles (`--k`) until a tree fits the page (Biotec and Lightforce get 0.92).
 - `drawArrows()` draws SVG connectors after layout: planet→planet as elbows, planet→group horizontal.
+- Look: neutral Gunmetal background for all factions (user request), standard `rim.webp` frame on every picture; the card kind is shown only by the big pictogram oval at the left picture edge (no type-coloured frames).
 - PDF size: Chrome embeds WebP as lossless pixels (>100 MB), so `toJpeg()` swaps images for 400 px JPEG data URIs (PDF ≈ 4 MB). CSS filters on the SVG make Chrome rasterise the whole page, so arrow shadows are a second dark stroke, not a filter.
 
 **Asset fallbacks (drop-in, no code change):**

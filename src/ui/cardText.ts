@@ -126,7 +126,7 @@ export function rulesFor(id: number): string[] {
   } else if (kindOfCardId(id) === 'building') {
     if (isReactor(id)) rules.push(`Liefert ${REACTOR_ENERGY} Energie.`);
     if (isSupply(id)) rules.push(`+${SUPPLY_INCOME} Credits pro Runde.`);
-    if (isFlak(id)) rules.push('Planetenabwehr: Schlägt bei Angriffen zurück und beschießt angreifende Hyperraumschiffe.');
+    if (isFlak(id)) rules.push('Planetenabwehr: Schlägt zurück und beschießt angreifende Hyperraumschiffe.');
     if (isCenter(id)) rules.push('Angriffe kosten keine Credits.');
     if (isSuperweapon(id)) rules.push(`Superwaffe: Trifft immer, danach ${SUPERWEAPON_RECHARGE} Runden Nachladen.`);
     if (id === WORMHOLE) rules.push('Aufklärer überspringen beim Angriff Reihe 1.');

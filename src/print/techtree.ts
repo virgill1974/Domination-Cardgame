@@ -8,6 +8,7 @@ import { CARDS, FACTIONS, FACTION_COLORS, NO_REQUIREMENT, type Faction } from '.
 import { factionOfCardId, kindOfCardId } from '../engine/cards';
 import { factionAsset, helgeIcon } from '../ui/assets';
 import { cardArtUrl, placeholderDataUri } from '../ui/cardArt';
+import { jpegImages } from './jpeg';
 
 const BASE = '../';
 const MAX_COLS = 4; // Kacheln je Zeile in einer Seitengruppe
@@ -64,14 +65,14 @@ function page(f: Faction): string {
 </div>`;
   }).join('');
 
-  const style = `--fc:${FACTION_COLORS[f]};--tex:url('${factionAsset(f, 'tile.webp', BASE)}')`;
+  const style = `--fc:${FACTION_COLORS[f]};--tex:url('${factionAsset(null, 'tile.webp', BASE)}');--rim:url('${factionAsset(f, 'rim.webp', BASE)}')`;
+  const legend = (kind: keyof typeof EMBLEM, label: string) =>
+    `<span class="legend"><i style="--m:url('${helgeIcon(EMBLEM[kind], BASE)}')"></i>${label}</span>`;
   return `<section class="page" style="${style}" data-faction="${f}">
   <header><img class="back" alt="" src="${factionAsset(f, 'back.webp', BASE)}"><h2>Technologiebaum – ${FACTIONS[f]}</h2></header>
   <div class="tree">${rows}<svg class="arrows"></svg></div>
   <footer>
-    <span class="legend building"><i></i>Planet</span>
-    <span class="legend unit"><i></i>Einheit</span>
-    <span class="legend upgrade"><i></i>Upgrade</span>
+    ${legend('building', 'Planet')}${legend('unit', 'Einheit')}${legend('upgrade', 'Upgrade')}
     <span class="legend arrow">→ schaltet frei</span>
     <span class="brand">Domination – Das Kartenspiel</span>
   </footer>
@@ -111,7 +112,7 @@ function drawArrows(section: HTMLElement) {
     const a = rect(owner), gr = rect(g);
     const y = (a.t + a.b) / 2;
     if (g.classList.contains('left')) arrow(a.l - 2, y, gr.r + 4, y);
-    else arrow(a.r + 2, y, gr.l - 4, y);
+    else arrow(a.r + 2, y, gr.l - 16, y); // Piktogramm ragt links aus der Kachel
   }
   svg.setAttribute('viewBox', `0 0 ${tree.offsetWidth} ${tree.offsetHeight}`);
   // dunkle Unterlinie als Schatten statt CSS-Filter (ein Filter lässt Chrome die ganze PDF-Seite rastern)
@@ -135,19 +136,6 @@ const layout = (section: HTMLElement) => {
   drawArrows(section);
 };
 
-/**
- * Bilder für den Druck in JPEG umwandeln: Chrome übernimmt JPEGs unverändert ins PDF, WebP-Bilder dagegen
- * als verlustfreie Rohpixel (sonst über 100 MB für vier Seiten). 400 px Breite reichen für 300 dpi bei 30 mm.
- */
-function toJpeg(img: HTMLImageElement, width = 400) {
-  if (img.src.startsWith('data:') || !img.naturalWidth) return;
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.min(width, img.naturalWidth);
-  canvas.height = Math.round((canvas.width / img.naturalWidth) * img.naturalHeight);
-  canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
-  img.src = canvas.toDataURL('image/jpeg', 0.86);
-}
-
 let faction = -1;
 function render() {
   const out = document.getElementById('output')!;
@@ -156,10 +144,7 @@ function render() {
   // nach Schriften und Bildern neu zeichnen, weil sich die Kachelgrößen dann noch verschieben können
   requestAnimationFrame(draw);
   void document.fonts.ready.then(draw);
-  out.querySelectorAll('img').forEach((img) => img.addEventListener('load', () => {
-    toJpeg(img);
-    draw();
-  }, { once: true }));
+  jpegImages(out, draw);
 }
 
 document.querySelectorAll<HTMLButtonElement>('[data-faction]').forEach((btn) => {

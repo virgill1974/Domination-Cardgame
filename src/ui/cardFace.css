@@ -11,7 +11,9 @@
   line-height: 1.2; text-align: left;
 }
 .cf-print { aspect-ratio: 652 / 899; }
-.cf-app { --cf-text: 19; }
+.cf-app { --cf-text: 18; }
+.cf-dense { --cf-text: 15.5; }
+.cf-app.cf-dense { --cf-text: 16.5; }
 .cf * { margin: 0; padding: 0; box-sizing: border-box; }
 
 .cf-icon {
