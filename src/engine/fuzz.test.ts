@@ -1,21 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { PHYSICAL_CARDS, type Faction } from './data';
 import { kindOfEan } from './cards';
-import { currentFaction, newGame, ownedSlots, type GameState, type Rng } from './state';
+import { currentFaction, newGame, ownedSlots, type GameState } from './state';
 import { beginTurn } from './turn';
 import { buy } from './buy';
 import { attack } from './combat';
 import { info, repair } from './actions';
 import { mainCheck } from './victory';
-
-function mulberry32(seed: number): Rng {
-  return () => {
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
+import { mulberry32 } from './testutil';
 
 const GAMES = 300;
 

@@ -54,6 +54,6 @@ export default defineConfig(({ mode }) => ({
     },
   },
   test: {
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'Tools/sim/**/*.test.ts'],
   },
 }));

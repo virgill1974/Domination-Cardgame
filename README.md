@@ -113,6 +113,40 @@ Ablauf:
 
 Lizenzen: SDXL 1.0 (CreativeML Open RAIL++-M) und IP-Adapter (Apache 2.0) erlauben die Nutzung der Ergebnisse.
 
+### Balance-Simulator
+
+`Tools/sim/` spielt Partien mit 2–4 Bots, um zu prüfen, ob eine Fraktion zu stark oder zu schwach ist und welche Spielweise sich lohnt. Er gehört nicht zur App und wird nicht mitgebaut.
+Die Ergebnisse stehen in [`Unterlagen/Balance_Simulation.pdf`](Unterlagen/Balance_Simulation.pdf) (auch als [Markdown](Unterlagen/Balance_Simulation.md)).
+
+- **Regeln:** Die Partien laufen über die echte Engine (`src/engine/`). Nachgebaut ist nur, was am Tisch passiert (`board.ts`):
+  - 3 Reihen × 7 Felder, Stapelregeln, verdeckte Planeten;
+  - die Reihenfolge beim Angriff: Hyperraumschiffe und Wurmloch-Aufklärer überspringen nur die 1. Reihe;
+  - Auge des Raumes, Schwarzer Schleier und Neuronetz (angenähert).
+- **Bots** (`bot.ts`, `params.ts`):
+  - Sie bewerten Käufe, Angriffe und Reparaturen in Credits. Die Kampfwahrscheinlichkeiten rechnen sie exakt (`duel.ts`).
+  - Sie sehen nur, was ein Spieler am Tisch sieht.
+  - 16 Stellschrauben, 5 Spielweisen: Ausgewogen, Händler, Blitzangriff, Festung, Superwaffe.
+- **Versuche:**
+  - A: alle spielen dieselbe Spielweise;
+  - B: jede Fraktion probiert jede Spielweise gegen „Ausgewogen“;
+  - Optimierer (`tune.ts`): Evolutionsstrategie mit Ko-Evolution je Fraktion;
+  - Balance-Urteil: alle Sitzordnungen mit den optimierten Einstellungen;
+  - Überlastungs-Sperre (`exploits`): Energiequelle in Reihe 2 statt Reihe 3;
+  - Was-wäre-wenn: dieselben Bots mit geänderten Kartenwerten (`final --patch … --tag …`).
+
+```bash
+npm run sim -- smoke --vp 30                 # schneller Durchlauf im Hauptthread
+npm run sim -- trace --factions 0,3 --seed 3  # eine Partie Zug für Zug
+npm run sim -- all                           # Versuche A+B, Optimierung, Urteil, Bericht (ca. 30 min)
+npm run sim -- report                        # Bericht (.md und .pdf) aus Tools/sim/out/*.json neu schreiben
+```
+
+- **PDF:** `report` schreibt den Bericht zusätzlich als HTML im Stil der Anleitung und druckt ihn mit Chrome (headless) nach `Unterlagen/Balance_Simulation.pdf`.
+- **Rechner:** Ein Lauf nutzt alle Kerne bis auf 4 (`--workers`).
+- **Reproduzierbar:** Jede Partie hat einen festen Seed.
+- **Rohdaten** landen in `Tools/sim/out/`, das Bündel in `Tools/sim/.build/`. Beides ist nicht im Repo.
+- **Balance-Änderungen ausprobieren**, ohne die App anzufassen: `--patch werte.json`, z. B. `{"Extend": {"price": 900, "requires": "Manufaktur"}}`.
+
 ---
 
 ## Spielübersicht
@@ -415,6 +449,7 @@ src/engine/                   Spiellogik ohne UI, 1:1 aus dem Microcontroller-Co
 src/scanner/                  Kamera + Barcode-Erkennung, manuelle Auswahl
 src/ui/                       Bildschirme, Kampfansicht, Platzhalter-Grafiken
 src/print/                    Kartendrucker (Tools/generate_barcodes.html)
+Tools/sim/                    Balance-Simulator (npm run sim), nicht Teil der App
 public/cards/                 Kartenbilder <ID>.png (Checkliste in README.md)
 Unterlagen/                   Domination-Kartenliste (neue Namen)
 Altes Projekt/                Originalunterlagen der C&C-Fassung (Regelreferenz)

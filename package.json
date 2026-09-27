@@ -10,6 +10,7 @@
     "test": "vitest run",
     "gfx": "node Tools/extract-helge.mjs",
     "art": "node Tools/card-art/generate.mjs",
+    "sim": "node Tools/sim/sim.mjs",
     "test:watch": "vitest"
   },
   "dependencies": {

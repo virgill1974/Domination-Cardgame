@@ -3,6 +3,16 @@ import { cardIdOfEan } from './cards';
 import { newGame, type GameState, type Rng } from './state';
 import { beginTurn } from './turn';
 
+/** Reproduzierbarer Zufall (Mulberry32) für Zufallspartien und den Balance-Simulator (Tools/sim/). */
+export function mulberry32(seed: number): Rng {
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 /** Würfel liefert nacheinander die angegebenen Augenzahlen. */
 export function dice(...rolls: number[]): Rng {
   let i = 0;

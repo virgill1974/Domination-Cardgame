@@ -8,3 +8,7 @@ domination_gfx/
 
 # Zwischenergebnisse der Kartenbild-Generierung (npm run art)
 art-work/
+
+# Balance-Simulator: Bündel und Rohdaten (npm run sim)
+Tools/sim/.build/
+Tools/sim/out/

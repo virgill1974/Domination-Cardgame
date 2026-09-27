@@ -149,6 +149,19 @@ npm run gfx                      # regenerate the Helge-style graphics in public
   - The Biotec back is only rewritten with `--apply --special biotec-back` (a running generator keeps the file open on Windows).
   - `npm run gfx` keeps the painted Biotec back while `selection.json` has `biotec-back`.
 
+**Balance simulator** (`Tools/sim/`, `npm run sim -- <command>`): not part of the app. It is bundled by rolldown (`sim.mjs` → `Tools/sim/.build/`, ships with Vite 8) and runs on `worker_threads`. The report goes to `Unterlagen/Balance_Simulation.md`.
+- **Engine reuse:** it calls the real engine (`beginTurn`, `buy`, `attack`, `repair`, `mainCheck`), so rule changes in `src/engine/` apply automatically.
+- **Table rules the app doesn't model** live only in `board.ts`: rows and fields, stacking, hidden planets, row gating.
+  - The user decided: Hyperraumschiffe (and Scaretech foot units with an active Wurmloch) skip only row 1. Row 3 needs an empty row 2.
+- **Bots** (`bot.ts`) value actions in credits using exact duel odds (`duel.ts`) and see only public information.
+  - `UPGRADE_UNITS` mirrors `applyUpgrade`; `duel.test.ts` checks both against the engine.
+  - Stellschrauben in `params.ts` (`PARAM_RANGES`, 5 archetypes); `tune.ts` evolves them per faction.
+- **Commands:** `smoke`, `trace`, `strategies`, `tune`, `final`, `exploits`, `report`, `all`. Raw results go to `Tools/sim/out/` (git-ignored).
+- `report` writes `Unterlagen/Balance_Simulation.md` and, via `pdf.ts`, `Balance_Simulation.pdf`. `pdf.ts` converts the Markdown to HTML in the manual's look, with embedded fonts, faction colour dots and inline SVG charts, then prints it with headless Chrome/Edge (`--print-to-pdf`, no puppeteer).
+- What-if runs: `final --patch file.json --tag name --label "Text"` writes `out/final-<tag>.json`; the report compares them (mean deviation from fair). They reuse the tuned bots without re-tuning.
+- `--patch file.json` changes card values (incl. `requires`) inside the simulator only.
+- The sim tests (`Tools/sim/*.test.ts`) run with `npm test`; `tsconfig` includes `Tools/sim`.
+
 ## Legacy material
 
 `Altes Projekt/` contains the original C code, manual, card lists and tech trees. The `.doc/.xls` files are password-protected (password in README). There is no Python on this machine. Read them read-only via Office COM from PowerShell, e.g. `Word.Application` `Documents.Open(path, $false, $true, $false, "<pw>")` or `Excel.Application` `Workbooks.Open(path, 0, $true, 5, "<pw>")`.
