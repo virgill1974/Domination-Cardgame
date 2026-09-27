@@ -95,6 +95,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - A code is accepted only after two identical consecutive reads.
 - The manual picker is a testing aid; the user plans to remove it later.
   - Each flow passes `available(ean)`, built from the engine's pure checks: `buyCheck`, `repairCheck`, `attackScan*`/`attackConfirm*`, `infoScan`/`info`. The picker shows only those cards by default, plus an "Alle Karten zeigen" toggle for testing error messages.
+  - Each row uses `factionStyle()` of the card's faction (plate in that faction's color) and a `KindBadge` (black oval, white kind emblem). The inventory shows the same badge on the card art's top-left corner.
   - For the defender step this reveals which enemy cards are in play; that is accepted for testing.
 
 **Barcodes:**

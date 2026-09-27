@@ -1,7 +1,7 @@
 import type { ComponentChildren } from 'preact';
 import { CARDS, FACTION_COLORS, FACTIONS, type Faction } from '../engine/data';
-import { cardIdOfEan, factionOfEan } from '../engine/cards';
-import { factionAsset, helgeIcon } from './assets';
+import { cardIdOfEan, factionOfEan, kindOfEan } from '../engine/cards';
+import { KIND_EMBLEM, factionAsset, helgeIcon } from './assets';
 import { cardArtUrl, placeholderDataUri } from './cardArt';
 import { cardFaceHtml } from './cardFace';
 import { isStartCard, typeLabel } from './cardText';
@@ -39,6 +39,11 @@ export function CardArt({ id, class: cls = 'art' }: { id: number; class?: string
 /** Piktogramm aus Helges Kartensymbolen (Maske, nimmt die Textfarbe an) */
 export function CardIcon({ name, class: cls = '' }: { name: string; class?: string }) {
   return <i class={`card-icon ${cls}`} style={{ '--m': `url('${helgeIcon(name)}')` }} aria-hidden="true" />;
+}
+
+/** Kartenart (Planet, Einheit, Upgrade) wie im schwarzen Oval oben links auf der Karte */
+export function KindBadge({ ean }: { ean: number }) {
+  return <span class="kind-badge"><CardIcon name={KIND_EMBLEM[kindOfEan(ean)]} /></span>;
 }
 
 /** Defensive mit dem Kartensymbol statt „Def“ */

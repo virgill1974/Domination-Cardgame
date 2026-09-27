@@ -227,13 +227,18 @@ a.btn { color: var(--text); text-decoration: none; }
 .list-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; width: 100%; text-align: left; cursor: pointer; }
 .list-item .code { margin-left: auto; font-size: 12px; }
 .list.inventory .list-item { cursor: default; }
+.list.inventory .grow { min-width: 0; overflow-wrap: anywhere; }
+.list.inventory .grow > b { font-size: clamp(13px, 4.2vw, 16px); }
 .list.inventory .art { width: 84px; flex: 0 0 84px; aspect-ratio: 512 / 299; }
 .list-item[data-unavailable] { opacity: 0.5; }
 .check { display: flex; align-items: center; gap: 10px; color: var(--muted); cursor: pointer; }
 .check input { width: 20px; height: 20px; accent-color: var(--accent-line); }
-/* Kartenart wie im schwarzen Oval der Karte, Symbol in Fraktionsfarbe */
-.list-item .kind { display: flex; flex: 0 0 40px; height: 28px; padding: 4px 7px; border-radius: 50%; background: #050505; color: var(--fc); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); }
-.list-item .kind .card-icon { width: 100%; height: 100%; }
+/* Kartenart wie im schwarzen Oval der Karte, Symbol weiß (die Zeile trägt die Fraktionsfarbe) */
+.kind-badge { display: flex; flex: 0 0 40px; width: 40px; height: 28px; padding: 4px 7px; border-radius: 50%; background: #050505; color: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); }
+.kind-badge .card-icon { width: 100%; height: 100%; }
+/* Inventar: Oval oben links auf dem Kartenbild, wie auf der Karte */
+.art-wrap { position: relative; flex: 0 0 auto; }
+.art-wrap .kind-badge { position: absolute; left: -5px; top: -5px; width: 32px; height: 22px; padding: 3px 6px; }
 
 /* Meldungen */
 .overlay {

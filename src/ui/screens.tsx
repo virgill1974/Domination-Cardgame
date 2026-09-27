@@ -4,7 +4,7 @@ import { CARDS, FACTIONS, SCARETECH, MAX_ATTACKS, MAX_BUYS, MAX_REPAIRS, type Fa
 import { cardIdOfEan, factionOfEan, kindOfEan } from '../engine/cards';
 import { currentFaction, currentPlayer, ownedSlots, type GameState } from '../engine/state';
 import { Scanner } from '../scanner/Scanner';
-import { CardArt, DefBar, DefValue, Icon, factionBack, factionStyle } from './components';
+import { CardArt, DefBar, DefValue, Icon, KindBadge, factionBack, factionStyle } from './components';
 import { play } from './sound';
 import { VolumeButton } from './VolumeControl';
 
@@ -174,7 +174,7 @@ export function Inventory({ game, onClose }: { game: GameState; onClose: () => v
   const upgrades = slots.filter((s) => kindOfEan(s.ean) === 'upgrade');
   const row = (ean: number, extra: ComponentChildren) => (
     <div key={ean} class="list-item" style={factionStyle(f)}>
-      <CardArt id={cardIdOfEan(ean)} class="art" />
+      <div class="art-wrap"><CardArt id={cardIdOfEan(ean)} class="art" /><KindBadge ean={ean} /></div>
       <div class="grow stack" style={{ gap: '4px' }}>
         <b>{CARDS[cardIdOfEan(ean)].name}</b>
         {extra}
