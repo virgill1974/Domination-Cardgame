@@ -119,7 +119,7 @@ ${h2('3', 'Der Zug beginnt – was nun?')}
 <p>Die App zeigt an, welcher Spieler an der Reihe ist. Er nimmt das Gerät und tippt auf <b>Zug starten</b>. Dann passiert automatisch:</p>
 <ol>
   <li><b>Einkommen:</b> ${BASE_INCOME} Credits, dazu ${SUPPLY_INCOME} Credits für jeden aktiven Handelsplaneten.</li>
-  <li><b>Überlastung:</b> Ist die Energie unter 0 gefallen, wird die zerstörte Energiequelle wieder aufgebaut und der Spieler setzt diese Runde aus.</li>
+  <li><b>Überlastung:</b> Ist die Energie unter 0 gefallen, weil eine Energiequelle zerstört wurde, setzt der Spieler diese Runde aus.</li>
   <li><b>Sonderaktion:</b> Ab Runde ${SPECIAL_MIN_ROUND} gibt es für Spieler mit höchstens ${SPECIAL_MAX_BUILDINGS} Planeten oder ${SPECIAL_MAX_UNITS} Einheiten oft einen Bonus (siehe Anhang A).</li>
   <li><b>Aktivierung:</b> Die App meldet, welche gekauften Karten jetzt fertig sind. Sie müssen sofort ausgespielt werden.</li>
 </ol>
@@ -158,7 +158,7 @@ ${h2('7', 'Kaufen')}
 <p>Pro Zug kann ein Spieler bis zu <b>${MAX_BUYS} Karten</b> kaufen. Dazu auf <b>Kaufen</b> tippen und den Barcode der Karte in den Rahmen der Kamera halten. Die App zeigt die Karte an; mit dem Kaufen-Knopf wird sie bezahlt. Welche Karten gekauft werden können, zeigt der Technologiebaum: Eine Karte ist erst <b>freigeschaltet</b>, wenn der Planet, der sie voraussetzt, aktiv ist. Kann eine Karte nicht gekauft werden, nennt die App den Grund (siehe Anhang B).</p>
 <p>Gekaufte Planeten und Einheiten kommen verdeckt auf einen Baustapel. Nach der aufgedruckten Bauzeit werden sie zu Beginn eines Zuges aktiviert und ausgespielt (Punkt 3).</p>
 ${h3('7.1', 'Planeten kaufen')}
-<p>Planeten erzeugen Credits und Energie, produzieren Einheiten, schalten Upgrades frei oder verteidigen den Stützpunkt. Außer bei Scaretech braucht jeder neue Planet <b>1 Energie</b>; jede Energiequelle liefert ${REACTOR_ENERGY} Energie (mit dem Energie-Upgrade der Fraktion ${REACTOR_ENERGY + REACTOR_UPGRADE_BONUS}). Ohne Energie können keine neuen Planeten gekauft werden. Eine Übersicht aller Planeten steht in Anhang E.</p>
+<p>Planeten erzeugen Credits und Energie, produzieren Einheiten, schalten Upgrades frei oder verteidigen den Stützpunkt. Außer bei Scaretech braucht jeder neue Planet <b>1 Energie</b>; jede Energiequelle liefert ${REACTOR_ENERGY} Energie (mit dem Energie-Upgrade der Fraktion ${REACTOR_ENERGY + REACTOR_UPGRADE_BONUS}). Ohne Energie können keine neuen Planeten gekauft werden. <b>Überlastung:</b> Wird eine Energiequelle zerstört und fällt die Energie dadurch unter 0, bleibt sie im Spiel. Sie bekommt ihre volle Defensive zurück und wird <b>verdeckt neu ausgelegt</b> (freies Feld in der 2. oder 3. Reihe); der Besitzer setzt seine nächste Runde aus. Eine Übersicht aller Planeten steht in Anhang E.</p>
 ${annotated(2, [
   [-16, 69, 'Piktogramm der Kartenart (hier: Planet)'],
   [668, 69, 'Name des Planeten'],
@@ -228,7 +228,7 @@ ${h2('11', 'Siegpunkte')}
 </figure>
 ${h2('12', 'Spielende')}
 <p>Das Spiel endet, sobald ein Spieler ein gegnerisches <b>Zentralgestirn</b> zerstört oder als Erster die eingestellten Siegpunkte erreicht. Die App zeigt dann den Sieger an.</p>
-${box(`<b>Startkapital:</b> Jeder Spieler beginnt mit ${START_CREDITS} Credits.`)}`;
+${box(`<b>Startkapital:</b> Jeder Spieler hat in seinem ersten Zug ${START_CREDITS + BASE_INCOME} Credits.`)}`;
 
 // ---------- Anhang ----------
 const SPECIAL_EXPLAIN: Record<string, string> = {

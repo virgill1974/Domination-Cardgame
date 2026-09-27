@@ -151,7 +151,7 @@ async function strategies(pool: Pool) {
 }
 
 /** Beste Spielweise je Fraktion aus Versuch B (Siegquote relativ zur Erwartung, gemittelt über alle Einstellungen) */
-export function bestArchetypes(saved: Saved): Record<Faction, BotParams> {
+export function bestArchetypes(saved: Saved, vp = '30'): Record<Faction, BotParams> {
   const out = {} as Record<Faction, BotParams>;
   for (const f of [0, 1, 2, 3] as Faction[]) {
     let best = ARCHETYPE_NAMES[0];
@@ -159,7 +159,7 @@ export function bestArchetypes(saved: Saved): Record<Faction, BotParams> {
     for (const arch of ARCHETYPE_NAMES) {
       let score = 0;
       for (const n of [2, 3, 4]) {
-        const agg = saved.results[`B|${f}|${arch}|${n}|30`];
+        const agg = saved.results[`B|${f}|${arch}|${n}|${vp}`];
         if (agg) score += (agg.factions[f].wins / agg.factions[f].games) * n;
       }
       if (score > bestScore) {
@@ -172,26 +172,38 @@ export function bestArchetypes(saved: Saved): Record<Faction, BotParams> {
   return out;
 }
 
+/** Optimierung je Siegpunkt-Einstellung (--vp 30|40|inf für nur eine), gespeichert als tuned-<vp>.json */
 async function runTune(pool: Pool) {
   const saved = load<Saved>('strategies');
-  const start = saved ? bestArchetypes(saved) : ([0, 1, 2, 3].map(() => ({ ...ARCHETYPES.ausgewogen })) as unknown as Record<Faction, BotParams>);
-  const result = await tune(pool, start, {
-    generations: opt('gens', 16), lambda: opt('lambda', 12), seed: opt('seed', 1), games2: opt('g2', 50), games4: opt('g4', 10),
-  });
-  save('tuned', { ...result, meta: { patch, date: new Date().toISOString() } });
+  const vpArg = optStr('vp');
+  const modes = vpArg ? [vpArg === 'inf' ? null : Number(vpArg)] : VP_MODES;
+  for (const vp of modes) {
+    console.log(`Optimierung für ${vp === null ? '∞' : vp + ' Siegpunkte'}`);
+    const start = saved ? bestArchetypes(saved, vpKey(vp))
+      : ([0, 1, 2, 3].map(() => ({ ...ARCHETYPES.ausgewogen })) as unknown as Record<Faction, BotParams>);
+    const result = await tune(pool, start, {
+      generations: opt('gens', 16), lambda: opt('lambda', 12), seed: opt('seed', 1), games2: opt('g2', 50), games4: opt('g4', 10), vpLimit: vp,
+    });
+    save(`tuned-${vpKey(vp)}`, { ...result, meta: { patch, vp: vpKey(vp), date: new Date().toISOString() } });
+  }
+}
+
+/** Optimierte Einstellungen für eine Siegpunkt-Einstellung (ältere Läufe: tuned.json für alle) */
+function tunedFor(vp: number | null): { best: Record<Faction, BotParams> } {
+  const tuned = load<{ best: Record<Faction, BotParams> }>(`tuned-${vpKey(vp)}`) ?? load<{ best: Record<Faction, BotParams> }>('tuned');
+  if (!tuned) throw new Error('Erst "tune" ausführen.');
+  return tuned;
 }
 
 /** Balance-Urteil: alle Sitzordnungen, jede Fraktion mit ihren optimierten Einstellungen */
 async function final(pool: Pool) {
-  const tuned = load<{ best: Record<Faction, BotParams> }>('tuned');
-  if (!tuned) throw new Error('Erst "tune" ausführen.');
   const games = opt('games', 250);
   const specs: JobSpec[] = [];
   for (const n of [2, 3, 4]) {
     for (const vp of VP_MODES) {
       for (const seats of seatings(n)) {
         specs.push({
-          key: `C|${n}|${vpKey(vp)}`, seats, bots: seats.map((f) => tuned.best[f]), vpLimit: vp,
+          key: `C|${n}|${vpKey(vp)}`, seats, bots: seats.map((f) => tunedFor(vp).best[f]), vpLimit: vp,
           seed: seedOf('C', n, vpKey(vp), seats.join()), games, details: true,
         });
       }
@@ -209,8 +221,7 @@ async function final(pool: Pool) {
 
 /** Überlastungs-Sperre: Je eine Fraktion legt ihre Energiequelle in Reihe 2, sonst dieselben Bots und Seeds wie im Balance-Urteil */
 async function exploits(pool: Pool) {
-  const tuned = load<{ best: Record<Faction, BotParams> }>('tuned');
-  if (!tuned) throw new Error('Erst "tune" ausführen.');
+  const tuned = tunedFor(30);
   const games = opt('games', 150);
   const specs: JobSpec[] = [];
   for (const f of [0, 1, 3] as Faction[]) {

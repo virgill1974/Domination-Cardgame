@@ -93,7 +93,7 @@ Der Dateiname endet immer auf `.png`. Die Endung ist nur der Name: Browser zeige
 
 | Datei | Karte | Typ | Anzahl im Deck | erledigt |
 |---|---|---|---|---|
-| `69.png` | Konzernführung | Planet | 1 | [x] |
+| `69.png` | Zentralgestirn | Planet | 1 | [x] |
 | `70.png` | Hive | Planet | 1 | [x] |
 | `71.png` | Plasmareaktor | Planet | 3 | [x] |
 | `72.png` | Deflektor | Planet | 3 | [x] |

@@ -129,7 +129,7 @@ Die Ergebnisse stehen in [`Unterlagen/Balance_Simulation.pdf`](Unterlagen/Balanc
 - **Versuche:**
   - A: alle spielen dieselbe Spielweise;
   - B: jede Fraktion probiert jede Spielweise gegen „Ausgewogen“;
-  - Optimierer (`tune.ts`): Evolutionsstrategie mit Ko-Evolution je Fraktion;
+  - Optimierer (`tune.ts`): Evolutionsstrategie mit Ko-Evolution je Fraktion, getrennt für 30, 40 und ∞ Siegpunkte;
   - Balance-Urteil: alle Sitzordnungen mit den optimierten Einstellungen;
   - Überlastungs-Sperre (`exploits`): Energiequelle in Reihe 2 statt Reihe 3;
   - Was-wäre-wenn: dieselben Bots mit geänderten Kartenwerten (`final --patch … --tag …`).
@@ -208,7 +208,7 @@ Jeder Spieler hat ein Spielfeld mit **3 Reihen × 7 Feldern**:
 
 | Mechanik | Details |
 |---|---|
-| Startkapital | 1600 Credits |
+| Startkapital | 2000 Credits im ersten Zug (1600 + 400 Einkommen, wie im Code) |
 | Einkommen/Runde | 400 Grund + 400 pro Handelsplanet (Handelssystem, Handelssektor, Antimaterieminen, Abt. Kapital) |
 | Max. Käufe/Runde | 3 |
 | Max. Angriffe/Runde | 3 (kostenlos mit Sternenparlament/Tribunal des Lichts/Dunklem Rat/Abt. Forschung, sonst 200 Credits) |
@@ -356,9 +356,9 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 
 | ID | Name | Typ | Anzahl | Preis | Runden | Def | Off | Schaden | Freischaltung |
 |---|---|---|---|---|---|---|---|---|---|
-| 69 | Konzernführung | Planet | 1 | 2000 | 1 | 8 | 0 | 0 | Start |
-| 70 | Hive | Planet | 1 | 500 | 1 | 2 | 0 | 0 | Konzernführung |
-| 71 | Plasmareaktor | Planet | 3 | 1500 | 3 | 3 | 0 | 0 | Konzernführung |
+| 69 | Zentralgestirn | Planet | 1 | 2000 | 1 | 8 | 0 | 0 | Start |
+| 70 | Hive | Planet | 1 | 500 | 1 | 2 | 0 | 0 | Zentralgestirn |
+| 71 | Plasmareaktor | Planet | 3 | 1500 | 3 | 3 | 0 | 0 | Zentralgestirn |
 | 72 | Deflektor | Planet | 3 | 900 | 1 | 2 | 2 | 1 | Hive |
 | 73 | Abt. Kapital | Planet | 2 | 2400 | 2 | 3 | 0 | 0 | Hive |
 | 74 | Manufaktur | Planet | 1 | 2500 | 3 | 4 | 0 | 0 | Abt. Kapital |
@@ -368,7 +368,7 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 | 78 | Einheit 5 | Aufklärer | 2 | 150 | 1 | 1 | 1 | 1 | Hive |
 | 79 | Mutant | Aufklärer | 2 | 250 | 1 | 1 | 1 | 2 | Hive |
 | 80 | Tyrant | Aufklärer | 2 | 500 | 2 | 2 | 3 | 2 | Hive |
-| 81 | Extend | Aufklärer | 2 | 600 | 2 | 3 | 3 | 3 | Hive |
+| 81 | Extend | Aufklärer | 2 | 600 | 2 | 3 | 3 | 2 | Hive |
 | 82 | Agressor Panzer | Kampfschiff | 3 | 900 | 2 | 4 | 3 | 2 | Manufaktur |
 | 83 | Artillerie Panzer | Kampfschiff | 3 | 800 | 2 | 1 | 3 | 2 | Manufaktur |
 | 84 | Regenerat. Panzer | Kampfschiff | 3 | 1000 | 3 | 3 | 5 | 5 | Manufaktur |
@@ -470,11 +470,14 @@ Die Mechanik folgt dem Microcontroller-Code. Folgende Programmierfehler bzw. feh
 9. Jedes neue Spiel startet mit frischen Kartenwerten. Im Original wurde z. B. Lichtgeschwindigkeit (Mig-Panzerung) bei einem Neustart ohne Stromreset nicht zurückgesetzt.
 10. **Biotec-Upgrades** (86–91) haben Namen, Preise, Voraussetzungen und Wirkungen bekommen. Im Original waren sie unfertig und wirkungslos.
 11. **Biotec Abt. Kapital** kostet 2400 statt 2500 Credits (Balance-Anpassung).
+12. **Biotec Extend** macht 2 statt 3 Schaden (Balance-Anpassung nach der Balance-Simulation: 3/3/3 für 600 Credits war ab Runde 1 die mit Abstand stärkste Einheit).
+13. **Überlastung, Tischregel:** Die gerettete Energiequelle wird verdeckt neu ausgelegt (freies Feld in der 2. oder 3. Reihe). Vorher blieb sie aufgedeckt liegen und konnte jede Runde erneut angegriffen werden; der Besitzer setzte dann immer wieder aus („Überlastungs-Sperre“).
+14. **Biotec-Zentrale** heißt wie bei allen Fraktionen „Zentralgestirn“ (vorher „Konzernführung“).
 
 Bewusst **wie im Original** belassen:
 - Sonderaktion tritt mit 4/6 Wahrscheinlichkeit ein (der Kommentar im Code sagt 1:3).
 - Orden ab 5 Planeten bzw. 5 Siegen (die Anleitung sagt „mehr als 6“).
-- Startkapital 1600 (die Anleitung sagt 5000).
+- Startkapital 1600, dazu 400 Einkommen schon im ersten Zug: Der Spieler sieht 2000 Credits (die alte Anleitung sagt 5000). Anleitung und Kurzanleitung nennen deshalb 2000.
 - Photonenhagel und Erazor haben Defensive 0 und werden dadurch nach jedem Angriff zerstört. Sie erhalten nie einen Stern.
 - Bei Einheit vs Einheit schlagen beide in jeder Runde zu, auch wenn der Gegner gerade gefallen ist. Beide können fallen.
 - Ein Abwehrplanet schlägt bei einem Angriff von Einheiten auch dann zurück, wenn er dabei zerstört wurde.

@@ -1,5 +1,5 @@
 // Optimierer: einfache Evolutionsstrategie mit Ko-Evolution. Jede Fraktion sucht Einstellungen, die gegen die
-// aktuell besten Einstellungen der anderen Fraktionen am häufigsten gewinnen (2er- und 4er-Partien, 30 Siegpunkte).
+// aktuell besten Einstellungen der anderen Fraktionen am häufigsten gewinnen (2er- und 4er-Partien, je Siegpunkt-Einstellung).
 import type { Faction } from '../../src/engine/data';
 import { mulberry32 } from '../../src/engine/testutil';
 import type { Rng } from '../../src/engine/state';
@@ -17,6 +17,8 @@ export interface TuneOptions {
   games4?: number;
   /** Anfangsschrittweite als Anteil des Wertebereichs */
   sigma?: number;
+  /** Siegpunkt-Einstellung der Testpartien (null = ∞), Standard 30 */
+  vpLimit?: number | null;
 }
 
 export interface TuneStep {
@@ -70,13 +72,13 @@ export async function tune(pool: Pool, start: Record<Faction, BotParams>, opts: 
         // Gleiche Seeds für alle Kandidaten einer Fraktion: Unterschiede kommen von den Einstellungen, nicht vom Würfel
         for (const seats of seatings(2).filter((s) => s.includes(f))) {
           specs.push({
-            key: `${f}|${ci}|2`, seats, bots: seats.map((x) => (x === f ? cand : current[x])), vpLimit: 30,
+            key: `${f}|${ci}|2`, seats, bots: seats.map((x) => (x === f ? cand : current[x])), vpLimit: opts.vpLimit === undefined ? 30 : opts.vpLimit,
             seed: (opts.seed * 1_000_003 + gen * 7919 + seats[0] * 101 + seats[1] * 13) >>> 0, games: g2, details: false,
           });
         }
         for (const seats of seatings(4)) {
           specs.push({
-            key: `${f}|${ci}|4`, seats, bots: seats.map((x) => (x === f ? cand : current[x])), vpLimit: 30,
+            key: `${f}|${ci}|4`, seats, bots: seats.map((x) => (x === f ? cand : current[x])), vpLimit: opts.vpLimit === undefined ? 30 : opts.vpLimit,
             seed: (opts.seed * 2_000_003 + gen * 104729 + seats.join('').split('').reduce((h, c) => h * 7 + Number(c), 0)) >>> 0,
             games: g4, details: false,
           });

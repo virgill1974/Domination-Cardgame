@@ -153,9 +153,10 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - **Engine reuse:** it calls the real engine (`beginTurn`, `buy`, `attack`, `repair`, `mainCheck`), so rule changes in `src/engine/` apply automatically.
 - **Table rules the app doesn't model** live only in `board.ts`: rows and fields, stacking, hidden planets, row gating.
   - The user decided: Hyperraumschiffe (and Scaretech foot units with an active Wurmloch) skip only row 1. Row 3 needs an empty row 2.
+  - Overload (table rule, README deviation 13): a rescued energy source is laid out again face down. The engine still rescues it (full defence, owner skips); `executeAttack` re-hides and re-places rescued planets.
 - **Bots** (`bot.ts`) value actions in credits using exact duel odds (`duel.ts`) and see only public information.
   - `UPGRADE_UNITS` mirrors `applyUpgrade`; `duel.test.ts` checks both against the engine.
-  - Stellschrauben in `params.ts` (`PARAM_RANGES`, 5 archetypes); `tune.ts` evolves them per faction.
+  - Stellschrauben in `params.ts` (`PARAM_RANGES`, 5 archetypes); `tune.ts` evolves them per faction and per VP mode (`out/tuned-30|40|inf.json`); `final` plays each mode with its own tuned set.
 - **Commands:** `smoke`, `trace`, `strategies`, `tune`, `final`, `exploits`, `report`, `all`. Raw results go to `Tools/sim/out/` (git-ignored).
 - `report` writes `Unterlagen/Balance_Simulation.md` and, via `pdf.ts`, `Balance_Simulation.pdf`. `pdf.ts` converts the Markdown to HTML in the manual's look, with embedded fonts, faction colour dots and inline SVG charts, then prints it with headless Chrome/Edge (`--print-to-pdf`, no puppeteer).
 - What-if runs: `final --patch file.json --tag name --label "Text"` writes `out/final-<tag>.json`; the report compares them (mean deviation from fair). They reuse the tuned bots without re-tuning.

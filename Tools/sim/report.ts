@@ -15,8 +15,8 @@ interface Saved {
 }
 
 const F: Faction[] = [0, 1, 2, 3];
-/** Fraktionen mit Energieversorgung (Scaretech braucht keine) */
-const ENERGY_FACTIONS: Faction[] = [0, 1, 3];
+/** Überlastungs-Sperre vor der Regeländerung: ausgesetzte Züge je Partie mit Energiequelle in Reihe 2 (Bericht vom 27.9.2026) */
+const LOCK_BEFORE = '3,9';
 const NS = [2, 3, 4];
 const VPS = ['30', '40', 'inf'];
 const VP_LABEL: Record<string, string> = { 30: '30 SP', 40: '40 SP', inf: '∞' };
@@ -228,10 +228,31 @@ function bestArchetype(strategies: Saved, f: Faction, vp = '30'): { name: string
 
 export function writeReport(load: <T>(name: string) => T | null, variantNames: string[] = []) {
   const strategies = load<Saved>('strategies');
-  const tuned = load<TuneResult & { meta?: { patch?: unknown } }>('tuned');
+  // Optimierte Einstellungen je Siegpunkt-Einstellung; ältere Läufe haben nur tuned.json (für alle)
+  const tunedBy: Record<string, TuneResult | null> = Object.fromEntries(VPS.map((vp) => [vp, load<TuneResult>(`tuned-${vp}`) ?? load<TuneResult>('tuned')]));
+  const tuned = tunedBy['30'];
+  const tunedModes = VPS.filter((vp) => load<TuneResult>(`tuned-${vp}`) !== null);
   const final = load<Saved>('final');
   const exploits = load<Saved>('exploits');
   const variants = variantNames.map((name) => load<Saved>(name)).filter((v): v is Saved => v !== null);
+  // Abschnittsnummern: Es zählen nur Abschnitte, für die es Daten gibt
+  const S: Record<string, number> = {};
+  const present: Array<[string, boolean]> = [
+    ['balance', !!final], ['seats', !!final], ['same', !!strategies], ['fit', !!strategies], ['tuned', !!tuned],
+    ['whatif', !!final && variants.length > 0], ['rules', !!final], ['cards', true], ['model', true], ['repro', true],
+  ];
+  for (const [key, on] of present) if (on) S[key] = Object.keys(S).length + 1;
+  // Überlastung: ausgesetzte Züge je Partie mit der Energiequelle hinten bzw. in Reihe 2 (Versuch „exploits“)
+  const overloadRows = F.filter((f) => f !== SCARETECH).flatMap((f) => [2, 4].map((n) => {
+    const baseAgg = final?.results[`C|${n}|30`];
+    const xAgg = exploits?.results[`X|${f}|${n}`];
+    const b = baseAgg?.factions[f];
+    const x = xAgg?.factions[f];
+    if (!b || !x) return null;
+    const sb = share(baseAgg, f);
+    const sx = share(xAgg, f);
+    return { f, n, back: b.overloads / b.games, front: x.overloads / x.games, winBack: sb.k / sb.n, winFront: sx.k / sx.n };
+  })).filter((r) => r !== null);
   const duels = duelTable();
   const charts: Record<string, string> = {};
   const out: string[] = [];
@@ -240,7 +261,7 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
 
   w('# Balance-Simulation Domination', '');
   w(`Erzeugt am ${date} mit dem Balance-Simulator (\`npm run sim\`, Tools/sim/). `
-    + 'Die Partien laufen über die echte Spiel-Engine der App. Spielfeld, verdeckte Planeten und die Entscheidungen übernehmen Strategie-Bots (Modell und Grenzen in Abschnitt 9).', '');
+    + `Die Partien laufen über die echte Spiel-Engine der App. Spielfeld, verdeckte Planeten und die Entscheidungen übernehmen Strategie-Bots (Modell und Grenzen in Abschnitt ${S.model}).`, '');
   const patched = final?.meta.patch ?? strategies?.meta.patch;
   if (patched) w(`> **Achtung:** Diese Ergebnisse gelten für geänderte Kartenwerte: \`${JSON.stringify(patched)}\``, '');
 
@@ -248,9 +269,9 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
   if (final) {
     w('## Kurzfassung', '');
     const verdict = strengths(final);
-    w('**Stärke** je Fraktion, wenn jede ihre beste gefundene Strategie spielt (Abschnitt 5), gemittelt über 2–4 Spieler und alle Siegpunkt-Einstellungen. '
+    w(`**Stärke** je Fraktion, wenn jede ihre beste gefundene Strategie spielt (Abschnitt ${S.tuned}), gemittelt über 2–4 Spieler und alle Siegpunkt-Einstellungen. `
       + '1,00 ist eine faire Siegquote (1 / Spielerzahl), 1,20 heißt 20 % häufiger als fair.', '');
-    w(table(['Fraktion', 'Stärke', 'Bereich (95 %)', 'Einschätzung', 'Beste Spielweise (Abschnitt 4)', 'Optimierte Strategie: Schwerpunkte'],
+    w(table(['Fraktion', 'Stärke', 'Bereich (95 %)', 'Einschätzung', `Beste Spielweise (Abschnitt ${S.fit})`, 'Optimierte Strategie bei 30 SP: Schwerpunkte'],
       verdict.map(({ f, r, lo, hi }) => [
         FACTIONS[f], num(r, 2), `${num(lo, 2)}–${num(hi, 2)}`, verdictText(r),
         strategies ? bestArchetype(strategies, f).name : '–',
@@ -271,14 +292,14 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     const c = CARDS[top.id];
     notes.push(`Auffälligste Karte: **${c.name}** (${FACTIONS[factionOfCardId(top.id)]}, ${c.price} Credits, ${c.def}/${c.off}/${c.dmg}) mit dem höchsten Kampfwert je Credit im Spiel `
       + `(${num(top.per1000, 2)} je 1000 Credits, beste Einheit einer anderen Fraktion: ${CARDS[next.id].name} mit ${num(next.per1000, 2)})`
-      + `${START_CARD_IDS.has(c.requires) ? `, schon über den Startplaneten ${CARDS[c.requires].name} zu haben` : ''} (Abschnitt 8).`);
+      + `${START_CARD_IDS.has(c.requires) ? `, schon über den Startplaneten ${CARDS[c.requires].name} zu haben` : ''} (Abschnitt ${S.cards}).`);
     if (variants.length) {
       const best = variants.map((v) => ({ v, st: strengths(v) })).sort((a, b) => deviation(a.st) - deviation(b.st))[0];
       const order = [...best.st].sort((a, b) => b.r - a.r);
       notes.push(`Am ausgeglichensten von den getesteten Änderungen: **${best.v.meta.label ?? JSON.stringify(best.v.meta.patch)}** `
         + `(mittlere Abweichung von fair ${num(deviation(best.st), 2)} statt ${num(deviation(verdict), 2)}). `
         + `Danach ist ${FACTIONS[order[0].f]} am stärksten (${num(order[0].r, 2)}) und ${FACTIONS[order[3].f]} am schwächsten (${num(order[3].r, 2)}); `
-        + 'eine einzelne Änderung reicht also nicht (Abschnitt 6).');
+        + `eine einzelne Änderung reicht also nicht (Abschnitt ${S.whatif}).`);
     }
     const four = sumAgg(VPS.map((v) => final.results[`C|4|${v}`]));
     const seatRate = (agg: Agg, i: number) => {
@@ -290,21 +311,24 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
       }
       return m ? k / m : 0;
     };
-    notes.push(`Wer anfängt, hat einen Vorteil: Bei 4 Spielern gewinnt Platz 1 ${pct(seatRate(four, 0), 0)}, Platz 4 nur ${pct(seatRate(four, 3), 0)} (Abschnitt 2).`);
+    notes.push(`Wer anfängt, hat einen Vorteil: Bei 4 Spielern gewinnt Platz 1 ${pct(seatRate(four, 0), 0)}, Platz 4 nur ${pct(seatRate(four, 3), 0)} (Abschnitt ${S.seats}).`);
     const inf2 = final.results['C|2|inf'];
     if (inf2 && inf2.draws / inf2.games > 0.1) {
-      notes.push(`„∞“ zu zweit zieht sich: Ø ${num(inf2.rounds / inf2.games, 0)} Runden, ${pct(inf2.draws / inf2.games, 0)} der Partien ohne Sieger nach 120 Runden, `
-        + 'wenn beide Seiten defensiv spielen (Abschnitt 1).');
+      notes.push(`„∞“ zu zweit zieht sich: Ø ${num(inf2.rounds / inf2.games, 0)} Runden, ${pct(inf2.draws / inf2.games, 0)} der Partien ohne Sieger nach 120 Runden (Abschnitt ${S.rules}).`);
     }
-    if (exploits) notes.push('Regel-Schwachstelle **Überlastungs-Sperre**: Eine Energiequelle in Reihe 2 kann jede Runde erneut „zerstört“ werden; der Besitzer setzt dann immer wieder aus (Abschnitt 7).');
+    if (overloadRows.length) {
+      const worstFront = Math.max(...overloadRows.map((r) => r.front));
+      notes.push(`**Überlastung mit der neuen Regel** (gerettete Energiequelle wird verdeckt neu ausgelegt): Selbst wenn eine Fraktion ihre Energiequelle anfangs in Reihe 2 legt, setzt sie höchstens `
+        + `${num(worstFront, 2)} Züge je Partie aus, vorher waren es bis zu ${LOCK_BEFORE} (Abschnitt ${S.rules}).`);
+    }
     for (const n of notes) w(`- ${n}`);
     w('');
   }
 
   // ---------- 1. Balance-Urteil
   if (final) {
-    w('## 1. Balance mit optimierten Strategien', '');
-    w(`Jede Fraktion spielt die Einstellungen, die der Optimierer für sie gefunden hat (Abschnitt 5). Alle Sitzordnungen, ${final.meta.games} Partien je Sitzordnung und Einstellung. `
+    w(`## ${S.balance}. Balance mit optimierten Strategien`, '');
+    w(`Jede Fraktion spielt die Einstellungen, die der Optimierer für sie gefunden hat (Abschnitt ${S.tuned}). Alle Sitzordnungen, ${final.meta.games} Partien je Sitzordnung und Einstellung. `
       + 'Angegeben ist der Anteil an den entschiedenen Partien mit 95-%-Konfidenzintervall; ▲/▼ = deutlich über/unter fair.', '');
     for (const n of NS) {
       w(`### ${n} Spieler (fair: ${pct(1 / n, 0)})`, '');
@@ -318,7 +342,7 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     }
 
     // ---------- 2. Sitzreihenfolge
-    w('## 2. Vorteil durch die Sitzreihenfolge', '');
+    w(`## ${S.seats}. Vorteil durch die Sitzreihenfolge`, '');
     w('Anteil an den entschiedenen Partien nach Platz in der Zugreihenfolge (Platz 1 beginnt), über alle Fraktionen und Siegpunkt-Einstellungen.', '');
     w(table(['Spieler', 'Platz 1', 'Platz 2', 'Platz 3', 'Platz 4', 'fair'], NS.map((n) => {
       const all = sumAgg(VPS.map((v) => final.results[`C|${n}|${v}`]));
@@ -337,7 +361,7 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
 
   // ---------- 3. Alle gleich
   if (strategies) {
-    w('## 3. Wenn alle dieselbe Spielweise wählen', '');
+    w(`## ${S.same}. Wenn alle dieselbe Spielweise wählen`, '');
     w('Alle Spieler nutzen denselben Bot. Unterschiede kommen dann nur vom Kartenmaterial der Fraktionen. '
       + `Stärke relativ zu fair, gemittelt über 2–4 Spieler (${strategies.meta.games} Partien je Sitzordnung).`, '');
     for (const vp of VPS) {
@@ -353,7 +377,7 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     }
 
     // ---------- 4. Spielweise je Fraktion
-    w('## 4. Welche Spielweise passt zu welcher Fraktion', '');
+    w(`## ${S.fit}. Welche Spielweise passt zu welcher Fraktion`, '');
     w('Eine Fraktion probiert jede Spielweise, alle Gegner spielen „Ausgewogen“. Stärke relativ zu fair, gemittelt über 2–4 Spieler. Fett: beste Spielweise der Fraktion.', '');
     w('- **Ausgewogen:** alles in Maßen (Referenz).',
       '- **Händler:** zuerst Handelsplaneten und Einkommen, die Armee später.',
@@ -379,10 +403,19 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
 
   // ---------- 5. Optimierte Strategien
   if (tuned) {
-    w('## 5. Die optimierten Strategien', '');
+    w(`## ${S.tuned}. Die optimierten Strategien`, '');
     const gens = tuned.history.length;
-    w(`Der Optimierer (Evolutionsstrategie, ${gens} Generationen) hat je Fraktion die Einstellungen gesucht, die gegen die jeweils besten der anderen am häufigsten gewinnen (2 und 4 Spieler, 30 SP). `
-      + 'Startpunkt war die beste Spielweise aus Abschnitt 4. Ab etwa der Hälfte der Generationen änderte sich die Stärke nur noch im Rahmen des Zufalls.', '');
+    const perMode = tunedModes.length > 1;
+    w(`Der Optimierer (Evolutionsstrategie, ${gens} Generationen) hat je Fraktion die Einstellungen gesucht, die gegen die jeweils besten der anderen am häufigsten gewinnen (2 und 4 Spieler)`
+      + (perMode ? ', getrennt für jede Siegpunkt-Einstellung, denn in langen Partien lohnt sich eine andere Spielweise als in kurzen. ' : ', 30 SP. ')
+      + `Startpunkt war jeweils die beste Spielweise aus Abschnitt ${S.fit}. Ab etwa der Hälfte der Generationen änderte sich die Stärke nur noch im Rahmen des Zufalls.`, '');
+    if (perMode) {
+      w('**Schwerpunkte je Siegpunkt-Einstellung** (die drei deutlichsten Abweichungen von „Ausgewogen“):', '');
+      w(table(['Fraktion', ...tunedModes.map((vp) => VP_LABEL[vp])], F.map((f) => [
+        FACTIONS[f], ...tunedModes.map((vp) => describe(tunedBy[vp]!.best[f], f, 3).join(', ')),
+      ])), '');
+      w('**Alle Einstellungen bei 30 SP:**', '');
+    }
     w(table(['Einstellung', 'Ausgewogen', ...F.map((f) => FACTIONS[f])], PARAM_KEYS.map((k) => [
       PARAM_LABEL[k], fmtParam(k, ARCHETYPES.ausgewogen[k]), ...F.map((f) => fmtParam(k, tuned.best[f][k])),
     ])), '');
@@ -416,7 +449,7 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
 
   // ---------- 6. Was wäre wenn
   if (final && variants.length) {
-    w('## 6. Was wäre wenn: geänderte Kartenwerte', '');
+    w(`## ${S.whatif}. Was wäre wenn: geänderte Kartenwerte`, '');
     w('Dieselben optimierten Bots spielen mit geänderten Kartenwerten (nur im Simulator, alle Sitzordnungen, 2–4 Spieler, alle Siegpunkt-Einstellungen). '
       + 'Ihre Käufe passen sie selbst an; neu optimiert wurden sie nicht. Stärke relativ zu fair wie in der Kurzfassung.', '');
     const base = strengths(final);
@@ -439,37 +472,31 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
 
   // ---------- 7. Regel-Auffälligkeiten
   if (final) {
-    w('## 7. Regel-Auffälligkeiten', '');
-    w('**Überlastungs-Sperre.** Wird eine Energiequelle zerstört und die Energie fällt unter 0, bleibt die Karte laut Regel liegen, bekommt ihre volle Defensive zurück und der Besitzer setzt eine Runde aus. '
-      + 'Liegt sie aufgedeckt in Reihe 2, kann der Gegner sie in jeder Runde erneut angreifen: Der Besitzer setzt dann immer wieder aus, ohne dass die Karte je verschwindet.', '');
-    if (exploits) {
-      w('Versuch: Eine Fraktion legt ihre Energiequelle in Reihe 2 statt in Reihe 3 (sonst gleiche Strategie; 30 SP).', '');
-      const rows: string[][] = [];
-      for (const f of ENERGY_FACTIONS) {
-        for (const n of [2, 4]) {
-          const baseAgg = final.results[`C|${n}|30`];
-          const xAgg = exploits.results[`X|${f}|${n}`];
-          const b = baseAgg?.factions[f];
-          const x = xAgg?.factions[f];
-          if (!b || !x) continue;
-          const sb = share(baseAgg, f);
-          const sx = share(xAgg, f);
-          rows.push([FACTIONS[f], String(n), num(b.overloads / b.games, 2), num(x.overloads / x.games, 2), pct(sb.k / sb.n, 0), pct(sx.k / sx.n, 0)]);
-        }
-      }
-      w(table(['Fraktion', 'Spieler', 'Aussetzen je Partie (hinten)', 'Aussetzen je Partie (Reihe 2)', 'Siegquote (hinten)', 'Siegquote (Reihe 2)'], rows), '');
-      w('Vorschlag: Eine durch Überlastung „gerettete“ Energiequelle wird verdeckt neu ausgelegt, oder sie kann in der folgenden Runde nicht erneut angegriffen werden. '
-        + 'Bis dahin gilt als Spieltipp: Energiequellen immer in die 3. Reihe.', '');
+    w(`## ${S.rules}. Regel-Auffälligkeiten`, '');
+    w('**Überlastung (geänderte Regel).** Wird eine Energiequelle zerstört und die Energie fällt unter 0, bleibt die Karte im Spiel, bekommt ihre volle Defensive zurück und der Besitzer setzt eine Runde aus. '
+      + 'Neu ist: Sie wird dabei **verdeckt neu ausgelegt**. Vorher blieb sie aufgedeckt liegen und konnte jede Runde erneut angegriffen werden; '
+      + `der Besitzer setzte dann immer wieder aus („Überlastungs-Sperre“, im alten Stand bis zu ${LOCK_BEFORE} ausgesetzte Züge je Partie).`, '');
+    if (overloadRows.length) {
+      w('Versuch mit der neuen Regel: Eine Fraktion legt ihre Energiequelle anfangs in Reihe 2 statt in Reihe 3 (sonst gleiche Strategie; 30 SP). '
+        + 'Nach einer Überlastung legt sie sie verdeckt nach hinten, wie es die neue Regel erlaubt.', '');
+      w(table(['Fraktion', 'Spieler', 'Aussetzen je Partie (hinten)', 'Aussetzen je Partie (Reihe 2)', 'Siegquote (hinten)', 'Siegquote (Reihe 2)'],
+        overloadRows.map((r) => [FACTIONS[r.f], String(r.n), num(r.back, 2), num(r.front, 2), pct(r.winBack, 0), pct(r.winFront, 0)])), '');
     }
     const inf2 = final.results['C|2|inf'];
     if (inf2) {
+      const drawRate = (f: Faction) => {
+        const fa = inf2.factions[f];
+        return fa ? fa.draws / fa.games : 0;
+      };
+      const most = [...F].sort((a, b) => drawRate(b) - drawRate(a)).slice(0, 2);
       w(`**„∞“ zu zweit.** Ohne Siegpunkte gewinnt nur, wer das gegnerische Zentralgestirn zerstört. Zu zweit dauerte das im Schnitt ${num(inf2.rounds / inf2.games, 0)} Runden; `
-        + `${pct(inf2.draws / inf2.games, 0)} der Partien hatten nach 120 Runden noch keinen Sieger, fast immer, wenn zwei verteidigende Fraktionen aufeinandertrafen.`, '');
+        + `${pct(inf2.draws / inf2.games, 0)} der Partien hatten nach 120 Runden noch keinen Sieger`
+        + (inf2.draws ? `, am häufigsten mit ${FACTIONS[most[0]]} (${pct(drawRate(most[0]), 0)} ihrer Partien) und ${FACTIONS[most[1]]} (${pct(drawRate(most[1]), 0)}).` : '.'), '');
     }
   }
 
   // ---------- 8. Kampfwerte
-  w('## 8. Kampfwert der Einheiten', '');
+  w(`## ${S.cards}. Kampfwert der Einheiten`, '');
   w('Mittlere Siegchance im Einzelgefecht gegen alle Einheiten der anderen Fraktionen (je zur Hälfte als Angreifer und als Verteidiger, Grundwerte ohne Upgrades), exakt berechnet. '
     + '„je 1000 Credits“ setzt das ins Verhältnis zum Preis; fett = besonders günstig. Einheiten mit Defensive 0 zerstören sich bei jedem Angriff selbst. '
     + 'Startplaneten sind mit * markiert: Ihre Einheiten sind ab Runde 1 kaufbar.', '');
@@ -484,13 +511,14 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     })), '');
 
   // ---------- 9. Modell
-  w('## 9. Modell und Grenzen', '');
+  w(`## ${S.model}. Modell und Grenzen`, '');
   w('- **Regeln:** Einkommen, Bauzeiten, Energie, Kaufen, alle Kampfarten, Reparatur, Upgrades, Münzen, Siegpunkte und Sonderaktion kommen unverändert aus der App-Engine (`src/engine/`).',
     '- **Tischregeln** (nicht in der App, im Simulator nachgebaut, `Tools/sim/board.ts`):',
     '  - 3 Reihen × 7 Felder, Stapelregeln in Reihe 1; Planeten liegen verdeckt und werden durch einen Angriff aufgedeckt.',
     '  - Reihe 2 ist erst angreifbar, wenn Reihe 1 leer ist, Reihe 3 erst, wenn Reihe 1 und 2 leer sind.',
     '  - Hyperraumschiffe (und Scaretech-Aufklärer mit Wurmloch) überspringen nur die 1. Reihe: Reihe 3 erst, wenn Reihe 2 leer ist. Die Superwaffe erreicht alles.',
     '  - Wer einen verdeckten Planeten angreift, erwischt zufällig einen der verdeckten Planeten der gewählten Reihe.',
+    '  - Überlastung: Eine gerettete Energiequelle wird verdeckt neu ausgelegt.',
     '  - Auge des Raumes deckt zu Zugbeginn einen gegnerischen Planeten auf. Schwarzer Schleier legt Scaretech-Einheiten verdeckt. Neuronetz tauscht verdeckte Planeten; das Umsetzen von Einheiten bringt im Modell nichts.',
     '- **Bots:** bewerten jede mögliche Aktion in Credits, mit exakt berechneten Kampfwahrscheinlichkeiten. Sie sehen nur, was am Tisch sichtbar ist. '
       + 'Energiequellen und das Zentralgestirn legen sie nach hinten und halten mindestens zwei Planeten als Schutz in Reihe 2.',
@@ -498,12 +526,12 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
       + 'Die Ergebnisse zeigen Tendenzen im Kartenmaterial, keine exakten Siegchancen am Tisch.',
     '- **Remis:** Partien ohne Sieger nach 120 Runden zählen nicht in die Siegquoten.', '');
 
-  w('## 10. Nachrechnen', '');
-  w('```bash', 'npm run sim -- all                  # Versuche A+B, Optimierung, Balance-Urteil, Bericht', 'npm run sim -- strategies --games 60', 'npm run sim -- tune --gens 20 --g2 60 --g4 12',
+  w(`## ${S.repro}. Nachrechnen`, '');
+  w('```bash', 'npm run sim -- all                  # Versuche A+B, Optimierung, Balance-Urteil, Bericht', 'npm run sim -- strategies --games 60', 'npm run sim -- tune --gens 16 --g2 60 --g4 12   # je Siegpunkt-Einstellung, oder --vp 30',
     'npm run sim -- final --games 300', 'npm run sim -- exploits', 'npm run sim -- final --games 150 --patch werte.json --tag name --label "Text"', 'npm run sim -- report', '```', '');
   const total = (s: Saved | null) => (s ? sumAgg(Object.values(s.results)).games : 0);
   const games = total(final) + total(strategies) + total(exploits) + variants.reduce((n, v) => n + total(v), 0)
-    + (tuned ? tuned.history.length * 4 * 13 * (6 * 60 + 24 * 12) : 0);
+    + VPS.reduce((n, vp) => n + (tunedModes.includes(vp) || vp === '30' ? (tunedBy[vp]?.history.length ?? 0) * 4 * 13 * (6 * 60 + 24 * 12) : 0), 0);
   w(`Umfang dieses Berichts: rund ${(Math.round(games / 1000) * 1000).toLocaleString('de-DE')} simulierte Partien.`, '');
 
   const md = out.filter((line) => !line.startsWith('@@CHART')).join('\n');

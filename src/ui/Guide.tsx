@@ -19,7 +19,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
       <ul>
         <li>Jeder wählt eine Fraktion (Karte scannen oder antippen) und legt seine Karten in drei Stapeln bereit: Planeten, Einheiten, Upgrades.</li>
         <li>Jeder bekommt seinen Technologiebaum. Er zeigt, welcher Planet welche Karten freischaltet.</li>
-        <li>Startkapital: 1600 Credits. In Runde 1 werden Zentralgestirn, der erste Produktionsplanet und die erste Energiequelle aktiviert, bei Scaretech nur Zentralgestirn und Telecluster.</li>
+        <li>Startkapital: 2000 Credits im ersten Zug. In Runde 1 werden Zentralgestirn, der erste Produktionsplanet und die erste Energiequelle aktiviert, bei Scaretech nur Zentralgestirn und Telecluster.</li>
         <li>Das Handy wird reihum weitergereicht.</li>
       </ul>
     ),
@@ -83,7 +83,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
       <ul>
         <li>Jede Energiequelle (Protonenmond, Elektronenmond, Plasmareaktor) liefert 3 Energie (mit Upgrade 5). Jeder andere Planet verbraucht 1.</li>
         <li>Ohne Energie keine neuen Planeten.</li>
-        <li>Wird die Energiequelle zerstört und die Energie fällt unter 0, bleibt es liegen und wird wieder aufgebaut. Der Besitzer setzt eine Runde aus.</li>
+        <li>Wird eine Energiequelle zerstört und die Energie fällt unter 0, wird sie wieder aufgebaut und <b>verdeckt neu ausgelegt</b> (freies Feld in der 2. oder 3. Reihe). Der Besitzer setzt eine Runde aus.</li>
         <li>Scaretech braucht keine Energie.</li>
       </ul>
     ),

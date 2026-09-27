@@ -13,7 +13,7 @@ export function eventMessages(events: GameEvent[]): Msg[] {
       case 'overload':
         msgs.push({
           tone: 'warn', sound: 'overload', title: 'Achtung: Überlastung',
-          body: 'Zu wenig Energie. Das Kraftwerk wird wieder aufgebaut, du setzt diese Runde aus.',
+          body: 'Zu wenig Energie. Die Energiequelle wird wieder aufgebaut, du setzt diese Runde aus.',
         });
         break;
       case 'special':

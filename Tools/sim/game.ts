@@ -56,7 +56,9 @@ export function playGame(setup: GameSetup): GameResult {
     dice: mulberry32(setup.seed),
     rng: mulberry32(setup.seed ^ 0x5bd1e995),
     logs: [0, 1, 2, 3].map(newLog),
+    placement: [0, 1, 2, 3].map(() => RANDOM_PLACEMENT),
   };
+  for (const { faction, bot } of setup.seats) ctx.placement[faction] = bot === 'random' ? RANDOM_PLACEMENT : bot;
   const botOf = new Map(setup.seats.map((x) => [x.faction, x.bot] as const));
   const maxRounds = setup.maxRounds ?? MAX_ROUNDS;
   while (s.winner === null) {

@@ -1,7 +1,32 @@
 import { describe, expect, it } from 'vitest';
 import type { Faction } from '../../src/engine/data';
+import { give, mulberry32, started } from '../../src/engine/testutil';
+import { newBoard, placePlanet, reveal } from './board';
+import { executeAttack, newLog, type Ctx } from './bot';
 import { playGame } from './game';
 import { ARCHETYPES, ARCHETYPE_NAMES } from './params';
+
+describe('Überlastung am Tisch', () => {
+  it('eine gerettete Energiequelle wird verdeckt neu ausgelegt', () => {
+    const s = started([0, 1]);
+    give(s, 0, 13); // Ionenpulsar (Superwaffe, trifft immer, Schaden 4)
+    give(s, 1, 43); // Elektronenmond (Energiequelle, Defensive 3)
+    s.players[1].energy = 0; // fällt nach der Zerstörung unter 0
+    const boards = [0, 1, 2, 3].map(newBoard);
+    placePlanet(boards[0], 13, 3);
+    placePlanet(boards[1], 43, 2);
+    reveal(boards[1], 43);
+    const ctx: Ctx = {
+      s, boards, dice: mulberry32(1), rng: mulberry32(2), logs: [0, 1, 2, 3].map(newLog),
+      placement: [0, 1, 2, 3].map(() => ARCHETYPES.ausgewogen),
+    };
+    const result = executeAttack(ctx, 13, 1, { type: 'planet', ean: 43 })!;
+    expect(result.rescued).toEqual([43]);
+    const spot = boards[1].planets.find((p) => p.ean === 43)!;
+    expect(spot.revealed).toBe(false);
+    expect(spot.row).toBe(3); // Energiequellen legt der Bot nach hinten
+  });
+});
 
 describe('Simulierte Partien', () => {
   const cases: Array<[Faction[], number | null]> = [

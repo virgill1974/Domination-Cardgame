@@ -44,6 +44,8 @@ export interface Ctx {
   /** Zufall am Tisch: welche verdeckte Karte getroffen wird, kleine Bewertungsunschärfe */
   rng: Rng;
   logs: PlayerLog[];
+  /** Legeregeln je Fraktion (für Planeten, die nach einer Überlastung neu ausgelegt werden) */
+  placement: BotParams[];
 }
 
 export const newLog = (): PlayerLog => ({ buys: [], attacks: 0, kills: 0, losses: 0, overloads: 0, firstAttack: null });
@@ -556,7 +558,14 @@ export function executeAttack(ctx: Ctx, attEan: number, opp: Faction, target: Ta
   reveal(boards[opp], defEan);
   reveal(boards[f], attEan);
   for (const ean of result.destroyed) {
-    if (!result.rescued.includes(ean)) removeFromBoard(boards[factionOfEan(ean)], ean);
+    const owner = factionOfEan(ean);
+    if (!result.rescued.includes(ean)) removeFromBoard(boards[owner], ean);
+    else if (kindOfEan(ean) === 'building') {
+      // Überlastung (Tischregel): Der gerettete Planet wird verdeckt neu ausgelegt
+      removeFromBoard(boards[owner], ean);
+      // Der Besitzer wählt das Feld frei; „Energiequelle vorn“ (Versuch) gilt nur fürs erste Auslegen
+      placePlanet(boards[owner], ean, planetRow(boards[owner], cardIdOfEan(ean), { ...ctx.placement[owner], reactorFront: false }));
+    }
   }
   const log = ctx.logs[f];
   log.attacks++;

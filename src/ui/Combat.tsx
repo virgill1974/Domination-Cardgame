@@ -118,7 +118,7 @@ function Summary({ result }: { result: CombatResult }) {
   const removed = result.destroyed.filter((ean) => !result.rescued.includes(ean));
   if (removed.length) lines.push(`Zerstört: ${removed.map(name).join(', ')}. Karte(n) vom Spielfeld nehmen und zurück auf den Stapel legen.`);
   for (const ean of result.rescued) {
-    lines.push(`Überlastung: ${name(ean)} wird wieder aufgebaut und bleibt liegen. Der Besitzer setzt seine nächste Runde aus.`);
+    lines.push(`Überlastung: ${name(ean)} wird wieder aufgebaut und verdeckt neu ausgelegt (freies Feld in der 2. oder 3. Reihe). Der Besitzer setzt seine nächste Runde aus.`);
   }
   if (!result.destroyed.length) lines.push('Nichts zerstört.');
   if (result.attackerStar) lines.push('Der Angreifer erhält einen Stern (+1 Siegpunkt).');

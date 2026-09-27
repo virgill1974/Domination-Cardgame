@@ -165,7 +165,7 @@ const ROWS: Row[] = [
   ['Gravitationsboost', 1000, 0, 0, 0, 0, 52],
   ['Schwarzer Schleier', 2000, 0, 0, 0, 0, 51],
   // BIOTEC
-  ['Konzernführung', 2000, 1, 8, 0, 0, 255],
+  ['Zentralgestirn', 2000, 1, 8, 0, 0, 255],
   ['Hive', 500, 1, 2, 0, 0, 69],
   ['Plasmareaktor', 1500, 3, 3, 0, 0, 69],
   ['Deflektor', 900, 1, 2, 2, 1, 70],
@@ -177,7 +177,7 @@ const ROWS: Row[] = [
   ['Einheit 5', 150, 1, 1, 1, 1, 70, 'foot'],
   ['Mutant', 250, 1, 1, 1, 2, 70, 'foot'],
   ['Tyrant', 500, 2, 2, 3, 2, 70, 'foot'],
-  ['Extend', 600, 2, 3, 3, 3, 70, 'foot'],
+  ['Extend', 600, 2, 3, 3, 2, 70, 'foot'],
   ['Agressor Panzer', 900, 2, 4, 3, 2, 74, 'vehicle'],
   ['Artillerie Panzer', 800, 2, 1, 3, 2, 74, 'vehicle'],
   ['Regenerat. Panzer', 1000, 3, 3, 5, 5, 74, 'vehicle'],
