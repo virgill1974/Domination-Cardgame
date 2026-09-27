@@ -143,7 +143,7 @@ const ROWS: Row[] = [
   // SCARETECH
   ['Zentralgestirn', 2000, 1, 8, 0, 0, 255],
   ['Telecluster', 500, 1, 2, 0, 0, 46],
-  ['Antimaterieminen', 1500, 3, 3, 0, 0, 46],
+  ['Antimaterieminen', 1500, 2, 3, 0, 0, 46],
   ['Raumbarriere', 900, 1, 2, 2, 1, 47],
   ['Flottenbasis', 2100, 2, 3, 0, 0, 48],
   ['Dunkler Rat', 2500, 3, 4, 0, 0, 50],
@@ -169,7 +169,7 @@ const ROWS: Row[] = [
   ['Hive', 500, 1, 2, 0, 0, 69],
   ['Plasmareaktor', 1500, 3, 3, 0, 0, 69],
   ['Deflektor', 900, 1, 2, 2, 1, 70],
-  ['Abt. Kapital', 2400, 2, 3, 0, 0, 70],
+  ['Abt. Kapital', 2500, 2, 3, 0, 0, 70],
   ['Manufaktur', 2500, 3, 4, 0, 0, 73],
   ['Helipad', 2500, 2, 3, 0, 0, 73],
   ['Abt. Forschung', 3500, 3, 4, 6, 4, 74],

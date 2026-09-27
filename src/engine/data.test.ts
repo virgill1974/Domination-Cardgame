@@ -18,7 +18,8 @@ describe('Kartendaten', () => {
 
   it('übernimmt Stichproben aus defaultkarten[]', () => {
     expect(CARDS[14]).toMatchObject({ name: 'Poseidons Fluch', price: 1200, rounds: 2, def: 4, off: 4, dmg: 3, requires: 5 });
-    expect(CARDS[48]).toMatchObject({ name: 'Antimaterieminen', rounds: 3 });
+    // Bauzeit 2 statt 3 (Balance-Anpassung, README „Abweichungen vom Original“ 11)
+    expect(CARDS[48]).toMatchObject({ name: 'Antimaterieminen', rounds: 2 });
     expect(CARDS[77]).toMatchObject({ name: 'Wumms', price: 1500, def: 2, requires: 76 });
   });
 });

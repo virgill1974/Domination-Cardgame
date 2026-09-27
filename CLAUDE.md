@@ -50,7 +50,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - **Actions** (`buy`, `attack`, `repair`, `info`) re-run every validation step themselves and return `{ error?: ErrorCode, ... }`. The step-wise helpers (`buyScan`, `attackScanAttacker`, `attackConfirmAttacker`, …) exist so the UI can report errors at the same moment the terminal did (after scan vs after OK). Keep the original check order.
 - **`beginTurn`** = C `einstiegspunkt` (income, overload skip, special action, build phase). **`mainCheck`** = C `hauptanzeige` (medals, VP, win) and must run after every action. The UI calls it when a flow closes.
 - `Slot.counted` tracks whether a card is in `buildings`/`units` (fix for recharging superweapons). The fuzz test asserts counters equal counted slots.
-- Biotec values are no longer exactly the original: Abt. Kapital costs 2400 (was 2500), listed under "Abweichungen".
+- Some card values are balance changes from the simulator (Extend damage 2, Lichtkoloss 2200, Flottenbasis 2100, Antimaterieminen 2 rounds; bonus up to 5 units), listed under "Abweichungen" in README.md. Abt. Kapital is back at the original 2500.
 - Biotec upgrades 86–91 are a **new design** (the original had "Update 1–6" without effect). The table is in README.md.
   - Mutagen, Perpetuum and Chitinpanzer live in `applyUpgrade`.
   - Flüstern is the `stealthy` check in `combat.ts`.

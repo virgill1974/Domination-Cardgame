@@ -330,7 +330,7 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 |---|---|---|---|---|---|---|---|---|---|
 | 46 | Zentralgestirn | Planet | 1 | 2000 | 1 | 8 | 0 | 0 | Start |
 | 47 | Telecluster | Planet | 2 | 500 | 1 | 2 | 0 | 0 | Zentralgestirn |
-| 48 | Antimaterieminen | Planet | 2 | 1500 | 3 | 3 | 0 | 0 | Zentralgestirn |
+| 48 | Antimaterieminen | Planet | 2 | 1500 | 2 | 3 | 0 | 0 | Zentralgestirn |
 | 49 | Raumbarriere | Planet | 3 | 900 | 1 | 2 | 2 | 1 | Telecluster |
 | 50 | Flottenbasis | Planet | 2 | 2100 | 2 | 3 | 0 | 0 | Antimaterieminen |
 | 51 | Dunkler Rat | Planet | 1 | 2500 | 3 | 4 | 0 | 0 | Flottenbasis |
@@ -360,7 +360,7 @@ Die Werte stehen in [`src/engine/data.ts`](src/engine/data.ts), direkt aus `defa
 | 70 | Hive | Planet | 1 | 500 | 1 | 2 | 0 | 0 | Zentralgestirn |
 | 71 | Plasmareaktor | Planet | 3 | 1500 | 3 | 3 | 0 | 0 | Zentralgestirn |
 | 72 | Deflektor | Planet | 3 | 900 | 1 | 2 | 2 | 1 | Hive |
-| 73 | Abt. Kapital | Planet | 2 | 2400 | 2 | 3 | 0 | 0 | Hive |
+| 73 | Abt. Kapital | Planet | 2 | 2500 | 2 | 3 | 0 | 0 | Hive |
 | 74 | Manufaktur | Planet | 1 | 2500 | 3 | 4 | 0 | 0 | Abt. Kapital |
 | 75 | Helipad | Planet | 1 | 2500 | 2 | 3 | 0 | 0 | Abt. Kapital |
 | 76 | Abt. Forschung | Planet | 1 | 3500 | 3 | 4 | 6 | 4 | Manufaktur |
@@ -469,7 +469,7 @@ Die Mechanik folgt dem Microcontroller-Code. Folgende Programmierfehler bzw. feh
 8. **Schwarzer Schleier** (Tarnung): Hinweis nach dem Kauf, dass Einheiten verdeckt ausgespielt werden dürfen.
 9. Jedes neue Spiel startet mit frischen Kartenwerten. Im Original wurde z. B. Lichtgeschwindigkeit (Mig-Panzerung) bei einem Neustart ohne Stromreset nicht zurückgesetzt.
 10. **Biotec-Upgrades** (86–91) haben Namen, Preise, Voraussetzungen und Wirkungen bekommen. Im Original waren sie unfertig und wirkungslos.
-11. **Biotec Abt. Kapital** kostet 2400 statt 2500 Credits (Balance-Anpassung).
+11. **Scaretech Antimaterieminen** brauchen 2 statt 3 Runden Bauzeit, wie in der Domination-Kartenliste (Balance-Anpassung nach der Balance-Simulation). Biotec Abt. Kapital kostet wieder 2500 Credits wie im Original (zwischenzeitlich 2400).
 12. **Biotec Extend** macht 2 statt 3 Schaden (Balance-Anpassung nach der Balance-Simulation: 3/3/3 für 600 Credits war ab Runde 1 die mit Abstand stärkste Einheit).
 13. **Überlastung, Tischregel:** Die gerettete Energiequelle wird verdeckt neu ausgelegt (freies Feld in der 2. oder 3. Reihe). Vorher blieb sie aufgedeckt liegen und konnte jede Runde erneut angegriffen werden; der Besitzer setzte dann immer wieder aus („Überlastungs-Sperre“).
 14. **Biotec-Zentrale** heißt wie bei allen Fraktionen „Zentralgestirn“ (vorher „Konzernführung“).
@@ -484,7 +484,6 @@ Bewusst **wie im Original** belassen:
 - Photonenhagel und Erazor haben Defensive 0 und werden dadurch nach jedem Angriff zerstört. Sie erhalten nie einen Stern.
 - Bei Einheit vs Einheit schlagen beide in jeder Runde zu, auch wenn der Gegner gerade gefallen ist. Beide können fallen.
 - Ein Abwehrplanet schlägt bei einem Angriff von Einheiten auch dann zurück, wenn er dabei zerstört wurde.
-- Antimaterieminen brauchen 3 Runden Bauzeit (die Domination-Kartenliste nennt 2, der Code gewinnt).
 
 ---
 
