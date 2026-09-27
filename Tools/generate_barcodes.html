@@ -6,9 +6,16 @@
 <title>Domination Kartendrucker</title>
 </head>
 <body>
-<div class="controls">
-  <h1>Domination Kartendrucker</h1>
+<header class="controls">
+  <div class="brand">
+    <img src="../ui/logo.svg" alt="">
+    <div>
+      <div class="kicker">Domination</div>
+      <h1>Kartendrucker</h1>
+    </div>
+  </div>
   <div class="group">
+    <span class="group-title">Druck</span>
     <button data-mode="cards" class="active">Vorderseiten</button>
     <button data-mode="backs">Rückseiten</button>
     <button data-mode="duplex">Beidseitig</button>
@@ -16,17 +23,23 @@
     <button data-mode="markers">Siegmarker</button>
   </div>
   <div class="group">
+    <span class="group-title">Fraktion</span>
     <button data-faction="-1" class="active">Alle</button>
     <button data-faction="0">Starwing</button>
     <button data-faction="1">Lightforce</button>
     <button data-faction="2">Scaretech</button>
     <button data-faction="3">Biotec</button>
   </div>
-  <button id="print">Drucken</button>
-  <a class="link" href="techtree.html">Technologiebäume</a>
-  <a class="link" href="manual.html">Spielanleitung</a>
-  <span id="count"></span>
-</div>
+  <div class="group">
+    <span class="group-title">Unterlagen</span>
+    <a class="link" href="techtree.html">Technologiebäume</a>
+    <a class="link" href="manual.html">Spielanleitung</a>
+  </div>
+  <div class="actions">
+    <span id="count"></span>
+    <button id="print">Drucken</button>
+  </div>
+</header>
 <p class="hint">
   Bilder: <code>public/cards/&lt;Karten-ID&gt;.png</code> ablegen, fehlende werden als Platzhalter gezeichnet.
   Beim Drucken „Tatsächliche Größe / 100 %“ wählen, damit die Barcodes maßhaltig bleiben.
