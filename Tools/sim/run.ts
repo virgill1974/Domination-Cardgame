@@ -2,20 +2,21 @@
 //   smoke        wenige Partien im Hauptthread: Laufzeit und Plausibilität
 //   strategies   Versuch A (alle gleiche Spielweise) und B (jede Fraktion probiert jede Spielweise)
 //   tune         Optimierer: beste Einstellungen je Fraktion (Start: bestes Ergebnis aus B)
-//   final        Balance-Urteil: jede Fraktion mit ihren optimierten Einstellungen
+//   select       Strategiewahl: je Spielerzahl und Siegpunkt-Einstellung die beste von 8 Strategien (3 optimierte, 5 Spielweisen)
+//   final        Balance-Urteil: jede Fraktion mit ihrer gewählten (sonst optimierten) Strategie
 //   exploits     Überlastungs-Sperre: Energiequelle in Reihe 2 statt Reihe 3
 //   report       Bericht Unterlagen/Balance_Simulation.md aus Tools/sim/out/*.json
-//   all          strategies, tune, final, exploits, report
+//   all          strategies, tune, select, final, exploits, report
 // Optionen: --games N (Partien je Sitzordnung), --workers N, --gens N, --patch datei.json,
 //           final --tag name --label "Text": Was-wäre-wenn-Lauf neben dem Hauptergebnis, --rules datei.json: Regelvarianten
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { cpus } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CARDS, FACTIONS, type Faction } from '../../src/engine/data';
 import { playGame, type SimRules } from './game';
 import { Pool, applyPatch, seatings, type JobSpec, type Patch } from './jobs';
-import { ARCHETYPES, ARCHETYPE_NAMES, type BotParams } from './params';
+import { ARCHETYPES, ARCHETYPE_LABEL, ARCHETYPE_NAMES, type BotParams } from './params';
 import { writeReport } from './report';
 import { addGame, emptyAgg, type Agg } from './stats';
 import { tune } from './tune';
@@ -194,6 +195,8 @@ async function runTune(pool: Pool) {
     });
     save(`tuned-${vpKey(vp)}`, { ...result, meta: { patch, vp: vpKey(vp), date: new Date().toISOString() } });
   }
+  // Die Strategiewahl gehört zu den alten optimierten Einstellungen
+  rmSync(join(OUT, 'selected.json'), { force: true });
 }
 
 /** Optimierte Einstellungen für eine Siegpunkt-Einstellung (ältere Läufe: tuned.json für alle) */
@@ -203,15 +206,86 @@ function tunedFor(vp: number | null): { best: Record<Faction, BotParams> } {
   return tuned;
 }
 
-/** Balance-Urteil: alle Sitzordnungen, jede Fraktion mit ihren optimierten Einstellungen */
+/** Kandidaten der Strategiewahl je Fraktion: die optimierten Einstellungen aller Siegpunkt-Einstellungen und die fünf Spielweisen */
+function candidates(f: Faction): Array<{ name: string; params: BotParams }> {
+  const tuned = VP_MODES.flatMap((vp) => {
+    const t = load<{ best: Record<Faction, BotParams> }>(`tuned-${vpKey(vp)}`);
+    return t ? [{ name: `optimiert für ${vp === null ? '∞' : `${vp} SP`}`, params: t.best[f] }] : [];
+  });
+  return [...tuned, ...ARCHETYPE_NAMES.map((a) => ({ name: ARCHETYPE_LABEL[a], params: ARCHETYPES[a] }))];
+}
+
+export interface Choice {
+  name: string;
+  params: BotParams;
+  /** Siegquote (entschiedene Partien) je Kandidat */
+  rates: Record<string, number>;
+}
+export const choiceKey = (f: Faction, n: number, vp: number | null) => `${f}|${n}|${vpKey(vp)}`;
+
+/**
+ * Strategiewahl: Der Optimierer bewertet 2 und 4 Spieler gemeinsam und kann dabei eine Strategie finden, die in einer
+ * Spielerzahl versagt. Hier probiert jede Fraktion je Spielerzahl und Siegpunkt-Einstellung alle Kandidaten gegen die
+ * optimierten Gegner (gleiche Seeds für alle Kandidaten) und behält die beste. „final“ nutzt diese Wahl.
+ * --again: weiterer Durchgang, die Gegner spielen je zur Hälfte ihre optimierte und ihre zuletzt gewählte Strategie.
+ * Das dämpft Kreisläufe (A schlägt B, B schlägt C …), wenn alle Fraktionen gleichzeitig wechseln.
+ */
+async function select(pool: Pool) {
+  const games = opt('games', 50);
+  const previous = argv.includes('--again') ? load<{ meta: { rounds?: number }; choice: Record<string, Choice> }>('selected') : null;
+  const specs: JobSpec[] = [];
+  for (const n of [2, 3, 4]) {
+    for (const vp of VP_MODES.filter((v) => allowed(n, v))) {
+      const tuned = tunedFor(vp).best;
+      const fields: Array<Record<number, BotParams>> = [tuned];
+      if (previous) fields.push(Object.fromEntries(([0, 1, 2, 3] as Faction[]).map((x) => [x, previous.choice[choiceKey(x, n, vp)]?.params ?? tuned[x]])));
+      for (const f of [0, 1, 2, 3] as Faction[]) {
+        candidates(f).forEach((c, ci) => {
+          for (const seats of seatings(n).filter((s) => s.includes(f))) {
+            fields.forEach((field, fi) => specs.push({
+              key: `S|${f}|${ci}|${n}|${vpKey(vp)}`, seats, bots: seats.map((x) => (x === f ? c.params : field[x])), vpLimit: vp,
+              seed: seedOf('S', n, vpKey(vp), seats.join(), fi), games: Math.ceil(games / fields.length), details: false, rules,
+            }));
+          }
+        });
+      }
+    }
+  }
+  const t0 = Date.now();
+  const results = await pool.run(specs, progress('Strategiewahl'));
+  const choice: Record<string, Choice> = {};
+  for (const n of [2, 3, 4]) {
+    for (const vp of VP_MODES.filter((v) => allowed(n, v))) {
+      for (const f of [0, 1, 2, 3] as Faction[]) {
+        const cands = candidates(f);
+        const rates = cands.map((_, ci) => {
+          const fa = results.get(`S|${f}|${ci}|${n}|${vpKey(vp)}`)?.factions[f];
+          return fa ? fa.wins / Math.max(1, fa.games - fa.draws) : 0;
+        });
+        const best = rates.indexOf(Math.max(...rates));
+        choice[choiceKey(f, n, vp)] = { name: cands[best].name, params: cands[best].params, rates: Object.fromEntries(cands.map((c, i) => [c.name, rates[i]])) };
+      }
+    }
+  }
+  const rounds = (previous?.meta.rounds ?? 1) + (previous ? 1 : 0);
+  save('selected', { meta: { games, rounds, date: new Date().toISOString(), seconds: (Date.now() - t0) / 1000, patch, rules }, choice });
+}
+
+/** Gewählte Strategie je Fraktion und Einstellung (Strategiewahl), sonst die optimierte */
+function botFor(selected: { choice: Record<string, Choice> } | null, f: Faction, n: number, vp: number | null): BotParams {
+  return selected?.choice[choiceKey(f, n, vp)]?.params ?? tunedFor(vp).best[f];
+}
+
+/** Balance-Urteil: alle Sitzordnungen, jede Fraktion mit ihrer gewählten bzw. optimierten Strategie */
 async function final(pool: Pool) {
   const games = opt('games', 250);
+  const selected = load<{ choice: Record<string, Choice> }>('selected');
   const specs: JobSpec[] = [];
   for (const n of [2, 3, 4]) {
     for (const vp of VP_MODES.filter((v) => allowed(n, v))) {
       for (const seats of seatings(n)) {
         specs.push({
-          key: `C|${n}|${vpKey(vp)}`, seats, bots: seats.map((f) => tunedFor(vp).best[f]), vpLimit: vp,
+          key: `C|${n}|${vpKey(vp)}`, seats, bots: seats.map((f) => botFor(selected, f, n, vp)), vpLimit: vp,
           seed: seedOf('C', n, vpKey(vp), seats.join()), games, details: true, rules,
         });
       }
@@ -222,7 +296,7 @@ async function final(pool: Pool) {
   // --tag name: Was-wäre-wenn-Lauf (meist mit --patch), landet in final-<name>.json statt im Hauptergebnis
   const tag = optStr('tag');
   save(tag ? `final-${tag}` : 'final', {
-    meta: { games, date: new Date().toISOString(), seconds: (Date.now() - t0) / 1000, patch, rules, tag, label: optStr('label') },
+    meta: { games, date: new Date().toISOString(), seconds: (Date.now() - t0) / 1000, patch, rules, tag, label: optStr('label'), selected: !!selected },
     results: Object.fromEntries(results),
   });
 }
@@ -260,10 +334,11 @@ async function main() {
   try {
     if (command === 'strategies' || command === 'all') await strategies(pool);
     if (command === 'tune' || command === 'all') await runTune(pool);
+    if (command === 'select' || command === 'all') await select(pool);
     if (command === 'final' || command === 'all') await final(pool);
     if (command === 'exploits' || command === 'all') await exploits(pool);
     if (command === 'all') writeReport(load, variants());
-    if (!['strategies', 'tune', 'final', 'exploits', 'all'].includes(command)) console.error(`Unbekannter Befehl: ${command}`);
+    if (!['strategies', 'tune', 'select', 'final', 'exploits', 'all'].includes(command)) console.error(`Unbekannter Befehl: ${command}`);
   } finally {
     await pool.close();
   }

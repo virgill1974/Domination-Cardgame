@@ -4,7 +4,7 @@ import { buy } from '../../src/engine/buy';
 import { attack } from '../../src/engine/combat';
 import type { GameState } from '../../src/engine/state';
 import { give, mulberry32, started } from '../../src/engine/testutil';
-import { UPGRADE_UNITS } from './bot';
+import { UPGRADE_STATS } from './bot';
 import { planetAttack, unitDuel, type Fighter, type Outcome } from './duel';
 
 const RUNS = 20_000;
@@ -86,6 +86,8 @@ describe('Upgrade-Tabelle des Bots entspricht der Engine', () => {
     const before = structuredClone(s.stats);
     expect(buy(s, eanOf(id)).error).toBeUndefined();
     const changed = s.stats.map((st, i) => (JSON.stringify(st) !== JSON.stringify(before[i]) ? i : -1)).filter((i) => i >= 0);
-    expect(changed).toEqual(UPGRADE_UNITS[id] ?? []);
+    const table = UPGRADE_STATS[id] ?? {};
+    expect(changed).toEqual(Object.keys(table).map(Number));
+    for (const u of changed) expect(s.stats[u]).toEqual({ ...before[u], ...table[u] });
   });
 });

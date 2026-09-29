@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { Faction } from '../../src/engine/data';
+import { CARD_OF_EAN, type Faction } from '../../src/engine/data';
 import { give, mulberry32, started } from '../../src/engine/testutil';
 import { newBoard, placePlanet, reveal } from './board';
-import { executeAttack, newLog, type Ctx } from './bot';
+import { executeAttack, newLog, playTurn, type Ctx } from './bot';
 import { playGame } from './game';
 import { ARCHETYPES, ARCHETYPE_NAMES } from './params';
 
@@ -43,6 +43,22 @@ describe('Regelvarianten im Simulator', () => {
       expect(r.players.find((p) => p.faction === r.winner)!.vp).toBe(best);
     }
     expect(pointWins).toBeGreaterThan(0);
+  });
+
+  it('letzte Runde: der Bot steckt seine Credits in Upgrades (sofort Siegpunkte), die billigsten zuerst', () => {
+    const s = started([0, 1]);
+    give(s, 0, CARD_OF_EAN.indexOf(7)); // Sternenparlament: Schildgenerator (1000), Auge des Raumes (500)
+    give(s, 0, CARD_OF_EAN.indexOf(6)); // Hyperraumnebel: Präzisionssprung, Interstellare Macht (je 1500)
+    s.players[0].credits = 3100;
+    s.finalRound = 1;
+    const ctx: Ctx = {
+      s, boards: [0, 1, 2, 3].map(newBoard), dice: mulberry32(1), rng: mulberry32(2), logs: [0, 1, 2, 3].map(newLog),
+      placement: [0, 1, 2, 3].map(() => ARCHETYPES.ausgewogen),
+    };
+    playTurn(ctx, ARCHETYPES.blitz);
+    // Auge des Raumes 500, Teilchenbeschleuniger 800 (Protonenmond ist Startkarte), Schildgenerator 1000; dann ist der dritte Kauf erreicht
+    expect(ctx.logs[0].buys.map(([, id]) => id)).toEqual([21, 18, 17]);
+    expect(s.players[0].upgrades).toBe(3);
   });
 
   it('Schonzeit: vor Runde 3 greift niemand an', () => {

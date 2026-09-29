@@ -1,7 +1,7 @@
 // Strategie-Bot: bewertet Käufe, Angriffe und Reparaturen in Credits und handelt über die echten Engine-Funktionen.
 // Er nutzt nur, was am Tisch sichtbar ist: Spielfeld, offene Karten, Upgrades, Münzen. Verdeckte Planeten kennt er nicht.
 import {
-  ATTACK_PRICE, BASE_INCOME, CARDS, HELICOPTER, MAX_ATTACKS, MAX_BUYS, MEDAL_MIN_STARS, MEDAL_POINTS, REPAIR_PRICE, SCARETECH,
+  ATTACK_PRICE, BASE_INCOME, CARDS, CARD_OF_EAN, HELICOPTER, MAX_ATTACKS, MAX_BUYS, MEDAL_MIN_STARS, MEDAL_POINTS, REPAIR_PRICE, SCARETECH,
   STEALTH, SUPPLY_INCOME, UPG, type Faction,
 } from '../../src/engine/data';
 import {
@@ -33,6 +33,8 @@ export interface PlayerLog {
   losses: number;
   overloads: number;
   firstAttack: number | null;
+  /** Upgrades, die in mindestens einem Zug kaufbar waren (freigeschaltet, noch nicht gekauft) */
+  offered: number[];
 }
 
 export interface Ctx {
@@ -50,20 +52,27 @@ export interface Ctx {
   firstAttackRound?: number;
 }
 
-export const newLog = (): PlayerLog => ({ buys: [], attacks: 0, kills: 0, losses: 0, overloads: 0, firstAttack: null });
+export const newLog = (): PlayerLog => ({ buys: [], attacks: 0, kills: 0, losses: 0, overloads: 0, firstAttack: null, offered: [] });
 
 const VP_CREDITS = 700;
 const WIN_VALUE = 1_000_000;
 const clamp = (x: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, x));
 
-/** Upgrade → Einheitentypen, deren Werte es verbessert (wie applyUpgrade in src/engine/buy.ts; per Test abgeglichen) */
-export const UPGRADE_UNITS: Record<number, number[]> = {
-  17: [12, 14], 19: [15, 16], 20: [15, 16], 22: [11],
-  40: [34], 41: [35], 43: [36, 38], 44: [32, 33], 45: [39],
-  63: [58, 59], 64: [55, 57], 66: [60], 67: [58],
-  86: [78, 79], 89: [82, 84],
+/** Upgrade → neue Werte der Einheitentypen, die es verbessert (wie applyUpgrade in src/engine/buy.ts; per Test abgeglichen) */
+export const UPGRADE_STATS: Record<number, Record<number, Partial<Fighter>>> = {
+  17: { 12: { def: 4 }, 14: { def: 5 } }, 19: { 15: { off: 4 }, 16: { off: 4 } }, 20: { 15: { dmg: 2 }, 16: { dmg: 3 } }, 22: { 11: { off: 3 } },
+  40: { 34: { dmg: 2 } }, 41: { 35: { dmg: 2 } }, 43: { 36: { dmg: 3 }, 38: { dmg: 4 } }, 44: { 32: { off: 2 }, 33: { off: 3 } }, 45: { 39: { def: 4 } },
+  63: { 58: { dmg: 2 }, 59: { dmg: 3 } }, 64: { 55: { dmg: 2 }, 57: { dmg: 2 } }, 66: { 60: { dmg: 3 } }, 67: { 58: { off: 3 } },
+  86: { 78: { off: 2 }, 79: { off: 2 } }, 89: { 82: { def: 5 }, 84: { def: 4 } },
 };
 const ENERGY_UPGRADES: number[] = [UPG.starwingControlRods, UPG.lightforceOvercharge, UPG.biotecPerpetuum];
+/** Upgrades zählen sofort und dauerhaft als Siegpunkt; Planeten erst nach der Bauzeit und nur, solange sie stehen */
+const SAFE_VP = 1.25;
+/** Wert eines Siegpunkts in der letzten Runde: Credits sind danach nichts mehr wert */
+const FINAL_VP_CREDITS = 3000;
+/** Anzahl der Karten je Kartentyp und Fraktion */
+const COPIES: number[] = CARDS.map((c) => CARD_OF_EAN.filter((id) => id === c.id).length);
+const inFinalRound = (s: GameState) => (s.finalRound ?? null) !== null;
 
 /** Kartentypen, die ein Kartentyp freischaltet */
 const CHILDREN: number[][] = CARDS.map((c) => CARDS.filter((x) => x.requires === c.id).map((x) => x.id));
@@ -96,6 +105,7 @@ function horizon(s: GameState): number {
 /** Wert eines eigenen Siegpunkts in Credits; kurz vor dem Ziel steigt er, bei „∞“ zählen Punkte nicht */
 function vpWorth(s: GameState, me: Player, P: BotParams): number {
   if (s.vpLimit === null) return 0;
+  if (inFinalRound(s)) return FINAL_VP_CREDITS;
   const close = clamp((victoryPoints(me) - (s.vpLimit - 8)) / 8, 0, 1);
   return P.vp * VP_CREDITS * (1 + 2 * close);
 }
@@ -207,13 +217,16 @@ class BuyPlanner {
   strength(id: number): number {
     const cached = this.strengthCache.get(id);
     if (cached !== undefined) return cached;
-    const me = fighter(this.ctx.s, id);
+    const v = this.strengthOf(fighter(this.ctx.s, id));
+    this.strengthCache.set(id, v);
+    return v;
+  }
+
+  private strengthOf(me: Fighter): number {
     const refs = this.enemyRefs();
     let sum = 0;
     for (const r of refs) sum += 0.5 * (unitDuel(me, r).attWin + unitDuel(r, me).defWin);
-    const v = sum / refs.length;
-    this.strengthCache.set(id, v);
-    return v;
+    return sum / refs.length;
   }
 
   private frontCount(): number {
@@ -269,10 +282,11 @@ class BuyPlanner {
     return v;
   }
 
-  private unitValue(id: number): number {
+  /** Wert einer Einheit; mit `boost` die Werte nach einem Upgrade */
+  private unitValue(id: number, boost?: Partial<Fighter>): number {
     const P = this.P;
-    const st = this.ctx.s.stats[id];
-    const strength = this.strength(id);
+    const st = { ...this.ctx.s.stats[id], ...boost };
+    const strength = boost ? this.strengthOf(st) : this.strength(id);
     let v = P.military * 2000 * strength;
     // Angriffe auf Planeten (auch Einweg-Einheiten wie Erazor); mit Wurmloch erreichen Scaretech-Aufklärer Reihe 2 direkt
     const planetStrike = (P.hqFocus * hitChance(st.off) * Math.min(st.dmg, 4)) / 4;
@@ -310,22 +324,39 @@ class BuyPlanner {
     return v;
   }
 
+  /**
+   * Wie viele Einheiten eines Typs ein Upgrade voraussichtlich betrifft: die eigenen (offen, wartend, im Bau)
+   * und, wenn der Typ freigeschaltet ist, weitere Käufe bis zum Horizont (höchstens die übrigen Karten)
+   */
+  private expectedUnits(id: number): number {
+    const mine = [...frontUnits(this.board), ...this.board.waiting, ...pendingUnits(this.me)].filter((ean) => cardIdOfEan(ean) === id).length;
+    const later = this.owns(CARDS[id].requires) ? Math.min(COPIES[id] - mine, this.H / 4) * 0.7 : 0;
+    return mine + later;
+  }
+
   private upgradeValue(id: number): number {
     const P = this.P;
-    const mine = [...frontUnits(this.board), ...this.board.waiting, ...pendingUnits(this.me)].map(cardIdOfEan);
-    const affected = UPGRADE_UNITS[id];
+    const units = frontUnits(this.board).length + this.board.waiting.length + pendingUnits(this.me).length;
+    const boost = UPGRADE_STATS[id];
     let effect = 200;
-    if (affected) effect = 300 * mine.filter((u) => affected.includes(u)).length + 150;
-    else if (ENERGY_UPGRADES.includes(id)) {
+    if (boost) {
+      // Kampfwert der betroffenen Einheiten vorher/nachher, für jede heutige und künftige Einheit
+      effect = 100;
+      for (const [u, change] of Object.entries(boost)) {
+        const unit = Number(u);
+        effect += Math.max(0, this.unitValue(unit, change) - this.unitValue(unit)) * this.expectedUnits(unit);
+      }
+    } else if (ENERGY_UPGRADES.includes(id)) {
+      // +2 Energie je Energiequelle: spart später eigene Energiequellen
       const reactors = ownedSlots(this.me).filter((sl) => isReactor(slotCardId(sl))).length;
-      effect = this.energyNeed() ? 500 * reactors : 50;
-    } else if (id === UPG.scaretechAutorepair) effect = 350;
+      effect = reactors * 2 * (this.energyNeed() ? 450 : 120);
+    } else if (id === UPG.scaretechAutorepair) effect = 100 * P.repair * this.H;
     else if (id === UPG.starwingSpySatellite) effect = 300 + P.hqFocus * 300;
-    else if (id === UPG.scaretechCamouflage) effect = 60 * mine.length;
-    else if (id === UPG.biotecWhisper) effect = 500 * mine.filter((u) => u === HELICOPTER).length;
-    else if (id === UPG.biotecNeuronet) effect = 300;
-    else if (id === UPG.biotecRegeneration) effect = 150 * mine.length;
-    return this.vpW + P.upgrades * effect;
+    else if (id === UPG.scaretechCamouflage) effect = 100 * Math.max(3, units);
+    else if (id === UPG.biotecWhisper) effect = 500 * this.expectedUnits(HELICOPTER);
+    else if (id === UPG.biotecNeuronet) effect = 200 + 40 * this.H;
+    else if (id === UPG.biotecRegeneration) effect = 20 * this.H * Math.max(units, P.minFront);
+    return this.vpW * SAFE_VP + P.upgrades * effect;
   }
 
   value(id: number): number {
@@ -344,9 +375,26 @@ interface BuyOption {
 const income = (p: Player) =>
   BASE_INCOME + SUPPLY_INCOME * ownedSlots(p).filter((slot) => slot.active && isSupply(slotCardId(slot))).length;
 
+/**
+ * Letzte Runde: Gebaute Karten werden nicht mehr fertig, nur Upgrades zählen sofort.
+ * Also möglichst viele Upgrades kaufen, die billigsten zuerst.
+ */
+function finalRoundBuys(ctx: Ctx) {
+  const { s } = ctx;
+  const f = currentFaction(s);
+  const upgrades = Array.from({ length: 6 }, (_, i) => f * 40 + 34 + i).sort((a, b) => CARDS[cardIdOfEan(a)].price - CARDS[cardIdOfEan(b)].price);
+  for (const ean of upgrades) {
+    if (s.buys >= MAX_BUYS || s.winner !== null) break;
+    if (buyCheck(s, ean) !== null || buy(s, ean).error) continue;
+    ctx.logs[f].buys.push([s.round, cardIdOfEan(ean)]);
+    mainCheck(s);
+  }
+}
+
 function buyPhase(ctx: Ctx, P: BotParams) {
   const { s, rng } = ctx;
   const f = currentFaction(s);
+  if (s.vpLimit !== null && inFinalRound(s)) return finalRoundBuys(ctx);
   for (let n = 0; n < MAX_BUYS && s.winner === null; n++) {
     const plan = new BuyPlanner(ctx, P);
     const p = plan.me;
@@ -432,7 +480,7 @@ class AttackPlanner {
   /** Wert des eigenen Angreifers, falls er fällt */
   private lossValue(ean: number): number {
     const id = cardIdOfEan(ean);
-    if (isSuperweapon(id)) return 0;
+    if (isSuperweapon(id) || inFinalRound(this.ctx.s)) return 0;
     const front = frontUnits(this.ctx.boards[this.f]).length;
     return CARDS[id].price * 0.7 + (front <= this.P.minFront ? this.P.defense * 300 : 0);
   }
@@ -609,7 +657,8 @@ function repairPhase(ctx: Ctx, P: BotParams) {
   const { s, boards } = ctx;
   const f = currentFaction(s);
   const me = s.players[f];
-  if (me.credits - REPAIR_PRICE < P.reserve * 0.5) return;
+  // In der letzten Runde bringen Credits für Upgrades Siegpunkte, eine Reparatur nicht
+  if (me.credits - REPAIR_PRICE < P.reserve * 0.5 || inFinalRound(s)) return;
   let best = -1;
   let bestScore = REPAIR_PRICE;
   for (const slot of ownedSlots(me)) {
@@ -633,7 +682,20 @@ function repairPhase(ctx: Ctx, P: BotParams) {
 
 // ---------------------------------------------------------------- Zug
 
+/** Für die Statistik: welche Upgrades zu Zugbeginn kaufbar sind (Voraussetzung aktiv, noch nicht gekauft) */
+function noteOffers(ctx: Ctx) {
+  const { s } = ctx;
+  const f = currentFaction(s);
+  const offered = ctx.logs[f].offered;
+  for (let ean = f * 40 + 34; ean < f * 40 + 40; ean++) {
+    const check = buyCheck(s, ean);
+    const id = cardIdOfEan(ean);
+    if (check !== 'alreadyOwned' && check !== 'locked' && !offered.includes(id)) offered.push(id);
+  }
+}
+
 export function playTurn(ctx: Ctx, P: BotParams) {
+  noteOffers(ctx);
   attackPhase(ctx, P);
   if (ctx.s.winner !== null) return;
   repairPhase(ctx, P);

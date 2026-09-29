@@ -29,6 +29,8 @@ export interface FactionAgg {
   firstAttackGames: number;
   /** Kartentyp → [Partien mit Kauf, davon gewonnen] */
   cards: Record<number, [number, number]>;
+  /** Upgrade → Partien, in denen es kaufbar war */
+  offered: Record<number, number>;
   /** Käufe der ersten 3 Runden → [Partien, Siege] */
   openings: Record<string, [number, number]>;
 }
@@ -40,15 +42,18 @@ export interface Agg {
   roundsSq: number;
   byPoints: number;
   byHq: number;
+  /** Partien mit letzter Runde und davon Punktsiege eines anderen als des Auslösers */
+  finalRounds: number;
+  overtaken: number;
   factions: Record<number, FactionAgg>;
 }
 
-export const emptyAgg = (): Agg => ({ games: 0, draws: 0, rounds: 0, roundsSq: 0, byPoints: 0, byHq: 0, factions: {} });
+export const emptyAgg = (): Agg => ({ games: 0, draws: 0, rounds: 0, roundsSq: 0, byPoints: 0, byHq: 0, finalRounds: 0, overtaken: 0, factions: {} });
 
 const emptyFaction = (): FactionAgg => ({
   games: 0, wins: 0, draws: 0, seatGames: [0, 0, 0, 0], seatWins: [0, 0, 0, 0], seatDraws: [0, 0, 0, 0], vp: 0, buildings: 0, upgrades: 0, stars: 0,
   bestBase: 0, bestArmy: 0, winBuildings: 0, winUpgrades: 0, winStars: 0, winMedals: 0, winByHq: 0, overloads: 0,
-  attacks: 0, kills: 0, losses: 0, firstAttack: 0, firstAttackGames: 0, cards: {}, openings: {},
+  attacks: 0, kills: 0, losses: 0, firstAttack: 0, firstAttackGames: 0, cards: {}, offered: {}, openings: {},
 });
 
 /** Eröffnung: Kartentypen der Käufe in den ersten 3 Runden, je Runde sortiert */
@@ -63,6 +68,10 @@ export function addGame(agg: Agg, r: GameResult, withDetails = true) {
   if (r.winner === null) agg.draws++;
   else if (r.reason === 'headquarters') agg.byHq++;
   else agg.byPoints++;
+  if (r.finalTrigger !== null) {
+    agg.finalRounds++;
+    if (r.reason === 'points' && r.winner !== r.finalTrigger) agg.overtaken++;
+  }
   for (const p of r.players) {
     const fa = (agg.factions[p.faction] ??= emptyFaction());
     const won = r.winner === p.faction;
@@ -101,6 +110,7 @@ export function addGame(agg: Agg, r: GameResult, withDetails = true) {
       c[0]++;
       if (won) c[1]++;
     }
+    for (const id of p.log.offered) fa.offered[id] = (fa.offered[id] ?? 0) + 1;
     const o = (fa.openings[openingKey(p.log.buys)] ??= [0, 0]);
     o[0]++;
     if (won) o[1]++;
@@ -122,10 +132,13 @@ export function mergeAgg(a: Agg, b: Agg): Agg {
   a.roundsSq += b.roundsSq;
   a.byPoints += b.byPoints;
   a.byHq += b.byHq;
+  a.finalRounds += b.finalRounds ?? 0;
+  a.overtaken += b.overtaken ?? 0;
   for (const [k, fb] of Object.entries(b.factions)) {
     const fa = (a.factions[Number(k)] ??= emptyFaction());
     for (const key of Object.keys(fb) as Array<keyof FactionAgg>) {
       if (key === 'cards' || key === 'openings') addRecord(fa[key], fb[key]);
+      else if (key === 'offered') for (const [id, n] of Object.entries(fb.offered ?? {})) fa.offered[Number(id)] = (fa.offered[Number(id)] ?? 0) + n;
       else if (key === 'seatGames' || key === 'seatWins' || key === 'seatDraws') fb[key].forEach((v, i) => (fa[key][i] += v));
       else fa[key] += fb[key];
     }

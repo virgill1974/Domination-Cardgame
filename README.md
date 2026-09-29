@@ -125,19 +125,22 @@ Die Ergebnisse stehen in [`Unterlagen/Balance_Simulation.pdf`](Unterlagen/Balanc
 - **Bots** (`bot.ts`, `params.ts`):
   - Sie bewerten Käufe, Angriffe und Reparaturen in Credits. Die Kampfwahrscheinlichkeiten rechnen sie exakt (`duel.ts`).
   - Sie sehen nur, was ein Spieler am Tisch sieht.
+  - Upgrades bewerten sie über die Wirkung (Kampfwert der betroffenen Einheiten vorher/nachher, gesparte Energiequellen) plus den sofortigen Siegpunkt. In der letzten Runde kaufen sie nur noch Upgrades.
   - 16 Stellschrauben, 5 Spielweisen: Ausgewogen, Händler, Blitzangriff, Festung, Superwaffe.
 - **Versuche:**
   - A: alle spielen dieselbe Spielweise;
   - B: jede Fraktion probiert jede Spielweise gegen „Ausgewogen“;
   - Optimierer (`tune.ts`): Evolutionsstrategie mit Ko-Evolution je Fraktion, getrennt für 30, 40 und ∞ Siegpunkte;
-  - Balance-Urteil: alle Sitzordnungen mit den optimierten Einstellungen;
+  - Strategiewahl (`select`): je Spielerzahl und Siegpunkt-Ziel die beste von 8 Strategien (3 optimierte, 5 Spielweisen);
+  - Balance-Urteil: alle Sitzordnungen mit den gewählten Strategien;
   - Überlastungs-Sperre (`exploits`): Energiequelle in Reihe 2 statt Reihe 3;
-  - Was-wäre-wenn: dieselben Bots mit geänderten Kartenwerten (`final --patch … --tag …`).
+  - Was-wäre-wenn: dieselben Bots mit geänderten Kartenwerten (`final --patch … --tag …`);
+  - Upgrades: wie oft jedes Upgrade kaufbar war, wie oft es gekauft wurde und die Siegquote mit/ohne.
 
 ```bash
 npm run sim -- smoke --vp 30                 # schneller Durchlauf im Hauptthread
 npm run sim -- trace --factions 0,3 --seed 3  # eine Partie Zug für Zug
-npm run sim -- all                           # Versuche A+B, Optimierung, Urteil, Bericht (ca. 30 min)
+npm run sim -- all                           # Versuche A+B, Optimierung, Strategiewahl, Urteil, Bericht (1–2 h)
 npm run sim -- report                        # Bericht (.md und .pdf) aus Tools/sim/out/*.json neu schreiben
 ```
 

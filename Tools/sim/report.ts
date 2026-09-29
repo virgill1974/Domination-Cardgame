@@ -3,6 +3,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CARDS, CARD_OF_EAN, FACTIONS, FACTION_COLORS, SCARETECH, STARTING_EANS, type Faction } from '../../src/engine/data';
 import { factionOfCardId, kindOfCardId } from '../../src/engine/cards';
+import { UPGRADE_EFFECTS } from '../../src/ui/cardText';
 import { unitDuel } from './duel';
 import { ARCHETYPES, ARCHETYPE_LABEL, ARCHETYPE_NAMES, PARAM_KEYS, PARAM_RANGES, type BotParams, type ParamKey } from './params';
 import { markdownToHtml, printPdf, reportPage, writeHtml } from './pdf';
@@ -10,11 +11,32 @@ import { emptyAgg, mergeAgg, wilson, type Agg } from './stats';
 import type { TuneResult } from './tune';
 
 interface Saved {
-  meta: { games: number; date: string; seconds: number; patch?: unknown; rules?: unknown; label?: string };
+  meta: { games: number; date: string; seconds: number; patch?: unknown; rules?: unknown; label?: string; selected?: boolean };
   results: Record<string, Agg>;
 }
 
+interface Selected {
+  meta: { games: number; rounds?: number };
+  choice: Record<string, { name: string; rates: Record<string, number> }>;
+}
+
 const F: Faction[] = [0, 1, 2, 3];
+
+/**
+ * Stärke, wenn nur diese Fraktion ihre Strategie wählt und die anderen bei ihren bleiben (beste Siegquote der Strategiewahl),
+ * gemittelt über alle Einstellungen wie strengths()
+ */
+function soloStrength(selected: Selected, f: Faction): number {
+  let r = 0;
+  let cnt = 0;
+  for (const [key, c] of Object.entries(selected.choice)) {
+    const [kf, n] = key.split('|').map(Number);
+    if (kf !== f) continue;
+    r += Math.max(...Object.values(c.rates)) * n;
+    cnt++;
+  }
+  return cnt ? r / cnt : 0;
+}
 /** Überlastungs-Sperre vor der Regeländerung: ausgesetzte Züge je Partie mit Energiequelle in Reihe 2 (Bericht vom 27.9.2026) */
 const LOCK_BEFORE = '3,9';
 /** Scaretech-Planet Wurmloch */
@@ -34,6 +56,19 @@ function share(agg: Agg | undefined, f: Faction): { k: number; n: number } {
 
 /** Siegquote relativ zur fairen Erwartung 1/n (1,00 = fair) */
 const rel = (k: number, n: number, players: number) => (k / n) * players;
+
+/** Stärke relativ zu fair, gemittelt über die Spielerzahlen mit Partien (zu zweit gibt es keine 30 SP) */
+function meanRel(saved: Saved, key: (n: number) => string, f: Faction): number {
+  let r = 0;
+  let cnt = 0;
+  for (const n of NS) {
+    const { k, n: m } = share(saved.results[key(n)], f);
+    if (!m) continue;
+    r += rel(k, m, n);
+    cnt++;
+  }
+  return cnt ? r / cnt : 0;
+}
 
 function cell(agg: Agg | undefined, f: Faction, players: number): string {
   const { k, n } = share(agg, f);
@@ -184,6 +219,13 @@ function duelTable(): Array<{ id: number; score: number; per1000: number }> {
 
 const START_CARD_IDS = new Set(Object.values(STARTING_EANS).flat().map((ean) => CARD_OF_EAN[ean]));
 
+/** Gewählte Strategien einer Fraktion über alle Einstellungen, häufigste zuerst */
+function chosenText(selected: Selected, f: Faction): string {
+  const count = new Map<string, number>();
+  for (const [key, c] of Object.entries(selected.choice)) if (key.startsWith(`${f}|`)) count.set(c.name, (count.get(c.name) ?? 0) + 1);
+  return [...count].sort((a, b) => b[1] - a[1]).map(([name, n]) => `${name} (${n})`).join(', ');
+}
+
 function openingText(key: string): string {
   return key.split('|').map((part, i) => {
     const names = part === '-' ? '–' : part.split('+').map((id) => CARDS[Number(id)].name).join(', ');
@@ -229,16 +271,11 @@ function fmtParam(k: ParamKey, v: number): string {
   return num(v, 2);
 }
 
-/** Beste Spielweise je Fraktion aus Versuch B (30 SP, gemittelt über 2–4 Spieler) */
+/** Beste Spielweise je Fraktion aus Versuch B (30 SP, gemittelt über die Spielerzahlen mit Partien) */
 function bestArchetype(strategies: Saved, f: Faction, vp = '30'): { name: string; r: number } {
   let best = { name: '–', r: -1 };
   for (const a of ARCHETYPE_NAMES) {
-    let r = 0;
-    for (const n of NS) {
-      const { k, n: m } = share(strategies.results[`B|${f}|${a}|${n}|${vp}`], f);
-      r += m ? rel(k, m, n) : 0;
-    }
-    r /= NS.length;
+    const r = meanRel(strategies, (n) => `B|${f}|${a}|${n}|${vp}`, f);
     if (r > best.r) best = { name: ARCHETYPE_LABEL[a], r };
   }
   return best;
@@ -253,12 +290,14 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
   const tuned = tunedBy['30'];
   const tunedModes = VPS.filter((vp) => load<TuneResult>(`tuned-${vp}`) !== null);
   const final = load<Saved>('final');
+  // Strategiewahl je Spielerzahl und Siegpunkt-Einstellung (run.ts select); nur gültig, wenn das Balance-Urteil sie benutzt hat
+  const selected = final?.meta.selected ? load<Selected>('selected') : null;
   const exploits = load<Saved>('exploits');
   const variants = variantNames.map((name) => load<Saved>(name)).filter((v): v is Saved => v !== null);
   // Abschnittsnummern: Es zählen nur Abschnitte, für die es Daten gibt
   const S: Record<string, number> = {};
   const present: Array<[string, boolean]> = [
-    ['balance', !!final], ['seats', !!final], ['same', !!strategies], ['fit', !!strategies], ['tuned', !!tuned],
+    ['balance', !!final], ['seats', !!final], ['same', !!strategies], ['fit', !!strategies], ['tuned', !!tuned], ['upgrades', !!final],
     ['whatif', !!final && variants.length > 0], ['rules', !!final], ['cards', true], ['model', true], ['repro', true],
   ];
   for (const [key, on] of present) if (on) S[key] = Object.keys(S).length + 1;
@@ -274,6 +313,22 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     const sx = share(xAgg, f);
     return { f, n, back: b.overloads / b.games, front: x.overloads / x.games, winBack: sb.k / sb.n, winFront: sx.k / sx.n };
   })).filter((r) => r !== null);
+  // Upgrades: kaufbar, gekauft, Siegquote je Upgrade über alle Partien des Balance-Urteils
+  const upgradeRows = final ? (() => {
+    const all = sumAgg(Object.values(final.results));
+    return F.flatMap((f) => {
+      const fa = all.factions[f];
+      if (!fa) return [];
+      return CARDS.filter((c) => factionOfCardId(c.id) === f && kindOfCardId(c.id) === 'upgrade').map((c) => {
+        const [n, wins] = fa.cards[c.id] ?? [0, 0];
+        const offered = fa.offered?.[c.id] ?? 0;
+        return {
+          f, id: c.id, name: c.name, price: c.price, requires: CARDS[c.requires].name, n, offered: offered / fa.games,
+          bought: offered ? Math.min(1, n / offered) : 0, winWith: n ? wins / n : 0, winWithout: (fa.wins - wins) / Math.max(1, fa.games - n),
+        };
+      });
+    });
+  })() : null;
   const duels = duelTable();
   const charts: Record<string, string> = {};
   const out: string[] = [];
@@ -290,13 +345,13 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
   if (final) {
     w('## Kurzfassung', '');
     const verdict = strengths(final);
-    w(`**Stärke** je Fraktion, wenn jede ihre beste gefundene Strategie spielt (Abschnitt ${S.tuned}), gemittelt über 2–4 Spieler und alle Siegpunkt-Einstellungen. `
+    w(`**Stärke** je Fraktion, wenn jede ihre beste gefundene Strategie spielt (Abschnitt ${S.tuned}${selected ? ', je Spielerzahl und Siegpunkt-Einstellung die beste von acht' : ''}), gemittelt über 2–4 Spieler und alle Siegpunkt-Einstellungen. `
       + '1,00 ist eine faire Siegquote (1 / Spielerzahl), 1,20 heißt 20 % häufiger als fair.', '');
-    w(table(['Fraktion', 'Stärke', 'Bereich (95 %)', 'Einschätzung', `Beste Spielweise (Abschnitt ${S.fit})`, 'Optimierte Strategie bei 30 SP: Schwerpunkte'],
+    w(table(['Fraktion', 'Stärke', 'Bereich (95 %)', 'Einschätzung', `Beste Spielweise (Abschnitt ${S.fit})`, selected ? 'Gewählte Strategien (Anzahl Einstellungen)' : 'Optimierte Strategie bei 30 SP: Schwerpunkte'],
       verdict.map(({ f, r, lo, hi }) => [
         FACTIONS[f], num(r, 2), `${num(lo, 2)}–${num(hi, 2)}`, verdictText(r),
         strategies ? bestArchetype(strategies, f).name : '–',
-        tuned ? describe(tuned.best[f], f, 3).join(', ') : '–',
+        selected ? chosenText(selected, f) : tuned ? describe(tuned.best[f], f, 3).join(', ') : '–',
       ])), '');
     charts.strength = strengthChart(verdict, 'Stärke je Fraktion (Balken) mit 95-%-Bereich (Linie). Gestrichelt: faire Siegquote.');
     w('@@CHART:strength@@', '');
@@ -305,6 +360,17 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     const notes: string[] = [];
     const sorted = [...verdict].sort((a, b) => b.r - a.r);
     notes.push(`**Stärkste Fraktion: ${FACTIONS[sorted[0].f]}** (${num(sorted[0].r, 2)}), **schwächste: ${FACTIONS[sorted[3].f]}** (${num(sorted[3].r, 2)}).`);
+    if (selected) {
+      const solo = F.map((f) => ({ f, r: soloStrength(selected, f), all: verdict.find((v) => v.f === f)!.r }));
+      const strong = solo.filter((x) => x.r >= 1.1 && x.all >= 1.1).map((x) => FACTIONS[x.f]);
+      const weak = solo.filter((x) => x.r <= 0.9 && x.all <= 0.9).map((x) => FACTIONS[x.f]);
+      const unsure = solo.filter((x) => Math.abs(x.r - x.all) >= 0.15).map((x) => FACTIONS[x.f]);
+      notes.push('**Wie sicher ist das?** Die Stärke hängt auch davon ab, welche Strategien die anderen spielen. Wählt nur eine Fraktion ihre beste Strategie und die anderen bleiben bei ihren, '
+        + `ergibt sich: ${solo.map((x) => `${FACTIONS[x.f]} ${num(x.r, 2)}`).join(', ')}. `
+        + (strong.length ? `In beiden Messungen zu stark: **${strong.join(', ')}**. ` : '')
+        + (weak.length ? `In beiden Messungen zu schwach: **${weak.join(', ')}**. ` : '')
+        + (unsure.length ? `Bei ${unsure.join(' und ')} liegen die Messungen weit auseinander: Dort entscheidet eher die Spielweise der anderen als das Kartenmaterial.` : ''));
+    }
     let worst = { f: 0 as Faction, n: 2, r: 1 };
     for (const n of NS) for (const s of strengths(final, [n])) if (Math.abs(s.r - 1) > Math.abs(worst.r - 1)) worst = { f: s.f, n, r: s.r };
     notes.push(`Am deutlichsten ist die Abweichung bei **${worst.n} Spielern**: ${FACTIONS[worst.f]} gewinnt ${pct(worst.r / worst.n, 0)} der entschiedenen Partien (fair: ${pct(1 / worst.n, 0)}).`);
@@ -341,7 +407,29 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
       }
       return m ? k / m : 0;
     };
-    notes.push(`Wer anfängt, hat einen Vorteil: Bei 4 Spielern gewinnt Platz 1 ${pct(seatRate(four, 0), 0)}, Platz 4 nur ${pct(seatRate(four, 3), 0)} (Abschnitt ${S.seats}).`);
+    const two = sumAgg(VPS.map((v) => final.results[`C|2|${v}`]));
+    const edge = Math.max(Math.abs(seatEdgeOf(final, 2)), Math.abs(seatEdgeOf(final, 4)));
+    notes.push(`**Sitzreihenfolge** (mit letzter Runde und Startkapital-Ausgleich): Zu viert gewinnt Platz 1 ${pct(seatRate(four, 0), 0)} und Platz 4 ${pct(seatRate(four, 3), 0)} (fair: 25 %), `
+      + `zu zweit Platz 1 ${pct(seatRate(two, 0), 0)} und Platz 2 ${pct(seatRate(two, 1), 0)}. `
+      + (edge < 0.03 ? 'Das ist praktisch fair.' : seatEdgeOf(final, 4) + seatEdgeOf(final, 2) > 0 ? 'Der Startspieler hat noch einen kleinen Vorteil.' : 'Die späteren Plätze sind jetzt leicht im Vorteil.')
+      + ` (Abschnitt ${S.seats})`);
+    const pointGames = sumAgg(Object.entries(final.results).filter(([k]) => !k.endsWith('|inf')).map(([, a]) => a));
+    if (pointGames.finalRounds) {
+      notes.push(`**Letzte Runde:** In ${pct(pointGames.overtaken / Math.max(1, pointGames.byPoints), 0)} der Punktsiege gewann nicht, wer das Siegpunkt-Ziel zuerst erreicht hatte, `
+        + 'sondern ein Spieler, der in der letzten Runde noch vorbeizog (Upgrades, Sterne, zerstörte Planeten).');
+    }
+    if (upgradeRows) {
+      const perGame = F.map((f) => {
+        const fa = sumAgg(Object.values(final.results)).factions[f];
+        return `${FACTIONS[f]} ${num(fa ? fa.upgrades / fa.games : 0)}`;
+      });
+      const rare = upgradeRows.filter((u) => u.offered < 0.15).map((u) => u.name);
+      const skipped = upgradeRows.filter((u) => u.offered >= 0.15 && u.bought < 0.2).map((u) => u.name);
+      notes.push(`**Upgrades** je Partie: ${perGame.join(', ')}. `
+        + (rare.length ? `Selten kaufbar, weil die Voraussetzung selten gebaut wird: ${rare.join(', ')}. ` : '')
+        + (skipped.length ? `Kaufbar, aber selten gekauft (Wirkung für den Preis zu schwach): ${skipped.join(', ')}. ` : '')
+        + `(Abschnitt ${S.upgrades})`);
+    }
     const inf2 = final.results['C|2|inf'];
     if (inf2 && inf2.draws / inf2.games > 0.1) {
       notes.push(`„∞“ zu zweit zieht sich: Ø ${num(inf2.rounds / inf2.games, 0)} Runden, ${pct(inf2.draws / inf2.games, 0)} der Partien ohne Sieger nach 120 Runden (Abschnitt ${S.rules}).`);
@@ -358,22 +446,25 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
   // ---------- 1. Balance-Urteil
   if (final) {
     w(`## ${S.balance}. Balance mit optimierten Strategien`, '');
-    w(`Jede Fraktion spielt die Einstellungen, die der Optimierer für sie gefunden hat (Abschnitt ${S.tuned}). Alle Sitzordnungen, ${final.meta.games} Partien je Sitzordnung und Einstellung. `
+    w(`Jede Fraktion spielt ${selected ? 'je Spielerzahl und Siegpunkt-Einstellung die beste von acht Strategien (Strategiewahl,' : 'die Einstellungen, die der Optimierer für sie gefunden hat ('} Abschnitt ${S.tuned}). Alle Sitzordnungen, ${final.meta.games} Partien je Sitzordnung und Einstellung. `
       + 'Angegeben ist der Anteil an den entschiedenen Partien mit 95-%-Konfidenzintervall; ▲/▼ = deutlich über/unter fair.', '');
     for (const n of NS) {
+      // Zu zweit gibt es keine 30-SP-Partien
+      const modes = VPS.filter((v) => final.results[`C|${n}|${v}`]);
       w(`### ${n} Spieler (fair: ${pct(1 / n, 0)})`, '');
-      w(table(['Fraktion', ...VPS.map((v) => VP_LABEL[v])], F.map((f) => [FACTIONS[f], ...VPS.map((v) => cell(final.results[`C|${n}|${v}`], f, n))])), '');
-      w(table(['', ...VPS.map((v) => VP_LABEL[v])], [
-        ['Partien', ...VPS.map((v) => (final.results[`C|${n}|${v}`]?.games ?? 0).toLocaleString('de-DE'))],
-        ['Ø Runden', ...VPS.map((v) => { const a = final.results[`C|${n}|${v}`]; return a ? num(a.rounds / a.games) : '–'; })],
-        ['Sieg durch Zentralgestirn', ...VPS.map((v) => { const a = final.results[`C|${n}|${v}`]; return a ? pct(a.byHq / a.games) : '–'; })],
-        ['Remis (nach 120 Runden)', ...VPS.map((v) => { const a = final.results[`C|${n}|${v}`]; return a ? pct(a.draws / a.games) : '–'; })],
+      w(table(['Fraktion', ...modes.map((v) => VP_LABEL[v])], F.map((f) => [FACTIONS[f], ...modes.map((v) => cell(final.results[`C|${n}|${v}`], f, n))])), '');
+      w(table(['', ...modes.map((v) => VP_LABEL[v])], [
+        ['Partien', ...modes.map((v) => (final.results[`C|${n}|${v}`]?.games ?? 0).toLocaleString('de-DE'))],
+        ['Ø Runden', ...modes.map((v) => { const a = final.results[`C|${n}|${v}`]; return a ? num(a.rounds / a.games) : '–'; })],
+        ['Sieg durch Zentralgestirn', ...modes.map((v) => { const a = final.results[`C|${n}|${v}`]; return a ? pct(a.byHq / a.games) : '–'; })],
+        ['Remis (nach 120 Runden)', ...modes.map((v) => { const a = final.results[`C|${n}|${v}`]; return a ? pct(a.draws / a.games) : '–'; })],
       ]), '');
     }
 
     // ---------- 2. Sitzreihenfolge
     w(`## ${S.seats}. Vorteil durch die Sitzreihenfolge`, '');
-    w('Anteil an den entschiedenen Partien nach Platz in der Zugreihenfolge (Platz 1 beginnt), über alle Fraktionen und Siegpunkt-Einstellungen.', '');
+    w('Anteil an den entschiedenen Partien nach Platz in der Zugreihenfolge (Platz 1 beginnt), über alle Fraktionen und Siegpunkt-Einstellungen. '
+      + 'Es gelten die Regeln gegen den Vorteil des Startspielers: Wer das Siegpunkt-Ziel erreicht, löst die letzte Runde aus, und Spieler 2, 3 und 4 bekommen 200, 300 bzw. 400 Credits mehr Startkapital.', '');
     w(table(['Spieler', 'Platz 1', 'Platz 2', 'Platz 3', 'Platz 4', 'fair'], NS.map((n) => {
       const all = sumAgg(VPS.map((v) => final.results[`C|${n}|${v}`]));
       const seat = (i: number) => {
@@ -393,22 +484,16 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
   if (strategies) {
     w(`## ${S.same}. Wenn alle dieselbe Spielweise wählen`, '');
     w('Alle Spieler nutzen denselben Bot. Unterschiede kommen dann nur vom Kartenmaterial der Fraktionen. '
-      + `Stärke relativ zu fair, gemittelt über 2–4 Spieler (${strategies.meta.games} Partien je Sitzordnung).`, '');
+      + `Stärke relativ zu fair, gemittelt über 2–4 Spieler, bei 30 SP über 3–4 (${strategies.meta.games} Partien je Sitzordnung).`, '');
     for (const vp of VPS) {
       w(`**${VP_LABEL[vp]}**`, '');
-      w(table(['Spielweise', ...F.map((f) => FACTIONS[f])], ARCHETYPE_NAMES.map((a) => [ARCHETYPE_LABEL[a], ...F.map((f) => {
-        let r = 0;
-        for (const n of NS) {
-          const { k, n: m } = share(strategies.results[`A|${a}|${n}|${vp}`], f);
-          r += m ? rel(k, m, n) : 0;
-        }
-        return num(r / NS.length, 2);
-      })])), '');
+      w(table(['Spielweise', ...F.map((f) => FACTIONS[f])], ARCHETYPE_NAMES.map((a) => [ARCHETYPE_LABEL[a], ...F.map((f) =>
+        num(meanRel(strategies, (n) => `A|${a}|${n}|${vp}`, f), 2))])), '');
     }
 
     // ---------- 4. Spielweise je Fraktion
     w(`## ${S.fit}. Welche Spielweise passt zu welcher Fraktion`, '');
-    w('Eine Fraktion probiert jede Spielweise, alle Gegner spielen „Ausgewogen“. Stärke relativ zu fair, gemittelt über 2–4 Spieler. Fett: beste Spielweise der Fraktion.', '');
+    w('Eine Fraktion probiert jede Spielweise, alle Gegner spielen „Ausgewogen“. Stärke relativ zu fair, gemittelt über 2–4 Spieler (bei 30 SP über 3–4). Fett: beste Spielweise der Fraktion.', '');
     w('- **Ausgewogen:** alles in Maßen (Referenz).',
       '- **Händler:** zuerst Handelsplaneten und Einkommen, die Armee später.',
       '- **Blitzangriff:** früh günstige Einheiten, greift jede Runde an, zielt auf Planeten und das Zentralgestirn.',
@@ -416,14 +501,7 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
       '- **Superwaffe:** spart früh auf den Technologiebaum bis zur Superwaffe.', '');
     for (const vp of VPS) {
       w(`**${VP_LABEL[vp]}**`, '');
-      const rows = ARCHETYPE_NAMES.map((a) => F.map((f) => {
-        let r = 0;
-        for (const n of NS) {
-          const { k, n: m } = share(strategies.results[`B|${f}|${a}|${n}|${vp}`], f);
-          r += m ? rel(k, m, n) : 0;
-        }
-        return r / NS.length;
-      }));
+      const rows = ARCHETYPE_NAMES.map((a) => F.map((f) => meanRel(strategies, (n) => `B|${f}|${a}|${n}|${vp}`, f)));
       const bestOf = F.map((_, fi) => Math.max(...rows.map((r) => r[fi])));
       w(table(['Spielweise', ...F.map((f) => FACTIONS[f])], ARCHETYPE_NAMES.map((a, ai) => [
         ARCHETYPE_LABEL[a], ...rows[ai].map((v, fi) => (v === bestOf[fi] ? `**${num(v, 2)}**` : num(v, 2))),
@@ -438,14 +516,26 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     const perMode = tunedModes.length > 1;
     w(`Der Optimierer (Evolutionsstrategie, ${gens} Generationen) hat je Fraktion die Einstellungen gesucht, die gegen die jeweils besten der anderen am häufigsten gewinnen (2 und 4 Spieler)`
       + (perMode ? ', getrennt für jede Siegpunkt-Einstellung, denn in langen Partien lohnt sich eine andere Spielweise als in kurzen. ' : ', 30 SP. ')
-      + `Startpunkt war jeweils die beste Spielweise aus Abschnitt ${S.fit}. Ab etwa der Hälfte der Generationen änderte sich die Stärke nur noch im Rahmen des Zufalls.`, '');
+      + `Startpunkt war die beste Spielweise aus Abschnitt ${S.fit}, bei späteren Läufen die zuletzt optimierten Einstellungen (weiter optimiert mit den aktuellen Regeln). `
+      + 'Weil alle vier Fraktionen gleichzeitig optimiert werden, schwankt die Stärke von Generation zu Generation.', '');
     if (perMode) {
       w('**Schwerpunkte je Siegpunkt-Einstellung** (die drei deutlichsten Abweichungen von „Ausgewogen“):', '');
       w(table(['Fraktion', ...tunedModes.map((vp) => VP_LABEL[vp])], F.map((f) => [
         FACTIONS[f], ...tunedModes.map((vp) => describe(tunedBy[vp]!.best[f], f, 3).join(', ')),
       ])), '');
-      w('**Alle Einstellungen bei 30 SP:**', '');
     }
+    if (selected) {
+      const settings = NS.flatMap((n) => VPS.filter((vp) => selected.choice[`0|${n}|${vp}`]).map((vp) => ({ n, vp })));
+      w('**Strategiewahl.** Der Optimierer bewertet 2 und 4 Spieler gemeinsam. Dabei kann er eine Strategie finden, die bei einer Spielerzahl versagt '
+        + '(im ersten Lauf etwa ein Biotec, das bei ∞ zu zweit nie angriff und deshalb nie gewann). Darum probiert jede Fraktion je Spielerzahl und Siegpunkt-Einstellung '
+        + `${Object.keys(selected.choice['0|4|30']?.rates ?? {}).length} Strategien gegen die optimierten Gegner (${selected.meta.games} Partien je Sitzordnung): `
+        + 'ihre drei optimierten und die fünf Spielweisen. Im Balance-Urteil spielt sie die beste davon, so wie ein Mensch seine Spielweise der Runde anpasst. '
+        + ((selected.meta.rounds ?? 1) > 1 ? `Das lief in ${selected.meta.rounds} Durchgängen: Ab dem zweiten spielen die Gegner je zur Hälfte ihre optimierte und ihre zuletzt gewählte Strategie. Das dämpft Kreisläufe, in denen jede Wahl die vorige aushebelt.` : ''), '');
+      w(table(['Fraktion', ...settings.map(({ n, vp }) => `${n} Sp. ${VP_LABEL[vp]}`)], F.map((f) => [
+        FACTIONS[f], ...settings.map(({ n, vp }) => selected.choice[`${f}|${n}|${vp}`].name),
+      ])), '');
+    }
+    if (perMode) w('**Alle Einstellungen der Optimierung für 30 SP:**', '');
     w(table(['Einstellung', 'Ausgewogen', ...F.map((f) => FACTIONS[f])], PARAM_KEYS.map((k) => [
       PARAM_LABEL[k], fmtParam(k, ARCHETYPES.ausgewogen[k]), ...F.map((f) => fmtParam(k, tuned.best[f][k])),
     ])), '');
@@ -482,7 +572,40 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     }
   }
 
-  // ---------- 6. Was wäre wenn
+  // ---------- 6. Upgrades
+  if (final && upgradeRows) {
+    w(`## ${S.upgrades}. Upgrades`, '');
+    w('Ein Upgrade zählt sofort und dauerhaft als Siegpunkt und wirkt ab dem Kauf. Die Bots bewerten Einheiten-Upgrades über den Kampfwert der betroffenen Einheiten vorher und nachher, '
+      + 'für die eigenen und die voraussichtlich noch gekauften. Energie-Upgrades zählen als gesparte Energiequellen. '
+      + 'In der **letzten Runde** kaufen sie nur noch Upgrades, die billigsten zuerst: Andere Karten werden bis zum Spielende nicht mehr fertig.', '');
+    w(table(['Fraktion', 'Ø Upgrades je Partie', ...VPS.map((v) => VP_LABEL[v])], F.map((f) => {
+      const per = (aggs: Array<Agg | undefined>) => {
+        const fa = sumAgg(aggs).factions[f];
+        return fa ? num(fa.upgrades / fa.games) : '–';
+      };
+      return [FACTIONS[f], per(Object.values(final.results)), ...VPS.map((v) => per(NS.map((n) => final.results[`C|${n}|${v}`])))];
+    })), '');
+    w('*Kaufbar:* Anteil der Partien, in denen die Voraussetzung mindestens einmal aktiv war. *Gekauft:* Anteil dieser Partien, in denen die Fraktion das Upgrade kaufte. '
+      + '*Siegquote mit/ohne:* Siegquote der Fraktion in Partien mit bzw. ohne das Upgrade, über alle Spielerzahlen. Das ist ein Zusammenhang, keine Ursache: '
+      + 'Wer vorn liegt, hat mehr Credits für Upgrades, und Käufe in der letzten Runde zählen mit.', '');
+    w(table(['Fraktion', 'Upgrade', 'Preis', 'Voraussetzung', 'Wirkung', 'kaufbar', 'gekauft', 'Siegquote mit', 'ohne'], upgradeRows.map((u) => [
+      FACTIONS[u.f], u.name, String(u.price), u.requires, UPGRADE_EFFECTS[u.id] ?? '–', pct(u.offered, 0),
+      u.offered ? pct(u.bought, 0) : '–', u.n ? pct(u.winWith, 0) : '–', pct(u.winWithout, 0),
+    ])), '');
+    const rare = upgradeRows.filter((u) => u.offered < 0.15);
+    const skipped = upgradeRows.filter((u) => u.offered >= 0.15 && u.bought < 0.2);
+    if (rare.length) {
+      w(`- **Selten kaufbar** (in weniger als 15 % der Partien): ${rare.map((u) => `${u.name} (${FACTIONS[u.f]}, ${pct(u.offered, 0)})`).join(', ')}. `
+        + 'Hier liegt es am Technologiebaum: Die Bots bauen die Voraussetzung selten.');
+    }
+    if (skipped.length) {
+      w(`- **Kaufbar, aber selten gekauft** (unter 20 %): ${skipped.map((u) => `${u.name} (${FACTIONS[u.f]}, ${u.price} Credits, ${pct(u.bought, 0)})`).join(', ')}. `
+        + 'Für die Bots ist die Wirkung den Preis meist nicht wert.');
+    }
+    w('');
+  }
+
+  // ---------- 7. Was wäre wenn
   if (final && variants.length) {
     w(`## ${S.whatif}. Was wäre wenn: geänderte Werte und Regeln`, '');
     w('Dieselben optimierten Bots spielen mit geänderten Kartenwerten oder Regeln (nur im Simulator, alle Sitzordnungen, 2–4 Spieler, alle Siegpunkt-Einstellungen). '
@@ -558,6 +681,8 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
   // ---------- 9. Modell
   w(`## ${S.model}. Modell und Grenzen`, '');
   w('- **Regeln:** Einkommen, Bauzeiten, Energie, Kaufen, alle Kampfarten, Reparatur, Upgrades, Münzen, Siegpunkte und Sonderaktion kommen unverändert aus der App-Engine (`src/engine/`).',
+    '  - Sieg wie in der App: Ein zerstörtes Zentralgestirn gewinnt sofort. Wer das Siegpunkt-Ziel erreicht, löst die letzte Runde aus; danach gewinnt, wer die meisten Siegpunkte hat.',
+    '  - Startkapital-Ausgleich: Spieler 2, 3 und 4 bekommen 200, 300 bzw. 400 Credits mehr. Zu zweit gibt es nur 40 SP und ∞.',
     '- **Tischregeln** (nicht in der App, im Simulator nachgebaut, `Tools/sim/board.ts`):',
     '  - 3 Reihen × 7 Felder, Stapelregeln in Reihe 1; Planeten liegen verdeckt und werden durch einen Angriff aufgedeckt.',
     '  - Reihe 2 ist erst angreifbar, wenn Reihe 1 leer ist, Reihe 3 erst, wenn Reihe 1 und 2 leer sind.',
@@ -566,16 +691,21 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     '  - Überlastung: Eine gerettete Energiequelle wird verdeckt neu ausgelegt.',
     '  - Auge des Raumes deckt zu Zugbeginn einen gegnerischen Planeten auf. Schwarzer Schleier legt Scaretech-Einheiten verdeckt. Neuronetz tauscht verdeckte Planeten; das Umsetzen von Einheiten bringt im Modell nichts.',
     '- **Bots:** bewerten jede mögliche Aktion in Credits, mit exakt berechneten Kampfwahrscheinlichkeiten. Sie sehen nur, was am Tisch sichtbar ist. '
-      + 'Energiequellen und das Zentralgestirn legen sie nach hinten und halten mindestens zwei Planeten als Schutz in Reihe 2.',
+      + 'Energiequellen und das Zentralgestirn legen sie nach hinten und halten mindestens zwei Planeten als Schutz in Reihe 2. '
+      + 'Upgrades bewerten sie über die Wirkung (Kampfwert vorher/nachher, gesparte Energiequellen) plus den sofortigen, sicheren Siegpunkt. '
+      + 'In der letzten Runde kaufen sie nur noch Upgrades, reparieren nicht mehr und setzen ihre Einheiten ohne Rücksicht auf Verluste ein. '
+      + 'Die Strategie wählt jede Fraktion je Spielerzahl und Siegpunkt-Einstellung (Abschnitt ${S.tuned}); innerhalb einer Partie passen die Bots sie nicht an.',
     '- **Grenzen:** Bots bluffen nicht, sprechen sich nicht ab und planen nur einen Zug voraus (plus Sparziel). Menschen spielen anders, besonders mit Absprachen zu dritt oder zu viert. '
       + 'Die Ergebnisse zeigen Tendenzen im Kartenmaterial, keine exakten Siegchancen am Tisch.',
     '- **Remis:** Partien ohne Sieger nach 120 Runden zählen nicht in die Siegquoten.', '');
 
   w(`## ${S.repro}. Nachrechnen`, '');
-  w('```bash', 'npm run sim -- all                  # Versuche A+B, Optimierung, Balance-Urteil, Bericht', 'npm run sim -- strategies --games 60', 'npm run sim -- tune --gens 16 --g2 60 --g4 12   # je Siegpunkt-Einstellung, oder --vp 30',
-    'npm run sim -- final --games 300', 'npm run sim -- exploits', 'npm run sim -- final --games 150 --patch werte.json --tag name --label "Text"', 'npm run sim -- report', '```', '');
+  w('```bash', 'npm run sim -- all                  # Versuche A+B, Optimierung, Strategiewahl, Balance-Urteil, Bericht', 'npm run sim -- strategies --games 100', 'npm run sim -- tune --warm --gens 12 --g2 60 --g4 12 --sigma 0.12   # je Siegpunkt-Einstellung, oder --vp 40',
+    'npm run sim -- select --games 80                # Strategiewahl je Spielerzahl', 'npm run sim -- select --again --games 80        # zweiter Durchgang', 'npm run sim -- final --games 2000', 'npm run sim -- exploits --games 500', 'npm run sim -- final --games 150 --patch werte.json --tag name --label "Text"', 'npm run sim -- report', '```', '');
   const total = (s: Saved | null) => (s ? sumAgg(Object.values(s.results)).games : 0);
-  const games = total(final) + total(strategies) + total(exploits) + variants.reduce((n, v) => n + total(v), 0)
+  // Strategiewahl: je Fraktion und Kandidat alle Sitzordnungen mit ihr (2 Sp.: 2 × 6, 3 Sp.: 3 × 18, 4 Sp.: 3 × 24)
+  const selectGames = selected ? selected.meta.games * 138 * 4 * Object.keys(selected.choice['0|4|30']?.rates ?? {}).length : 0;
+  const games = total(final) + total(strategies) + total(exploits) + selectGames + variants.reduce((n, v) => n + total(v), 0)
     + VPS.reduce((n, vp) => n + (tunedModes.includes(vp) || vp === '30' ? (tunedBy[vp]?.history.length ?? 0) * 4 * 13 * (6 * 60 + 24 * 12) : 0), 0);
   w(`Umfang dieses Berichts: rund ${(Math.round(games / 1000) * 1000).toLocaleString('de-DE')} simulierte Partien.`, '');
 

@@ -52,6 +52,8 @@ export interface PlayerResult {
 export interface GameResult {
   winner: Faction | null;
   reason: 'points' | 'headquarters' | null;
+  /** Wer die letzte Runde ausgelöst hat (Siegpunkt-Ziel zuerst erreicht) */
+  finalTrigger: Faction | null;
   rounds: number;
   players: PlayerResult[];
 }
@@ -95,6 +97,7 @@ export function playGame(setup: GameSetup): GameResult {
   return {
     winner: s.winner,
     reason: s.winReason,
+    finalTrigger: s.finalRound ?? null,
     rounds: Math.min(s.round, maxRounds),
     players: setup.seats.map(({ faction }, seat) => {
       const p = s.players[faction];

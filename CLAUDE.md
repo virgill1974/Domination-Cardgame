@@ -157,9 +157,11 @@ npm run gfx                      # regenerate the Helge-style graphics in public
   - The user decided: Hyperraumschiffe (and Scaretech foot units with an active Wurmloch) skip only row 1. Row 3 needs an empty row 2.
   - Overload (table rule, README deviation 13): a rescued energy source is laid out again face down. The engine still rescues it (full defence, owner skips); `executeAttack` re-hides and re-places rescued planets.
 - **Bots** (`bot.ts`) value actions in credits using exact duel odds (`duel.ts`) and see only public information.
-  - `UPGRADE_UNITS` mirrors `applyUpgrade`; `duel.test.ts` checks both against the engine.
-  - Stellschrauben in `params.ts` (`PARAM_RANGES`, 5 archetypes); `tune.ts` evolves them per faction and per VP mode (`out/tuned-30|40|inf.json`); `final` plays each mode with its own tuned set.
-- **Commands:** `smoke`, `trace`, `strategies`, `tune`, `final`, `exploits`, `report`, `all`. Raw results go to `Tools/sim/out/` (git-ignored).
+  - `UPGRADE_STATS` mirrors `applyUpgrade`; `duel.test.ts` checks both against the engine. Stat upgrades are valued by the unit value before/after for owned and expected units.
+  - Final round: bots buy only upgrades (instant VP, cheapest first), skip repairs and value a VP at 3000 credits.
+  - Stellschrauben in `params.ts` (`PARAM_RANGES`, 5 archetypes); `tune.ts` evolves them per faction and per VP mode (`out/tuned-30|40|inf.json`); `final` plays each mode with its own tuned set (or the `select` choice).
+- `select` (strategy choice): the tuner scores 2 and 4 players together and can produce a set that fails at one player count (e.g. a never-attacking Biotec at 2 players ∞). `select` tries 8 candidates per faction, player count and VP mode (3 tuned sets + 5 archetypes) against the tuned opponents and writes `out/selected.json`; `final` uses it if present. `tune` deletes it. `select --again` runs another round against a 50/50 field of tuned and last-chosen opponents, which damps rock-paper-scissors cycles when all factions switch at once.
+- **Commands:** `smoke`, `trace`, `strategies`, `tune`, `select`, `final`, `exploits`, `report`, `all`. Raw results go to `Tools/sim/out/` (git-ignored).
 - `report` writes `Unterlagen/Balance_Simulation.md` and, via `pdf.ts`, `Balance_Simulation.pdf`. `pdf.ts` converts the Markdown to HTML in the manual's look, with embedded fonts, faction colour dots and inline SVG charts, then prints it with headless Chrome/Edge (`--print-to-pdf`, no puppeteer).
 - The sim uses the engine's victory rules (it calls `endTurn`); 2-player games skip the 30-VP mode like the app. `--rules file.json` sets sim-only rules (`firstAttackRound`).
 - What-if runs: `final --patch file.json --tag name --label "Text"` writes `out/final-<tag>.json`; the report compares them (mean deviation from fair). They reuse the tuned bots without re-tuning.
