@@ -245,6 +245,11 @@ class BuyPlanner {
     return ownedSlots(this.me).some((slot) => slotCardId(slot) === id);
   }
 
+  /** Scaretech mit Wurmloch (im Bau oder aktiv) */
+  private hasWormhole(): boolean {
+    return this.me.faction === SCARETECH && this.owns(WORMHOLE);
+  }
+
   /**
    * Was ein Planet freischaltet: Nettowert der neuen Karten (Wert minus Preis) unter der aktuellen Lage,
    * Einheiten doppelt, weil man sie mehrfach kaufen kann; eine Stufe tiefer mit Abschlag
@@ -267,8 +272,10 @@ class BuyPlanner {
     const st = this.ctx.s.stats[id];
     const strength = this.strength(id);
     let v = P.military * 2000 * strength;
-    // Angriffe auf Planeten (auch Einweg-Einheiten wie Erazor)
-    v += (P.hqFocus * 400 * hitChance(st.off) * Math.min(st.dmg, 4)) / 4;
+    // Angriffe auf Planeten (auch Einweg-Einheiten wie Erazor); mit Wurmloch erreichen Scaretech-Aufklärer Reihe 2 direkt
+    const planetStrike = (P.hqFocus * hitChance(st.off) * Math.min(st.dmg, 4)) / 4;
+    v += 400 * planetStrike;
+    if (this.hasWormhole() && CARDS[id].unitClass === 'foot') v += 900 * planetStrike;
     if (isAircraft(id)) v += P.air * 600 + P.hqFocus * 300;
     if (st.def > 0) {
       // Verteidigungsbedarf: je kampfstärker die Einheit, desto mehr hilft sie
@@ -288,7 +295,12 @@ class BuyPlanner {
     if (isFlak(id)) v += P.defense * 500;
     if (isCenter(id)) v += 200 * Math.min(3, frontUnits(this.board).length) * this.H * 0.4 * Math.max(0.5, P.military);
     if (isSuperweapon(id)) v += P.superweapon * 2500;
-    if (id === WORMHOLE) v += P.hqFocus * 600;
+    if (id === WORMHOLE) {
+      // Jeder eigene Aufklärer kann damit Planeten in Reihe 2 angreifen, auch wenn der Gegner Einheiten in Reihe 1 hat
+      const foot = [...frontUnits(this.board), ...this.board.waiting, ...pendingUnits(this.me)]
+        .filter((ean) => CARDS[cardIdOfEan(ean)].unitClass === 'foot').length;
+      v += P.hqFocus * (400 + 300 * Math.max(2, foot));
+    }
     // Schutzplaneten in Reihe 2 halten die 3. Reihe (Zentralgestirn) verdeckt
     if (rowCount(this.board, 2) < SHIELD_PLANETS) v += P.defense * 400;
     if (withUnlocks) v += P.tech * this.unlockValue(id);

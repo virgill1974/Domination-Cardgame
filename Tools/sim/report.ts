@@ -17,6 +17,8 @@ interface Saved {
 const F: Faction[] = [0, 1, 2, 3];
 /** Überlastungs-Sperre vor der Regeländerung: ausgesetzte Züge je Partie mit Energiequelle in Reihe 2 (Bericht vom 27.9.2026) */
 const LOCK_BEFORE = '3,9';
+/** Scaretech-Planet Wurmloch */
+const WORMHOLE_ID = 54;
 const NS = [2, 3, 4];
 const VPS = ['30', '40', 'inf'];
 const VP_LABEL: Record<string, string> = { 30: '30 SP', 40: '40 SP', inf: '∞' };
@@ -430,6 +432,11 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
         w(`- **So gewinnt sie:** Ø ${num(fa.winBuildings / fa.wins)} Planeten, ${num(fa.winUpgrades / fa.wins)} Upgrades, ${num(fa.winStars / fa.wins)} Sterne, `
           + `${num(fa.winMedals / fa.wins)} Münzen; ${pct(fa.winByHq / fa.wins, 0)} der Siege durch ein zerstörtes Zentralgestirn.`);
         w(`- **Angriffe:** der erste im Schnitt in Runde ${num(fa.firstAttack / Math.max(1, fa.firstAttackGames))}; ${num(fa.attacks / fa.games)} Angriffe je Partie.`);
+        if (f === SCARETECH) {
+          const [n, wins] = fa.cards[WORMHOLE_ID] ?? [0, 0];
+          w(`- **Wurmloch** (Aufklärer überspringen Reihe 1): in ${pct(n / fa.games, 0)} der Partien gebaut`
+            + (n ? `, Siegquote dann ${pct(wins / n, 0)} (sonst insgesamt ${pct(fa.wins / fa.games, 0)}).` : '.'));
+        }
         const openings = Object.entries(fa.openings).sort((a, b) => b[1][0] - a[1][0]).slice(0, 3);
         if (openings.length) {
           w('- **Häufigste Eröffnungen** (Käufe der ersten drei Runden, „–“ = gespart; Anteil der Partien, Siegquote):');
