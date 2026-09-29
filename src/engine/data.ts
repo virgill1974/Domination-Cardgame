@@ -98,7 +98,7 @@ const ROWS: Row[] = [
   ['Zentralgestirn', 2000, 1, 8, 0, 0, 255],
   ['Aufklärungskomplex', 600, 1, 2, 0, 0, 0],
   ['Protonenmond', 800, 1, 2, 0, 0, 0],
-  ['Handelssystem', 2000, 2, 4, 0, 0, 2],
+  ['Handelssystem', 1500, 2, 4, 0, 0, 2], // Balance-Anpassung: 1500 statt 2000 (README „Abweichungen“ 11)
   ['Planetenschild', 1000, 1, 3, 3, 2, 2],
   ['Orbitaldock', 2000, 2, 3, 0, 0, 3],
   ['Hyperraumnebel', 1000, 3, 3, 0, 0, 3],
@@ -145,7 +145,7 @@ const ROWS: Row[] = [
   // SCARETECH
   ['Zentralgestirn', 2000, 1, 8, 0, 0, 255],
   ['Telecluster', 500, 1, 2, 0, 0, 46],
-  ['Antimaterieminen', 1500, 2, 3, 0, 0, 46],
+  ['Antimaterieminen', 1500, 3, 3, 0, 0, 46],
   ['Raumbarriere', 900, 1, 2, 2, 1, 47],
   ['Flottenbasis', 2100, 2, 3, 0, 0, 48],
   ['Dunkler Rat', 2500, 3, 4, 0, 0, 50],
