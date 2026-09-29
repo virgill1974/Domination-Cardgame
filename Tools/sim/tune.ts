@@ -60,6 +60,8 @@ export async function tune(pool: Pool, start: Record<Faction, BotParams>, opts: 
   const rng = mulberry32(opts.seed);
   const current = structuredClone(start);
   const g2 = opts.games2 ?? 50;
+  // Zu zweit gibt es keine 30-SP-Partien: dann zählen 3er-Partien als „kleine“ Besetzung
+  const small = (opts.vpLimit === undefined ? 30 : opts.vpLimit) === 30 ? 3 : 2;
   const g4 = opts.games4 ?? 10;
   const history: TuneStep[] = [];
   let lastFitness = [1, 1, 1, 1];
@@ -70,7 +72,7 @@ export async function tune(pool: Pool, start: Record<Faction, BotParams>, opts: 
     for (const f of FACTIONS) {
       cands[f].forEach((cand, ci) => {
         // Gleiche Seeds für alle Kandidaten einer Fraktion: Unterschiede kommen von den Einstellungen, nicht vom Würfel
-        for (const seats of seatings(2).filter((s) => s.includes(f))) {
+        for (const seats of seatings(small).filter((s) => s.includes(f))) {
           specs.push({
             key: `${f}|${ci}|2`, seats, bots: seats.map((x) => (x === f ? cand : current[x])), vpLimit: opts.vpLimit === undefined ? 30 : opts.vpLimit,
             seed: (opts.seed * 1_000_003 + gen * 7919 + seats[0] * 101 + seats[1] * 13) >>> 0, games: g2, details: false,
@@ -90,7 +92,7 @@ export async function tune(pool: Pool, start: Record<Faction, BotParams>, opts: 
     const fit = (f: Faction, ci: number) => {
       const two = res.get(`${f}|${ci}|2`)!.factions[f];
       const four = res.get(`${f}|${ci}|4`)!.factions[f];
-      return 0.5 * (two.wins / two.games / 0.5) + 0.5 * (four.wins / four.games / 0.25);
+      return 0.5 * (two.wins / two.games) * small + 0.5 * (four.wins / four.games / 0.25);
     };
     const step: TuneStep = { gen, sigma, parent: [], best: [], accepted: [] };
     for (const f of FACTIONS) {

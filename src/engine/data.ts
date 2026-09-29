@@ -11,6 +11,8 @@ export const BIOTEC: Faction = 3;
 export const FACTION_COLORS = ['#74d4e6', '#ffb469', '#9aa9a1', '#9be05a'] as const;
 
 export const START_CREDITS = 1600;
+/** Startkapital-Ausgleich je Sitzplatz (Platz 1 bis 4), gegen den Vorteil des Startspielers (Balance-Simulation) */
+export const SEAT_BONUS = [0, 200, 300, 400] as const;
 export const BASE_INCOME = 400;
 export const SUPPLY_INCOME = 400;
 export const ATTACK_PRICE = 200;

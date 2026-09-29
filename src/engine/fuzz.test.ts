@@ -6,7 +6,7 @@ import { beginTurn } from './turn';
 import { buy } from './buy';
 import { attack } from './combat';
 import { info, repair } from './actions';
-import { mainCheck } from './victory';
+import { endTurn, mainCheck } from './victory';
 import { mulberry32 } from './testutil';
 
 const GAMES = 300;
@@ -50,6 +50,7 @@ describe('Fuzz: zufällige Partien', () => {
           mainCheck(s);
           checkInvariants(s);
         }
+        if (s.winner === null) endTurn(s);
       }
       if (s.winner !== null) finished++;
     }

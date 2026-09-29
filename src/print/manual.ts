@@ -9,7 +9,7 @@ import './manual.css';
 import {
   ATTACK_PRICE, BASE_INCOME, CARDS, CARD_OF_EAN, FACTIONS, FACTION_COLORS, MAX_ATTACKS, MAX_BUYS, MAX_REPAIRS,
   MEDAL_MIN_BUILDINGS, MEDAL_MIN_STARS, MEDAL_POINTS, NO_REQUIREMENT, PHYSICAL_CARDS, REACTOR_ENERGY,
-  REACTOR_UPGRADE_BONUS, REPAIR_PRICE, SPECIAL_MAX_BUILDINGS, SPECIAL_MAX_UNITS, SPECIAL_MIN_ROUND, START_CREDITS,
+  REACTOR_UPGRADE_BONUS, REPAIR_PRICE, SEAT_BONUS, SPECIAL_MAX_BUILDINGS, SPECIAL_MAX_UNITS, SPECIAL_MIN_ROUND, START_CREDITS,
   SUPERWEAPON_RECHARGE, SUPPLY_INCOME, type Faction,
 } from '../engine/data';
 import { factionOfCardId, kindOfCardId } from '../engine/cards';
@@ -83,7 +83,7 @@ const chapter1 = () => `
 ${h2('1', 'Spieleranzahl')}
 <p>Domination ist ein rundenbasiertes Science-Fiction-Strategiespiel für <b>2–4 Spieler</b> ab 10 Jahren. Ein Handy oder Tablet mit der Domination-App übernimmt die Verwaltung: Es rechnet Credits, Energie und Siegpunkte, würfelt die Gefechte aus und wird von Zug zu Zug weitergereicht.</p>
 ${h3('1.1', 'Ziel des Spiels')}
-<p>Gewinner ist, wer zuerst die eingestellte Anzahl an <b>Siegpunkten</b> sammelt oder das <b>Zentralgestirn</b> eines Gegenspielers zerstört.</p>
+<p>Wer als Erster die eingestellte Anzahl an <b>Siegpunkten</b> erreicht, löst die <b>letzte Runde</b> aus. Sie wird zu Ende gespielt, danach gewinnt, wer die meisten Siegpunkte hat. Wer das <b>Zentralgestirn</b> eines Gegenspielers zerstört, gewinnt sofort.</p>
 ${h3('1.2', 'Inhalt')}
 <ul>
   <li>${PHYSICAL_CARDS} Spielkarten in 4 Fraktionen:
@@ -108,8 +108,9 @@ ${h3('2.2', 'Spieleinstellungen in der App')}
 <p>Auf dem Startbildschirm der App <b>Neues Spiel</b> wählen, dann:</p>
 <ul>
   <li><b>Spieleranzahl</b> 2, 3 oder 4.</li>
-  <li><b>Siegpunkte</b>: 30 (kurzes Spiel, ca. 45–60 Minuten), 40 (langes Spiel, ca. 60–90 Minuten) oder ∞ (nur die Zerstörung eines gegnerischen Zentralgestirns führt zum Sieg).</li>
+  <li><b>Siegpunkte</b>: 30 (kurzes Spiel, ca. 45–60 Minuten), 40 (langes Spiel, ca. 60–90 Minuten) oder ∞ (nur die Zerstörung eines gegnerischen Zentralgestirns führt zum Sieg). <b>Zu zweit</b> gibt es nur 40 oder ∞.</li>
   <li>Reihum hält jeder Spieler eine beliebige Karte seiner Fraktion vor die Kamera. So legt die App fest, wer welche Fraktion spielt und in welcher Reihenfolge gespielt wird.</li>
+  <li><b>Ausgleich für die Zugreihenfolge:</b> Wer später dran ist, bekommt mehr Startkapital: Spieler 2 +${SEAT_BONUS[1]}, Spieler 3 +${SEAT_BONUS[2]}, Spieler 4 +${SEAT_BONUS[3]} Credits.</li>
 </ul>
 ${box('<b>Tipp:</b> Die App lässt sich über das Browsermenü „Zum Startbildschirm hinzufügen“ installieren und funktioniert dann auch ohne Internet. Der Spielstand wird nach jeder Aktion gespeichert.')}
 ${board()}`;
@@ -227,8 +228,9 @@ ${h2('11', 'Siegpunkte')}
   </div>
 </figure>
 ${h2('12', 'Spielende')}
-<p>Das Spiel endet, sobald ein Spieler ein gegnerisches <b>Zentralgestirn</b> zerstört oder als Erster die eingestellten Siegpunkte erreicht. Die App zeigt dann den Sieger an.</p>
-${box(`<b>Startkapital:</b> Jeder Spieler hat in seinem ersten Zug ${START_CREDITS + BASE_INCOME} Credits.`)}`;
+<p>Zerstört ein Spieler ein gegnerisches <b>Zentralgestirn</b>, hat er sofort gewonnen.</p>
+<p>Erreicht ein Spieler als Erster die eingestellten Siegpunkte, meldet die App die <b>letzte Runde</b>. Die übrigen Spieler kommen in dieser Runde noch an die Reihe, damit alle gleich viele Züge hatten. Am Ende der Runde gewinnt, wer die <b>meisten Siegpunkte</b> hat, auch wenn die Punkte in dieser Runde noch einmal gesunken sind. Bei Gleichstand gewinnt, wer mehr Planeten hat, dann wer mehr Sterne hat, dann wer das Ziel zuerst erreicht hat. Die App zeigt den Sieger an.</p>
+${box(`<b>Startkapital:</b> Im ersten Zug hat Spieler 1 ${START_CREDITS + BASE_INCOME} Credits (${START_CREDITS} Startkapital + ${BASE_INCOME} Einkommen). Zum Ausgleich für die Zugreihenfolge bekommen Spieler 2, 3 und 4 zusätzlich ${SEAT_BONUS[1]}, ${SEAT_BONUS[2]} und ${SEAT_BONUS[3]} Credits.`)}`;
 
 // ---------- Anhang ----------
 const SPECIAL_EXPLAIN: Record<string, string> = {

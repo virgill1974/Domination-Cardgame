@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import type { Faction } from '../engine/data';
 import { currentFaction, newGame, type GameState } from '../engine/state';
 import { beginTurn } from '../engine/turn';
-import { mainCheck } from '../engine/victory';
+import { endTurn, mainCheck } from '../engine/victory';
 import { buyPrecheck } from '../engine/buy';
 import { attackPrecheck } from '../engine/combat';
 import { repairPrecheck } from '../engine/actions';
@@ -155,7 +155,7 @@ export function App() {
             <h3>Zug beenden?</h3>
             <div class="btn-row">
               <button class="btn cancel" onClick={() => setDialog(null)}>Abbruch</button>
-              <button class="btn primary" onClick={() => { commit((s) => (s.turnActive = false)); setDialog(null); }}>OK</button>
+              <button class="btn primary" onClick={() => { notify(eventMessages(commit(endTurn))); setDialog(null); }}>OK</button>
             </div>
           </div>
         </div>

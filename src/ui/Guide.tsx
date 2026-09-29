@@ -8,8 +8,9 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
     title: 'Ziel des Spiels',
     body: (
       <p>
-        Gewonnen hat, wer zuerst die eingestellten <b>Siegpunkte</b> (30 oder 40) erreicht oder ein gegnerisches
-        <b> Zentralgestirn zerstört</b>. Bei „∞“ zählt nur die Zerstörung eines Zentralgestirns.
+        Wer ein gegnerisches <b>Zentralgestirn zerstört</b>, gewinnt sofort. Wer als Erster die eingestellten
+        <b> Siegpunkte</b> (30 oder 40) erreicht, löst die <b>letzte Runde</b> aus: Sie wird zu Ende gespielt, danach gewinnt,
+        wer die meisten Siegpunkte hat. Zu zweit gibt es nur 40 Siegpunkte oder „∞“; bei „∞“ zählt nur die Zerstörung eines Zentralgestirns.
       </p>
     ),
   },
@@ -19,7 +20,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
       <ul>
         <li>Jeder wählt eine Fraktion (Karte scannen oder antippen) und legt seine Karten in drei Stapeln bereit: Planeten, Einheiten, Upgrades.</li>
         <li>Jeder bekommt seinen Technologiebaum. Er zeigt, welcher Planet welche Karten freischaltet.</li>
-        <li>Startkapital: 2000 Credits im ersten Zug. In Runde 1 werden Zentralgestirn, der erste Produktionsplanet und die erste Energiequelle aktiviert, bei Scaretech nur Zentralgestirn und Telecluster.</li>
+        <li>Startkapital: 2000 Credits im ersten Zug. Ausgleich für die Zugreihenfolge: Spieler 2 bekommt 200, Spieler 3 300, Spieler 4 400 Credits mehr. In Runde 1 werden Zentralgestirn, der erste Produktionsplanet und die erste Energiequelle aktiviert, bei Scaretech nur Zentralgestirn und Telecluster.</li>
         <li>Das Handy wird reihum weitergereicht.</li>
       </ul>
     ),
@@ -96,6 +97,7 @@ const SECTIONS: Array<{ title: string; body: ComponentChildren }> = [
         <li><b>Bester Stützpunkt</b> (ab 5 Planeten, mehr als alle anderen): +5 Punkte.</li>
         <li><b>Beste Streitmacht</b> (ab 5 Siegen, mehr als alle anderen): +5 Punkte.</li>
         <li>Die goldene Münze behältst du, bis dich jemand übertrifft.</li>
+        <li><b>Letzte Runde</b>: Erreicht jemand die Siegpunkte, spielen alle die Runde zu Ende. Es gewinnt, wer dann die meisten Siegpunkte hat (bei Gleichstand mehr Planeten, dann mehr Sterne, dann wer das Ziel zuerst erreicht hat).</li>
       </ul>
     ),
   },

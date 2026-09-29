@@ -1,3 +1,4 @@
+import { FACTIONS } from '../engine/data';
 import type { GameEvent } from '../engine/events';
 import { ERRORS, SPECIAL_TEXT, type ErrorCode } from '../engine/messages';
 import type { Msg } from './components';
@@ -51,6 +52,12 @@ export function eventMessages(events: GameEvent[]): Msg[] {
         msgs.push({
           tone: 'ok', sound: 'medal', title: 'Siegmarker erhalten',
           body: `${e.medal === 'bestBase' ? 'Bester Stützpunkt' : 'Beste Streitmacht'} (+5 Siegpunkte). Nimm dir die Münze.`,
+        });
+        break;
+      case 'finalRound':
+        msgs.push({
+          tone: 'warn', sound: 'medal', title: 'Letzte Runde!',
+          body: `${FACTIONS[e.faction]} hat ${e.limit} Siegpunkte erreicht. Die Runde wird zu Ende gespielt; danach gewinnt, wer die meisten Siegpunkte hat.`,
         });
         break;
       case 'winner':

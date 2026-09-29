@@ -5,7 +5,7 @@ import { beginTurn } from './turn';
 import { buy, buyCheck, buyPrecheck } from './buy';
 import { attack, attackConfirmAttacker } from './combat';
 import { info, repair, repairCheck } from './actions';
-import { mainCheck } from './victory';
+import { endTurn, mainCheck } from './victory';
 import { dice, give, noDice, started } from './testutil';
 
 describe('Spielstart und Zugbeginn', () => {
@@ -571,12 +571,41 @@ describe('Siegpunkte und Orden', () => {
     expect(mainCheck(s)).toEqual([]);
   });
 
-  it('gewinnt bei Erreichen des Siegpunkt-Limits, ∞ gewinnt nie nach Punkten', () => {
+  it('Siegpunkte lösen die letzte Runde aus; am Rundenende gewinnt, wer die meisten hat', () => {
     const s = started([STARWING, LIGHTFORCE]);
-    s.players[STARWING].stars = 27;
-    expect(mainCheck(s)).toContainEqual({ type: 'winner', faction: STARWING, reason: 'points' });
+    // Punkte über den Upgrade-Zähler, damit keine Münze (ab 5 Sternen) mitspielt
+    s.players[STARWING].upgrades = 27; // 3 Startplaneten + 27 = 30
+    expect(mainCheck(s)).toContainEqual({ type: 'finalRound', faction: STARWING, limit: 30 });
+    expect(s.winner).toBeNull();
+    expect(endTurn(s)).toEqual([]); // Platz 1 ist nicht der letzte Platz
+    beginTurn(s, noDice);
+    s.players[LIGHTFORCE].upgrades = 28; // 3 + 28 = 31
+    mainCheck(s);
+    expect(endTurn(s)).toContainEqual({ type: 'winner', faction: LIGHTFORCE, reason: 'points' });
+    expect(s.winner).toBe(LIGHTFORCE);
+  });
+
+  it('bei Gleichstand gewinnt, wer das Ziel zuerst erreicht hat (Planeten und Sterne gleich)', () => {
+    const s = started([STARWING, LIGHTFORCE]);
+    s.players[STARWING].upgrades = 27;
+    mainCheck(s);
+    endTurn(s);
+    beginTurn(s, noDice);
+    s.players[LIGHTFORCE].upgrades = 27;
+    mainCheck(s);
+    endTurn(s);
+    expect(s.winner).toBe(STARWING);
+  });
+
+  it('∞ gewinnt nie nach Punkten', () => {
     const endless = started([STARWING, LIGHTFORCE], null);
     endless.players[STARWING].stars = 200;
-    expect(mainCheck(endless).some((e) => e.type === 'winner')).toBe(false);
+    expect(mainCheck(endless).some((e) => e.type === 'finalRound' || e.type === 'winner')).toBe(false);
+    expect(endTurn(endless)).toEqual([]);
+  });
+
+  it('Startkapital-Ausgleich: spätere Plätze bekommen 200, 300 und 400 Credits mehr', () => {
+    const s = newGame([LIGHTFORCE, BIOTEC, STARWING, SCARETECH], 30);
+    expect([LIGHTFORCE, BIOTEC, STARWING, SCARETECH].map((f) => s.players[f].credits)).toEqual([1600, 1800, 1900, 2000]);
   });
 });

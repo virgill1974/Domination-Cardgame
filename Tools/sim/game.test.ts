@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import type { Faction } from '../../src/engine/data';
-import { newGame } from '../../src/engine/state';
 import { give, mulberry32, started } from '../../src/engine/testutil';
 import { newBoard, placePlanet, reveal } from './board';
 import { executeAttack, newLog, type Ctx } from './bot';
-import { applySeatBonus, playGame } from './game';
+import { playGame } from './game';
 import { ARCHETYPES, ARCHETYPE_NAMES } from './params';
 
 describe('Überlastung am Tisch', () => {
@@ -33,10 +32,10 @@ describe('Regelvarianten im Simulator', () => {
   const seats = [{ faction: 0 as Faction, bot: ARCHETYPES.festung }, { faction: 1 as Faction, bot: ARCHETYPES.festung },
     { faction: 2 as Faction, bot: ARCHETYPES.festung }, { faction: 3 as Faction, bot: ARCHETYPES.festung }];
 
-  it('Runde zu Ende spielen: Punktsiege fallen erst am Rundenende, an den mit den meisten Siegpunkten', () => {
+  it('Punktsiege fallen am Rundenende an den mit den meisten Siegpunkten (Engine-Regel)', () => {
     let pointWins = 0;
     for (let seed = 1; seed <= 12; seed++) {
-      const r = playGame({ seats, vpLimit: 30, seed, rules: { finishRound: true }, check: true });
+      const r = playGame({ seats, vpLimit: 30, seed, check: true });
       if (r.reason !== 'points') continue;
       pointWins++;
       const best = Math.max(...r.players.map((p) => p.vp));
@@ -44,12 +43,6 @@ describe('Regelvarianten im Simulator', () => {
       expect(r.players.find((p) => p.faction === r.winner)!.vp).toBe(best);
     }
     expect(pointWins).toBeGreaterThan(0);
-  });
-
-  it('Startkapital-Ausgleich je Sitzplatz', () => {
-    const s = newGame([2, 0, 3, 1], 30);
-    applySeatBonus(s, [0, 100, 200, 300]);
-    expect([2, 0, 3, 1].map((f) => s.players[f].credits)).toEqual([1600, 1700, 1800, 1900]);
   });
 
   it('Schonzeit: vor Runde 3 greift niemand an', () => {

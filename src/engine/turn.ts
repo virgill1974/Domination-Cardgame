@@ -5,7 +5,7 @@ import {
 import { isReactor, isSupply, kindOfEan } from './cards';
 import type { GameEvent } from './events';
 import { currentPlayer, d6, hasCard, ownedSlots, slotCardId, type GameState, type Player, type Rng } from './state';
-import { mainCheck } from './victory';
+import { finishFinalRound, mainCheck } from './victory';
 
 export const reactorEnergy = (p: Player) => REACTOR_ENERGY + (p.energyUpgrade ? REACTOR_UPGRADE_BONUS : 0);
 
@@ -34,7 +34,8 @@ export function beginTurn(s: GameState, rng: Rng): TurnStart {
   if (p.energy < 0 && p.faction !== SCARETECH) {
     p.energy += reactorEnergy(p);
     s.turnActive = false;
-    return { events: [{ type: 'overload' }], skipped: true };
+    // Setzt der letzte Platz der letzten Runde aus, ist die Runde damit zu Ende
+    return { events: [{ type: 'overload' }, ...finishFinalRound(s)], skipped: true };
   }
 
   if (s.round >= SPECIAL_MIN_ROUND && (p.buildings <= SPECIAL_MAX_BUILDINGS || p.units <= SPECIAL_MAX_UNITS)) {

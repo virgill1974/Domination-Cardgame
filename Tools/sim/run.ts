@@ -42,6 +42,8 @@ applyPatch(patch);
 
 export const VP_MODES: Array<number | null> = [30, 40, null];
 export const vpKey = (vp: number | null) => (vp === null ? 'inf' : String(vp));
+/** Zu zweit gibt es nur 40 Siegpunkte oder ∞ (Spielregel) */
+export const allowed = (players: number, vp: number | null) => !(players === 2 && vp === 30);
 const workerFile = join(dirname(fileURLToPath(import.meta.url)), 'worker.js');
 
 export interface Saved {
@@ -123,7 +125,7 @@ async function strategies(pool: Pool) {
   const specs: JobSpec[] = [];
   for (const arch of ARCHETYPE_NAMES) {
     for (const n of [2, 3, 4]) {
-      for (const vp of VP_MODES) {
+      for (const vp of VP_MODES.filter((v) => allowed(n, v))) {
         for (const seats of seatings(n)) {
           specs.push({
             key: `A|${arch}|${n}|${vpKey(vp)}`, seats, bots: seats.map(() => ARCHETYPES[arch]), vpLimit: vp,
@@ -136,7 +138,7 @@ async function strategies(pool: Pool) {
   for (const f of [0, 1, 2, 3] as Faction[]) {
     for (const arch of ARCHETYPE_NAMES) {
       for (const n of [2, 3, 4]) {
-        for (const vp of VP_MODES) {
+        for (const vp of VP_MODES.filter((v) => allowed(n, v))) {
           for (const seats of seatings(n).filter((s) => s.includes(f))) {
             specs.push({
               key: `B|${f}|${arch}|${n}|${vpKey(vp)}`, seats,
@@ -206,7 +208,7 @@ async function final(pool: Pool) {
   const games = opt('games', 250);
   const specs: JobSpec[] = [];
   for (const n of [2, 3, 4]) {
-    for (const vp of VP_MODES) {
+    for (const vp of VP_MODES.filter((v) => allowed(n, v))) {
       for (const seats of seatings(n)) {
         specs.push({
           key: `C|${n}|${vpKey(vp)}`, seats, bots: seats.map((f) => tunedFor(vp).best[f]), vpLimit: vp,
@@ -234,9 +236,9 @@ async function exploits(pool: Pool) {
     for (const n of [2, 4]) {
       for (const seats of seatings(n).filter((s) => s.includes(f))) {
         specs.push({
-          key: `X|${f}|${n}`, seats, vpLimit: 30, games, details: false,
+          key: `X|${f}|${n}`, seats, vpLimit: n === 2 ? 40 : 30, games, details: false,
           bots: seats.map((x) => (x === f ? { ...tuned.best[x], reactorFront: true } : tuned.best[x])),
-          seed: seedOf('C', n, '30', seats.join()),
+          seed: seedOf('C', n, n === 2 ? '40' : '30', seats.join()),
         });
       }
     }

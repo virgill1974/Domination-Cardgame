@@ -9,4 +9,5 @@ export type GameEvent =
   | { type: 'neuronet' }
   | { type: 'regeneration'; count: number }
   | { type: 'medal'; medal: 'bestBase' | 'bestArmy' }
+  | { type: 'finalRound'; faction: Faction; limit: number }
   | { type: 'winner'; faction: Faction; reason: 'points' | 'headquarters' };

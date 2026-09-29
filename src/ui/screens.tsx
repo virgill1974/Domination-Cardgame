@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
-import { CARDS, FACTIONS, SCARETECH, MAX_ATTACKS, MAX_BUYS, MAX_REPAIRS, type Faction } from '../engine/data';
+import { CARDS, FACTIONS, SCARETECH, SEAT_BONUS, MAX_ATTACKS, MAX_BUYS, MAX_REPAIRS, type Faction } from '../engine/data';
 import { cardIdOfEan, factionOfEan, kindOfEan } from '../engine/cards';
 import { currentFaction, currentPlayer, ownedSlots, type GameState } from '../engine/state';
 import { Scanner } from '../scanner/Scanner';
@@ -32,9 +32,12 @@ export function Home({ canResume, onNew, onResume, onGuide }: {
   );
 }
 
+/** Siegpunkt-Ziele je Spielerzahl: zu zweit nur 40 oder ∞ (30 begünstigt dort den frühen Sturm, Balance-Simulation) */
+const VP_OPTIONS = (players: number): Array<number | null> => (players === 2 ? [40, null] : [30, 40, null]);
+
 export function Setup({ onStart, onBack }: { onStart: (seats: Faction[], vpLimit: number | null) => void; onBack: () => void }) {
   const [count, setCount] = useState(2);
-  const [limit, setLimit] = useState<number | null>(30);
+  const [limit, setLimit] = useState<number | null>(40);
   const [seats, setSeats] = useState<Faction[]>([]);
   const [scanning, setScanning] = useState(false);
   const [notice, setNotice] = useState('');
@@ -65,24 +68,31 @@ export function Setup({ onStart, onBack }: { onStart: (seats: Faction[], vpLimit
         <div class="title">Spieleranzahl</div>
         <div class="seg">
           {[2, 3, 4].map((n) => (
-            <button key={n} class={`btn ${count === n ? 'selected' : ''}`} onClick={() => { setCount(n); setSeats(seats.slice(0, n)); }}>{n}</button>
+            <button key={n} class={`btn ${count === n ? 'selected' : ''}`} onClick={() => {
+              setCount(n);
+              setSeats(seats.slice(0, n));
+              if (!VP_OPTIONS(n).includes(limit)) setLimit(40);
+            }}>{n}</button>
           ))}
         </div>
         <div class="title">Siegpunkte</div>
         <div class="seg">
-          {[30, 40, null].map((v) => (
+          {VP_OPTIONS(count).map((v) => (
             <button key={String(v)} class={`btn ${limit === v ? 'selected' : ''}`} onClick={() => setLimit(v)}>{v ?? '∞'}</button>
           ))}
         </div>
         <div class="small muted">
-          {limit === null ? 'Nur die Zerstörung eines gegnerischen Zentralgestirns führt zum Sieg.' : `${limit} Siegpunkte oder zerstörtes Zentralgestirn.`}
+          {limit === null
+            ? 'Nur die Zerstörung eines gegnerischen Zentralgestirns führt zum Sieg.'
+            : `${limit} Siegpunkte oder zerstörtes Zentralgestirn. Wer die Siegpunkte erreicht, löst die letzte Runde aus.`}
+          {count === 2 && ' Zu zweit wird bis 40 Siegpunkte oder endlos gespielt.'}
         </div>
       </div>
       <div class="panel stack">
         <div class="title">Fraktionen in Zugreihenfolge</div>
         {Array.from({ length: count }, (_, i) => (
           <div key={i} class="row faction-bar" style={{ ...(seats[i] !== undefined ? factionStyle(seats[i]) : {}), paddingLeft: '10px' }}>
-            <span class="grow">Spieler {i + 1}</span>
+            <span class="grow">Spieler {i + 1}{SEAT_BONUS[i] > 0 && <span class="muted small"> · +{SEAT_BONUS[i]} Credits</span>}</span>
             {seats[i] !== undefined
               ? <span class="faction-name">{FACTIONS[seats[i]]}</span>
               : <span class="muted small">{i === seats.length ? 'ist dran' : 'offen'}</span>}
@@ -119,6 +129,7 @@ export function Handoff({ game, onStart, onMenu }: { game: GameState; onStart: (
       <div class="panel stack handoff">
         <img class="back" src={factionBack(faction)} alt="" />
         <div class="title">Runde {round} · Spieler {seat + 1}</div>
+        {game.finalRound != null && <div class="badge gold">Letzte Runde</div>}
         <h1 class="faction-name" style={{ fontSize: 'clamp(26px, 9vw, 40px)' }}>{FACTIONS[faction]}</h1>
         <div class="muted small">Gerät an diesen Spieler übergeben.</div>
       </div>
@@ -136,7 +147,7 @@ export function Hud({ game, onAction, onMenu }: { game: GameState; onAction: (a:
       <div class="panel hud-card">
         <div class="hud-top">
           <div>
-            <div class="title">Runde {game.round} · Spieler {game.seat + 1}</div>
+            <div class="title">Runde {game.round} · Spieler {game.seat + 1}{game.finalRound != null && ' · Letzte Runde'}</div>
             <div class="faction-name" style={{ fontSize: '28px' }}>{FACTIONS[f]}</div>
           </div>
           <button class="btn ghost" onClick={onMenu} aria-label="Menü">☰</button>
@@ -154,7 +165,7 @@ export function Hud({ game, onAction, onMenu }: { game: GameState; onAction: (a:
       </div>
       <div class="actions">
         <button class="btn action" onClick={() => onAction('buy')}><Icon name="buy" />Kaufen</button>
-        <button class="btn action attack" onClick={() => onAction('attack')}><Icon name="attack" />Angriff</button>
+        <button class="btn action" onClick={() => onAction('attack')}><Icon name="attack" />Angriff</button>
         <button class="btn action" onClick={() => onAction('repair')}><Icon name="repair" />Reparatur<small>200 Credits</small></button>
         <button class="btn action" onClick={() => onAction('info')}><Icon name="info" />Info</button>
         <button class="btn action" onClick={() => onAction('inventory')}><Icon name="inventory" />Inventar</button>
@@ -235,7 +246,7 @@ export function Winner({ game, onNew }: { game: GameState; onNew: () => void }) 
   return (
     <div class="screen center" style={factionStyle(f)}>
       <div class="stack" style={{ textAlign: 'center', gap: '8px' }}>
-        <div class="title">{game.winReason === 'headquarters' ? 'Zentralgestirn zerstört!' : 'Siegpunkte erreicht'}</div>
+        <div class="title">{game.winReason === 'headquarters' ? 'Zentralgestirn zerstört!' : 'Die meisten Siegpunkte'}</div>
         <div>Gewinner</div>
         <h1 class="faction-name" style={{ fontSize: '48px' }}>{FACTIONS[f]}</h1>
         <div class="muted">{game.players[f].vp} Siegpunkte · Runde {game.round}</div>

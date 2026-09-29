@@ -1,4 +1,4 @@
-import { CARDS, MAX_SLOTS, START_CREDITS, START_ENERGY, STARTING_EANS, type Faction } from './data';
+import { CARDS, MAX_SLOTS, SEAT_BONUS, START_CREDITS, START_ENERGY, STARTING_EANS, type Faction } from './data';
 import { cardIdOfEan } from './cards';
 
 export interface Slot {
@@ -55,6 +55,11 @@ export interface GameState {
   repairBonus: boolean;
   winner: Faction | null;
   winReason: 'points' | 'headquarters' | null;
+  /**
+   * Letzte Runde: Diese Fraktion hat die Siegpunkte zuerst erreicht. Die Runde wird zu Ende gespielt, danach gewinnt,
+   * wer die meisten Siegpunkte hat. Fehlt in älteren Spielständen.
+   */
+  finalRound?: Faction | null;
 }
 
 export type Rng = () => number;
@@ -75,12 +80,14 @@ function newPlayer(faction: Faction): Player {
 }
 
 export function newGame(seats: Faction[], vpLimit: number | null): GameState {
+  const players = ([0, 1, 2, 3] as Faction[]).map(newPlayer);
+  seats.forEach((f, seat) => (players[f].credits += SEAT_BONUS[seat]));
   return {
     version: 1,
     playerCount: seats.length,
     vpLimit,
     seats,
-    players: ([0, 1, 2, 3] as Faction[]).map(newPlayer),
+    players,
     stats: CARDS.map(({ rounds, def, off, dmg }) => ({ rounds, def, off, dmg })),
     round: 0,
     seat: -1,
@@ -91,6 +98,7 @@ export function newGame(seats: Faction[], vpLimit: number | null): GameState {
     repairBonus: true,
     winner: null,
     winReason: null,
+    finalRound: null,
   };
 }
 

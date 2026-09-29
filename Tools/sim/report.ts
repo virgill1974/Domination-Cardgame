@@ -264,7 +264,8 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
   for (const [key, on] of present) if (on) S[key] = Object.keys(S).length + 1;
   // Überlastung: ausgesetzte Züge je Partie mit der Energiequelle hinten bzw. in Reihe 2 (Versuch „exploits“)
   const overloadRows = F.filter((f) => f !== SCARETECH).flatMap((f) => [2, 4].map((n) => {
-    const baseAgg = final?.results[`C|${n}|30`];
+    // Zu zweit gibt es keine 30-SP-Partien mehr: Vergleich bei 40 SP
+    const baseAgg = final?.results[`C|${n}|${n === 2 ? '40' : '30'}`];
     const xAgg = exploits?.results[`X|${f}|${n}`];
     const b = baseAgg?.factions[f];
     const x = xAgg?.factions[f];
@@ -521,7 +522,7 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
       + 'Neu ist: Sie wird dabei **verdeckt neu ausgelegt**. Vorher blieb sie aufgedeckt liegen und konnte jede Runde erneut angegriffen werden; '
       + `der Besitzer setzte dann immer wieder aus („Überlastungs-Sperre“, im alten Stand bis zu ${LOCK_BEFORE} ausgesetzte Züge je Partie).`, '');
     if (overloadRows.length) {
-      w('Versuch mit der neuen Regel: Eine Fraktion legt ihre Energiequelle anfangs in Reihe 2 statt in Reihe 3 (sonst gleiche Strategie; 30 SP). '
+      w('Versuch mit der neuen Regel: Eine Fraktion legt ihre Energiequelle anfangs in Reihe 2 statt in Reihe 3 (sonst gleiche Strategie; 30 SP, zu zweit 40 SP). '
         + 'Nach einer Überlastung legt sie sie verdeckt nach hinten, wie es die neue Regel erlaubt.', '');
       w(table(['Fraktion', 'Spieler', 'Aussetzen je Partie (hinten)', 'Aussetzen je Partie (Reihe 2)', 'Siegquote (hinten)', 'Siegquote (Reihe 2)'],
         overloadRows.map((r) => [FACTIONS[r.f], String(r.n), num(r.back, 2), num(r.front, 2), pct(r.winBack, 0), pct(r.winFront, 0)])), '');

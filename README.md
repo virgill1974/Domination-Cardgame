@@ -208,7 +208,7 @@ Jeder Spieler hat ein Spielfeld mit **3 Reihen × 7 Feldern**:
 
 | Mechanik | Details |
 |---|---|
-| Startkapital | 2000 Credits im ersten Zug (1600 + 400 Einkommen, wie im Code) |
+| Startkapital | 2000 Credits im ersten Zug (1600 + 400 Einkommen, wie im Code), dazu Ausgleich: Spieler 2 +200, Spieler 3 +300, Spieler 4 +400 |
 | Einkommen/Runde | 400 Grund + 400 pro Handelsplanet (Handelssystem, Handelssektor, Antimaterieminen, Abt. Kapital) |
 | Max. Käufe/Runde | 3 |
 | Max. Angriffe/Runde | 3 (kostenlos mit Sternenparlament/Tribunal des Lichts/Dunklem Rat/Abt. Forschung, sonst 200 Credits) |
@@ -216,6 +216,7 @@ Jeder Spieler hat ein Spielfeld mit **3 Reihen × 7 Feldern**:
 | Energiesystem | Energiequellen liefern je 3 Energie, jeder andere Planet verbraucht 1. Scaretech braucht keine Energie. |
 | Kampfwürfel | W6 – Offensive ≥ Wurf = Treffer, dann Schaden von Defensive abziehen |
 | Siegpunkte | Planeten + Upgrades + Sterne + Siegmarker (Bester Stützpunkt: +5, Beste Streitmacht: +5) |
+| Sieg | Zentralgestirn zerstört: sofort. Siegpunkt-Ziel (30, 40 oder ∞; zu zweit nur 40 oder ∞) erreicht: letzte Runde, danach gewinnt, wer die meisten Siegpunkte hat (Gleichstand: mehr Planeten, dann mehr Sterne, dann wer das Ziel zuerst erreicht hat) |
 | Sonderaktionen | Ab Runde 5, bei höchstens 7 Planeten oder höchstens 5 Einheiten, Zufallsbonus (Credits, Sofort-Aktivierung, Reparatur) |
 | Auge des Raumes | Starwing-Upgrade: Pro Runde eine verdeckte Gegnerkarte aufdecken |
 
@@ -476,6 +477,9 @@ Die Mechanik folgt dem Microcontroller-Code. Folgende Programmierfehler bzw. feh
 15. **Lightforce Lichtkoloss** kostet 2200 statt 1800 Credits (Balance-Anpassung nach der Balance-Simulation).
 16. **Scaretech Flottenbasis** kostet 2100 statt 2500 Credits (Balance-Anpassung nach der Balance-Simulation).
 17. **Sonderaktion** gibt es ab Runde 5 bei höchstens 7 Planeten oder höchstens **5** Einheiten (Original: 7). Mit 7 bekam sie praktisch jeder Spieler in jedem Zug; so wirkt sie stärker als Hilfe für Schwächere.
+18. **Letzte Runde:** Wer das Siegpunkt-Ziel erreicht, gewinnt nicht sofort. Die Runde wird bis zum letzten Spieler zu Ende gespielt; dann gewinnt, wer die meisten Siegpunkte hat (Gleichstand: mehr Planeten, dann mehr Sterne, dann wer das Ziel zuerst erreicht hat). Ein zerstörtes Zentralgestirn beendet das Spiel weiter sofort. Im Original gewann der Erste sofort; frühere Sitzplätze hatten so einen Zug mehr (Balance-Simulation).
+19. **Startkapital-Ausgleich:** Spieler 2, 3 und 4 bekommen 200, 300 bzw. 400 Credits mehr Startkapital als Spieler 1. Zusammen mit Nr. 18 gleicht das den Vorteil des Startspielers aus (Balance-Simulation: Vorsprung Platz 1 zu zweit von 14 auf 6, zu viert von 7 auf 0 Prozentpunkte).
+20. **Zu zweit** gibt es nur die Ziele 40 Siegpunkte oder endlos. Bei 30 Siegpunkten entschied zu zweit meist der frühe Sturm (Biotec gewann 80 %).
 
 Bewusst **wie im Original** belassen:
 - Sonderaktion tritt mit 4/6 Wahrscheinlichkeit ein (der Kommentar im Code sagt 1:3).

@@ -49,6 +49,8 @@ npm run gfx                      # regenerate the Helge-style graphics in public
 - **`stats[]`:** per-game copy of card values. Upgrades overwrite entries here, like the original's mutable `defaultkarten[]`.
 - **Actions** (`buy`, `attack`, `repair`, `info`) re-run every validation step themselves and return `{ error?: ErrorCode, ... }`. The step-wise helpers (`buyScan`, `attackScanAttacker`, `attackConfirmAttacker`, …) exist so the UI can report errors at the same moment the terminal did (after scan vs after OK). Keep the original check order.
 - **`beginTurn`** = C `einstiegspunkt` (income, overload skip, special action, build phase). **`mainCheck`** = C `hauptanzeige` (medals, VP, win) and must run after every action. The UI calls it when a flow closes.
+- **Victory (README deviations 18–20):** HQ destruction wins instantly in `mainCheck`. Reaching the VP goal only sets `finalRound` (event `finalRound`); `finishFinalRound` in `victory.ts` picks the winner after the last seat (most VP, then planets, stars, first to reach). It runs from `endTurn` (the App calls it on "Zug beenden") and from `beginTurn` when the last seat skips for overload.
+  - `newGame` adds `SEAT_BONUS` (0/200/300/400) to the start credits by seat. Setup offers only 40 or ∞ for 2 players.
 - `Slot.counted` tracks whether a card is in `buildings`/`units` (fix for recharging superweapons). The fuzz test asserts counters equal counted slots.
 - Some card values are balance changes from the simulator (Extend damage 2, Lichtkoloss 2200, Flottenbasis 2100, Antimaterieminen 2 rounds; bonus up to 5 units), listed under "Abweichungen" in README.md. Abt. Kapital is back at the original 2500.
 - Biotec upgrades 86–91 are a **new design** (the original had "Update 1–6" without effect). The table is in README.md.
@@ -159,6 +161,7 @@ npm run gfx                      # regenerate the Helge-style graphics in public
   - Stellschrauben in `params.ts` (`PARAM_RANGES`, 5 archetypes); `tune.ts` evolves them per faction and per VP mode (`out/tuned-30|40|inf.json`); `final` plays each mode with its own tuned set.
 - **Commands:** `smoke`, `trace`, `strategies`, `tune`, `final`, `exploits`, `report`, `all`. Raw results go to `Tools/sim/out/` (git-ignored).
 - `report` writes `Unterlagen/Balance_Simulation.md` and, via `pdf.ts`, `Balance_Simulation.pdf`. `pdf.ts` converts the Markdown to HTML in the manual's look, with embedded fonts, faction colour dots and inline SVG charts, then prints it with headless Chrome/Edge (`--print-to-pdf`, no puppeteer).
+- The sim uses the engine's victory rules (it calls `endTurn`); 2-player games skip the 30-VP mode like the app. `--rules file.json` sets sim-only rules (`firstAttackRound`).
 - What-if runs: `final --patch file.json --tag name --label "Text"` writes `out/final-<tag>.json`; the report compares them (mean deviation from fair). They reuse the tuned bots without re-tuning.
 - `--patch file.json` changes card values (incl. `requires`) inside the simulator only.
 - The sim tests (`Tools/sim/*.test.ts`) run with `npm test`; `tsconfig` includes `Tools/sim`.
