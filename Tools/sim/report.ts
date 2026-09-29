@@ -10,7 +10,7 @@ import { emptyAgg, mergeAgg, wilson, type Agg } from './stats';
 import type { TuneResult } from './tune';
 
 interface Saved {
-  meta: { games: number; date: string; seconds: number; patch?: unknown; label?: string };
+  meta: { games: number; date: string; seconds: number; patch?: unknown; rules?: unknown; label?: string };
   results: Record<string, Agg>;
 }
 
@@ -78,6 +78,24 @@ function strengths(saved: Saved, ns = NS, vps = VPS): Strength[] {
 
 /** Mittlere Abweichung aller Fraktionen von fair (quadratisches Mittel): 0 = alle genau fair */
 const deviation = (st: Array<{ r: number }>) => Math.sqrt(st.reduce((n, x) => n + (x.r - 1) ** 2, 0) / st.length);
+
+/** Anteil als Prozentpunkte, ohne „-0“ */
+const points = (x: number) => `${Math.round(x * 100) || 0} Pkt.`;
+
+/** Vorteil von Platz 1 gegenüber dem letzten Platz (Anteil entschiedener Partien, über alle Siegpunkt-Einstellungen) */
+function seatEdgeOf(saved: Saved, n: number): number {
+  const all = sumAgg(VPS.map((v) => saved.results[`C|${n}|${v}`]));
+  const rate = (i: number) => {
+    let k = 0;
+    let m = 0;
+    for (const fa of Object.values(all.factions)) {
+      k += fa.seatWins[i];
+      m += fa.seatGames[i] - fa.seatDraws[i];
+    }
+    return m ? k / m : 0;
+  };
+  return rate(0) - rate(n - 1);
+}
 const verdictText = (r: number) =>
   r >= 1.2 ? '**zu stark**' : r >= 1.1 ? 'etwas zu stark' : r <= 0.8 ? '**zu schwach**' : r <= 0.9 ? 'etwas zu schwach' : 'ausgeglichen';
 
@@ -295,8 +313,16 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     notes.push(`Auffälligste Karte: **${c.name}** (${FACTIONS[factionOfCardId(top.id)]}, ${c.price} Credits, ${c.def}/${c.off}/${c.dmg}) mit dem höchsten Kampfwert je Credit im Spiel `
       + `(${num(top.per1000, 2)} je 1000 Credits, beste Einheit einer anderen Fraktion: ${CARDS[next.id].name} mit ${num(next.per1000, 2)})`
       + `${START_CARD_IDS.has(c.requires) ? `, schon über den Startplaneten ${CARDS[c.requires].name} zu haben` : ''} (Abschnitt ${S.cards}).`);
-    if (variants.length) {
-      const best = variants.map((v) => ({ v, st: strengths(v) })).sort((a, b) => deviation(a.st) - deviation(b.st))[0];
+    const label = (v: Saved) => v.meta.label ?? JSON.stringify(v.meta.patch ?? v.meta.rules);
+    // Fairste Sitzreihenfolge unter den getesteten Varianten (Summe der Vorteile von Platz 1 zu zweit und zu viert)
+    const seatScore = (v: Saved) => Math.abs(seatEdgeOf(v, 2)) + Math.abs(seatEdgeOf(v, 4));
+    const bestSeat = [...variants].sort((a, b) => seatScore(a) - seatScore(b))[0];
+    if (bestSeat && seatScore(bestSeat) < seatScore(final) - 0.03) {
+      notes.push(`Fairste getestete Sitzreihenfolge: **${label(bestSeat)}**. Vorteil des Startspielers zu zweit ${points(seatEdgeOf(bestSeat, 2))} statt ${points(seatEdgeOf(final, 2))}, `
+        + `zu viert ${points(seatEdgeOf(bestSeat, 4))} statt ${points(seatEdgeOf(final, 4))} (Abschnitt ${S.whatif}).`);
+    }
+    const best = variants.map((v) => ({ v, st: strengths(v) })).sort((a, b) => deviation(a.st) - deviation(b.st))[0];
+    if (best && deviation(best.st) < deviation(verdict) - 0.02) {
       const order = [...best.st].sort((a, b) => b.r - a.r);
       notes.push(`Am ausgeglichensten von den getesteten Änderungen: **${best.v.meta.label ?? JSON.stringify(best.v.meta.patch)}** `
         + `(mittlere Abweichung von fair ${num(deviation(best.st), 2)} statt ${num(deviation(verdict), 2)}). `
@@ -457,24 +483,34 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
 
   // ---------- 6. Was wäre wenn
   if (final && variants.length) {
-    w(`## ${S.whatif}. Was wäre wenn: geänderte Kartenwerte`, '');
-    w('Dieselben optimierten Bots spielen mit geänderten Kartenwerten (nur im Simulator, alle Sitzordnungen, 2–4 Spieler, alle Siegpunkt-Einstellungen). '
+    w(`## ${S.whatif}. Was wäre wenn: geänderte Werte und Regeln`, '');
+    w('Dieselben optimierten Bots spielen mit geänderten Kartenwerten oder Regeln (nur im Simulator, alle Sitzordnungen, 2–4 Spieler, alle Siegpunkt-Einstellungen). '
       + 'Ihre Käufe passen sie selbst an; neu optimiert wurden sie nicht. Stärke relativ zu fair wie in der Kurzfassung.', '');
+    const seatEdge = (saved: Saved, n: number) => points(seatEdgeOf(saved, n));
+    const biotecTwo = (saved: Saved) => {
+      const { k, n } = share(sumAgg(VPS.map((v) => saved.results[`C|2|${v}`])), 3);
+      return n ? pct(k / n, 0) : '–';
+    };
+    const extra = (saved: Saved) => [seatEdge(saved, 2), seatEdge(saved, 4), biotecTwo(saved)];
     const base = strengths(final);
-    const rows = [['heutige Werte', ...base.map((x) => num(x.r, 2)), num(deviation(base), 2)]];
-    const chartRows = [{ label: 'heutige Werte', st: base }];
+    const rows = [['heutige Regeln und Werte', ...base.map((x) => num(x.r, 2)), num(deviation(base), 2), ...extra(final)]];
+    const chartRows = [{ label: 'heutige Regeln und Werte', st: base }];
     for (const v of variants) {
       const st = strengths(v);
-      const label = v.meta.label ?? JSON.stringify(v.meta.patch);
-      rows.push([label, ...st.map((x) => num(x.r, 2)), num(deviation(st), 2)]);
+      const label = v.meta.label ?? JSON.stringify(v.meta.patch ?? v.meta.rules);
+      rows.push([label, ...st.map((x) => num(x.r, 2)), num(deviation(st), 2), ...extra(v)]);
       chartRows.push({ label, st });
     }
-    w(table(['Änderung', ...F.map((f) => FACTIONS[f]), 'mittlere Abweichung von fair'], rows), '');
-    w('*Mittlere Abweichung:* quadratisches Mittel der Abstände aller vier Fraktionen von 1,00; 0 wäre perfekt ausgeglichen.', '');
+    w(table(['Änderung', ...F.map((f) => FACTIONS[f]), 'mittlere Abweichung', 'Vorteil Platz 1 (2 Sp.)', 'Vorteil Platz 1 (4 Sp.)', 'Biotec zu zweit'], rows), '');
+    w('*Mittlere Abweichung:* quadratisches Mittel der Abstände aller vier Fraktionen von 1,00; 0 wäre perfekt ausgeglichen. '
+      + '*Vorteil Platz 1:* Siegquote des Startspielers minus Siegquote des letzten Platzes (fair: 0). *Biotec zu zweit:* Anteil der Siege von Biotec mit 2 Spielern (fair: 50 %).', '');
     charts.variants = variantChart(chartRows, 'Stärke der Fraktionen je Änderung. Je näher die Punkte an der gestrichelten Linie liegen, desto ausgeglichener.');
     w('@@CHART:variants@@', '');
     w('Genaue Änderungen:', '');
-    for (const v of variants) w(`- ${v.meta.label ?? 'Änderung'}: \`${JSON.stringify(v.meta.patch)}\``);
+    for (const v of variants) {
+      const what = [v.meta.patch && `Kartenwerte \`${JSON.stringify(v.meta.patch)}\``, v.meta.rules && `Regeln \`${JSON.stringify(v.meta.rules)}\``].filter(Boolean);
+      w(`- ${v.meta.label ?? 'Änderung'}: ${what.join(', ')}`);
+    }
     w('');
   }
 

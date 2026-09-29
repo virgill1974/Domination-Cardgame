@@ -2,6 +2,7 @@
 import { Worker } from 'node:worker_threads';
 import { CARDS, type CardType, type Faction } from '../../src/engine/data';
 import type { Bot } from './bot';
+import type { SimRules } from './game';
 import { emptyAgg, mergeAgg, type Agg } from './stats';
 
 export interface Job {
@@ -13,6 +14,8 @@ export interface Job {
   games: number;
   /** Karten- und Eröffnungsstatistik mitschreiben */
   details: boolean;
+  /** Regelvarianten (nur Simulator) */
+  rules?: SimRules;
 }
 
 export type JobSpec = Omit<Job, 'id'> & { key: string };

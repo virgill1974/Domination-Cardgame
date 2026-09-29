@@ -7,13 +7,13 @@
 //   report       Bericht Unterlagen/Balance_Simulation.md aus Tools/sim/out/*.json
 //   all          strategies, tune, final, exploits, report
 // Optionen: --games N (Partien je Sitzordnung), --workers N, --gens N, --patch datei.json,
-//           final --tag name --label "Text": Was-wäre-wenn-Lauf neben dem Hauptergebnis
+//           final --tag name --label "Text": Was-wäre-wenn-Lauf neben dem Hauptergebnis, --rules datei.json: Regelvarianten
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { cpus } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CARDS, FACTIONS, type Faction } from '../../src/engine/data';
-import { playGame } from './game';
+import { playGame, type SimRules } from './game';
 import { Pool, applyPatch, seatings, type JobSpec, type Patch } from './jobs';
 import { ARCHETYPES, ARCHETYPE_NAMES, type BotParams } from './params';
 import { writeReport } from './report';
@@ -35,6 +35,9 @@ const OUT = join(process.cwd(), 'Tools', 'sim', 'out');
 mkdirSync(OUT, { recursive: true });
 const patchFile = optStr('patch');
 const patch: Patch | undefined = patchFile ? JSON.parse(readFileSync(patchFile, 'utf8')) : undefined;
+/** --rules datei.json: Regelvarianten nur im Simulator (siehe SimRules in game.ts), z. B. {"finishRound": true} */
+const rulesFile = optStr('rules');
+const rules: SimRules | undefined = rulesFile ? JSON.parse(readFileSync(rulesFile, 'utf8')) : undefined;
 applyPatch(patch);
 
 export const VP_MODES: Array<number | null> = [30, 40, null];
@@ -207,7 +210,7 @@ async function final(pool: Pool) {
       for (const seats of seatings(n)) {
         specs.push({
           key: `C|${n}|${vpKey(vp)}`, seats, bots: seats.map((f) => tunedFor(vp).best[f]), vpLimit: vp,
-          seed: seedOf('C', n, vpKey(vp), seats.join()), games, details: true,
+          seed: seedOf('C', n, vpKey(vp), seats.join()), games, details: true, rules,
         });
       }
     }
@@ -217,7 +220,7 @@ async function final(pool: Pool) {
   // --tag name: Was-wäre-wenn-Lauf (meist mit --patch), landet in final-<name>.json statt im Hauptergebnis
   const tag = optStr('tag');
   save(tag ? `final-${tag}` : 'final', {
-    meta: { games, date: new Date().toISOString(), seconds: (Date.now() - t0) / 1000, patch, tag, label: optStr('label') },
+    meta: { games, date: new Date().toISOString(), seconds: (Date.now() - t0) / 1000, patch, rules, tag, label: optStr('label') },
     results: Object.fromEntries(results),
   });
 }

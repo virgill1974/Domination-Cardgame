@@ -46,6 +46,8 @@ export interface Ctx {
   logs: PlayerLog[];
   /** Legeregeln je Fraktion (für Planeten, die nach einer Überlastung neu ausgelegt werden) */
   placement: BotParams[];
+  /** Regelvariante „Schonzeit“: Angriffe erst ab dieser Runde */
+  firstAttackRound?: number;
 }
 
 export const newLog = (): PlayerLog => ({ buys: [], attacks: 0, kills: 0, losses: 0, overloads: 0, firstAttack: null });
@@ -590,6 +592,7 @@ export function executeAttack(ctx: Ctx, attEan: number, opp: Faction, target: Ta
 
 function attackPhase(ctx: Ctx, P: BotParams) {
   const { s } = ctx;
+  if (ctx.firstAttackRound !== undefined && s.round < ctx.firstAttackRound) return;
   while (s.winner === null && s.attacks < MAX_ATTACKS) {
     const me = s.players[currentFaction(s)];
     if (!hasActiveCenter(me) && me.credits < ATTACK_PRICE) break;
@@ -658,7 +661,8 @@ export function playRandomTurn(ctx: Ctx) {
     mainCheck(s);
   }
   const planner = new AttackPlanner(ctx, RANDOM_PARAMS);
-  for (let n = 0; n < MAX_ATTACKS && s.winner === null; n++) {
+  const noAttacks = ctx.firstAttackRound !== undefined && s.round < ctx.firstAttackRound;
+  for (let n = 0; n < MAX_ATTACKS && s.winner === null && !noAttacks; n++) {
     if (rng() < 0.5 || (!hasActiveCenter(me) && me.credits < ATTACK_PRICE)) continue;
     const attacker = pick(planner.attackers());
     const opp = pick(opponents(s));

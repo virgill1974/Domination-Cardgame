@@ -14,6 +14,7 @@ parentPort!.on('message', (job: Job) => {
       seats: job.seats.map((faction, k) => ({ faction, bot: job.bots[k] })),
       vpLimit: job.vpLimit,
       seed: job.seed + i,
+      rules: job.rules,
     });
     addGame(agg, r, job.details);
   }

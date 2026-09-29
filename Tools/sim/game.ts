@@ -1,7 +1,7 @@
 // Eine simulierte Partie: echte Engine (Zugbeginn, Kaufen, Kampf, Siegpunkte) + Spielfeld am Tisch + Bots.
 import type { Faction } from '../../src/engine/data';
 import { kindOfEan } from '../../src/engine/cards';
-import { currentFaction, newGame, ownedSlots, slotCardId } from '../../src/engine/state';
+import { currentFaction, newGame, ownedSlots, slotCardId, type GameState } from '../../src/engine/state';
 import { mulberry32 } from '../../src/engine/testutil';
 import { beginTurn } from '../../src/engine/turn';
 import { victoryPoints } from '../../src/engine/victory';
@@ -17,10 +17,21 @@ export interface SeatSetup {
   bot: Bot;
 }
 
+/** Regelvarianten, die nur im Simulator getestet werden (die App kennt sie nicht) */
+export interface SimRules {
+  /** Wer die Siegpunkte erreicht, gewinnt nicht sofort: Die Runde wird zu Ende gespielt, dann gewinnt, wer die meisten hat */
+  finishRound?: boolean;
+  /** Zusätzliche Start-Credits je Sitzplatz (Platz 1, 2, …) */
+  seatBonus?: number[];
+  /** Angriffe erst ab dieser Runde (Schonzeit) */
+  firstAttackRound?: number;
+}
+
 export interface GameSetup {
   seats: SeatSetup[];
   vpLimit: number | null;
   seed: number;
+  rules?: SimRules;
   /** Abbruch als Remis nach so vielen Runden */
   maxRounds?: number;
   /** Spielfeld und Engine nach jedem Zug gegeneinander prüfen (Tests) */
@@ -48,6 +59,13 @@ export interface GameResult {
 
 export const MAX_ROUNDS = 120;
 
+/** Startkapital-Ausgleich: Sitzplatz i bekommt seatBonus[i] Credits dazu */
+export function applySeatBonus(s: GameState, seatBonus?: number[]) {
+  seatBonus?.forEach((bonus, seat) => {
+    if (seat < s.seats.length) s.players[s.seats[seat]].credits += bonus;
+  });
+}
+
 export function playGame(setup: GameSetup): GameResult {
   const s = newGame(setup.seats.map((x) => x.faction), setup.vpLimit);
   const ctx: Ctx = {
@@ -57,28 +75,67 @@ export function playGame(setup: GameSetup): GameResult {
     rng: mulberry32(setup.seed ^ 0x5bd1e995),
     logs: [0, 1, 2, 3].map(newLog),
     placement: [0, 1, 2, 3].map(() => RANDOM_PLACEMENT),
+    firstAttackRound: setup.rules?.firstAttackRound,
   };
+  applySeatBonus(s, setup.rules?.seatBonus);
+  const finishRound = !!setup.rules?.finishRound && setup.vpLimit !== null;
+  let finalRound = false;
+  let firstToReach: Faction | null = null;
   for (const { faction, bot } of setup.seats) ctx.placement[faction] = bot === 'random' ? RANDOM_PLACEMENT : bot;
   const botOf = new Map(setup.seats.map((x) => [x.faction, x.bot] as const));
   const maxRounds = setup.maxRounds ?? MAX_ROUNDS;
-  while (s.winner === null) {
+  // Runde zu Ende spielen: Nach dem ersten Punktsieg gilt das Ziel bis zum Rundenende nicht mehr, damit alle normal weiterspielen
+  const absorbPointsWin = () => {
+    if (finishRound && s.winner !== null && s.winReason === 'points' && !finalRound) {
+      finalRound = true;
+      firstToReach = s.winner;
+      s.winner = null;
+      s.winReason = null;
+      s.vpLimit = 999;
+    }
+  };
+  const endOfTurn = (): boolean => {
+    if (!finishRound) return s.winner !== null;
+    absorbPointsWin();
+    if (s.winner !== null) return true; // Zentralgestirn zerstört: sofort vorbei
+    if (finalRound && s.seat === s.playerCount - 1) {
+      s.vpLimit = setup.vpLimit;
+      const rank = (f: Faction) => [victoryPoints(s.players[f]), s.players[f].buildings, s.players[f].stars, f === firstToReach ? 1 : 0];
+      const better = (a: Faction, b: Faction) => {
+        const ra = rank(a);
+        const rb = rank(b);
+        for (let i = 0; i < ra.length; i++) if (ra[i] !== rb[i]) return ra[i] > rb[i];
+        return false;
+      };
+      s.winner = s.seats.reduce((best, f) => (better(f, best) ? f : best), s.seats[0]);
+      s.winReason = 'points';
+      return true;
+    }
+    return false;
+  };
+  for (;;) {
     const start = beginTurn(s, ctx.dice);
     if (s.round > maxRounds) break;
     const f = currentFaction(s);
     if (start.skipped) {
       ctx.logs[f].overloads++;
+      if (endOfTurn()) break;
       continue;
     }
     const bot = botOf.get(f)!;
     const P = bot === 'random' ? RANDOM_PLACEMENT : bot;
     for (const e of start.events) if (e.type === 'activated') placeActivated(ctx, f, e.ean, P);
     placeWaiting(ctx, f);
-    if (s.winner !== null) break;
-    turnStartSpecials(ctx, f, P);
-    if (bot === 'random') playRandomTurn(ctx);
-    else playTurn(ctx, bot);
+    absorbPointsWin();
+    if (s.winner === null) {
+      turnStartSpecials(ctx, f, P);
+      if (bot === 'random') playRandomTurn(ctx);
+      else playTurn(ctx, bot);
+    }
     if (setup.check) checkConsistency(ctx);
+    if (endOfTurn()) break;
   }
+  if (finalRound && s.winner === null) s.vpLimit = setup.vpLimit;
   return {
     winner: s.winner,
     reason: s.winReason,

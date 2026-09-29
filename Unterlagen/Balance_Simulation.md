@@ -1,6 +1,6 @@
 # Balance-Simulation Domination
 
-Erzeugt am 29.9.2026 mit dem Balance-Simulator (`npm run sim`, Tools/sim/). Die Partien laufen über die echte Spiel-Engine der App. Spielfeld, verdeckte Planeten und die Entscheidungen übernehmen Strategie-Bots (Modell und Grenzen in Abschnitt 8).
+Erzeugt am 29.9.2026 mit dem Balance-Simulator (`npm run sim`, Tools/sim/). Die Partien laufen über die echte Spiel-Engine der App. Spielfeld, verdeckte Planeten und die Entscheidungen übernehmen Strategie-Bots (Modell und Grenzen in Abschnitt 9).
 
 ## Kurzfassung
 
@@ -16,9 +16,10 @@ Erzeugt am 29.9.2026 mit dem Balance-Simulator (`npm run sim`, Tools/sim/). Die 
 
 - **Stärkste Fraktion: Lightforce** (1,08), **schwächste: Biotec** (0,95).
 - Am deutlichsten ist die Abweichung bei **4 Spielern**: Lightforce gewinnt 34 % der entschiedenen Partien (fair: 25 %).
-- Auffälligste Karte: **Extend** (Biotec, 600 Credits, 3/3/2) mit dem höchsten Kampfwert je Credit im Spiel (1,09 je 1000 Credits, beste Einheit einer anderen Fraktion: Damokles mit 0,77), schon über den Startplaneten Hive zu haben (Abschnitt 7).
+- Auffälligste Karte: **Extend** (Biotec, 600 Credits, 3/3/2) mit dem höchsten Kampfwert je Credit im Spiel (1,09 je 1000 Credits, beste Einheit einer anderen Fraktion: Damokles mit 0,77), schon über den Startplaneten Hive zu haben (Abschnitt 8).
+- Fairste getestete Sitzreihenfolge: **F: A + Platz 2/3/4 bekommen +200/300/400**. Vorteil des Startspielers zu zweit 6 Pkt. statt 14 Pkt., zu viert 0 Pkt. statt 7 Pkt. (Abschnitt 6).
 - Wer anfängt, hat einen Vorteil: Bei 4 Spielern gewinnt Platz 1 28 %, Platz 4 nur 21 % (Abschnitt 2).
-- **Überlastung mit der neuen Regel** (gerettete Energiequelle wird verdeckt neu ausgelegt): Selbst wenn eine Fraktion ihre Energiequelle anfangs in Reihe 2 legt, setzt sie höchstens 1,46 Züge je Partie aus, vorher waren es bis zu 3,9 (Abschnitt 6).
+- **Überlastung mit der neuen Regel** (gerettete Energiequelle wird verdeckt neu ausgelegt): Selbst wenn eine Fraktion ihre Energiequelle anfangs in Reihe 2 legt, setzt sie höchstens 1,46 Züge je Partie aus, vorher waren es bis zu 3,9 (Abschnitt 7).
 
 ## 1. Balance mit optimierten Strategien
 
@@ -243,7 +244,35 @@ Der Optimierer (Evolutionsstrategie, 5 Generationen) hat je Fraktion die Einstel
 - **Karten, mit denen sie seltener gewinnt:** Hive (−14 Pkt.), Einheit 5 (−3 Pkt.), Mutant (−2 Pkt.)
   - Das ist ein Zusammenhang, keine Ursache: Wer vorn liegt, kauft andere Karten als wer zurückliegt.
 
-## 6. Regel-Auffälligkeiten
+## 6. Was wäre wenn: geänderte Werte und Regeln
+
+Dieselben optimierten Bots spielen mit geänderten Kartenwerten oder Regeln (nur im Simulator, alle Sitzordnungen, 2–4 Spieler, alle Siegpunkt-Einstellungen). Ihre Käufe passen sie selbst an; neu optimiert wurden sie nicht. Stärke relativ zu fair wie in der Kurzfassung.
+
+| Änderung | Starwing | Lightforce | Scaretech | Biotec | mittlere Abweichung | Vorteil Platz 1 (2 Sp.) | Vorteil Platz 1 (4 Sp.) | Biotec zu zweit |
+|---|---|---|---|---|---|---|---|---|
+| heutige Regeln und Werte | 1,00 | 1,08 | 0,97 | 0,95 | 0,05 | 14 Pkt. | 7 Pkt. | 60 % |
+| A: Runde zu Ende spielen | 0,99 | 1,07 | 0,97 | 0,96 | 0,05 | 13 Pkt. | 4 Pkt. | 60 % |
+| B: +100 Credits je späterem Platz | 0,98 | 1,10 | 0,91 | 1,00 | 0,07 | 8 Pkt. | 3 Pkt. | 63 % |
+| C: A + B | 0,97 | 1,10 | 0,92 | 1,00 | 0,07 | 7 Pkt. | 1 Pkt. | 62 % |
+| D: Angriffe erst ab Runde 3 | 0,99 | 1,08 | 0,97 | 0,95 | 0,05 | 14 Pkt. | 7 Pkt. | 60 % |
+| E: Extend 3 Runden Bauzeit | 1,01 | 1,07 | 1,00 | 0,92 | 0,05 | 14 Pkt. | 8 Pkt. | 59 % |
+| F: A + Platz 2/3/4 bekommen +200/300/400 | 0,97 | 1,13 | 0,96 | 0,94 | 0,08 | 6 Pkt. | 0 Pkt. | 59 % |
+| G: A + Platz 2/3/4 bekommen +300/400/500 | 0,94 | 1,13 | 0,97 | 0,95 | 0,08 | 3 Pkt. | -4 Pkt. | 60 % |
+
+*Mittlere Abweichung:* quadratisches Mittel der Abstände aller vier Fraktionen von 1,00; 0 wäre perfekt ausgeglichen. *Vorteil Platz 1:* Siegquote des Startspielers minus Siegquote des letzten Platzes (fair: 0). *Biotec zu zweit:* Anteil der Siege von Biotec mit 2 Spielern (fair: 50 %).
+
+
+Genaue Änderungen:
+
+- A: Runde zu Ende spielen: Regeln `{"finishRound":true}`
+- B: +100 Credits je späterem Platz: Regeln `{"seatBonus":[0,100,200,300]}`
+- C: A + B: Regeln `{"finishRound":true,"seatBonus":[0,100,200,300]}`
+- D: Angriffe erst ab Runde 3: Regeln `{"firstAttackRound":3}`
+- E: Extend 3 Runden Bauzeit: Kartenwerte `{"Extend":{"rounds":3}}`
+- F: A + Platz 2/3/4 bekommen +200/300/400: Regeln `{"finishRound":true,"seatBonus":[0,200,300,400]}`
+- G: A + Platz 2/3/4 bekommen +300/400/500: Regeln `{"finishRound":true,"seatBonus":[0,300,400,500]}`
+
+## 7. Regel-Auffälligkeiten
 
 **Überlastung (geänderte Regel).** Wird eine Energiequelle zerstört und die Energie fällt unter 0, bleibt die Karte im Spiel, bekommt ihre volle Defensive zurück und der Besitzer setzt eine Runde aus. Neu ist: Sie wird dabei **verdeckt neu ausgelegt**. Vorher blieb sie aufgedeckt liegen und konnte jede Runde erneut angegriffen werden; der Besitzer setzte dann immer wieder aus („Überlastungs-Sperre“, im alten Stand bis zu 3,9 ausgesetzte Züge je Partie).
 
@@ -260,7 +289,7 @@ Versuch mit der neuen Regel: Eine Fraktion legt ihre Energiequelle anfangs in Re
 
 **„∞“ zu zweit.** Ohne Siegpunkte gewinnt nur, wer das gegnerische Zentralgestirn zerstört. Zu zweit dauerte das im Schnitt 42 Runden; 4 % der Partien hatten nach 120 Runden noch keinen Sieger, am häufigsten mit Lightforce (7 % ihrer Partien) und Starwing (5 %).
 
-## 7. Kampfwert der Einheiten
+## 8. Kampfwert der Einheiten
 
 Mittlere Siegchance im Einzelgefecht gegen alle Einheiten der anderen Fraktionen (je zur Hälfte als Angreifer und als Verteidiger, Grundwerte ohne Upgrades), exakt berechnet. „je 1000 Credits“ setzt das ins Verhältnis zum Preis; fett = besonders günstig. Einheiten mit Defensive 0 zerstören sich bei jedem Angriff selbst. Startplaneten sind mit * markiert: Ihre Einheiten sind ab Runde 1 kaufbar.
 
@@ -299,7 +328,7 @@ Mittlere Siegchance im Einzelgefecht gegen alle Einheiten der anderen Fraktionen
 | Biotec | Regenerat. Panzer | 1000 | 3/5/5 | Manufaktur | 83 % | **0,83** |
 | Biotec | Helicopter | 1200 | 2/4/3 | Helipad | 59 % | 0,50 |
 
-## 8. Modell und Grenzen
+## 9. Modell und Grenzen
 
 - **Regeln:** Einkommen, Bauzeiten, Energie, Kaufen, alle Kampfarten, Reparatur, Upgrades, Münzen, Siegpunkte und Sonderaktion kommen unverändert aus der App-Engine (`src/engine/`).
 - **Tischregeln** (nicht in der App, im Simulator nachgebaut, `Tools/sim/board.ts`):
@@ -313,7 +342,7 @@ Mittlere Siegchance im Einzelgefecht gegen alle Einheiten der anderen Fraktionen
 - **Grenzen:** Bots bluffen nicht, sprechen sich nicht ab und planen nur einen Zug voraus (plus Sparziel). Menschen spielen anders, besonders mit Absprachen zu dritt oder zu viert. Die Ergebnisse zeigen Tendenzen im Kartenmaterial, keine exakten Siegchancen am Tisch.
 - **Remis:** Partien ohne Sieger nach 120 Runden zählen nicht in die Siegquoten.
 
-## 9. Nachrechnen
+## 10. Nachrechnen
 
 ```bash
 npm run sim -- all                  # Versuche A+B, Optimierung, Balance-Urteil, Bericht
@@ -325,4 +354,4 @@ npm run sim -- final --games 150 --patch werte.json --tag name --label "Text"
 npm run sim -- report
 ```
 
-Umfang dieses Berichts: rund 626.000 simulierte Partien.
+Umfang dieses Berichts: rund 815.000 simulierte Partien.
