@@ -15,7 +15,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CARDS, FACTIONS, type Faction } from '../../src/engine/data';
 import { playGame, type SimRules } from './game';
-import { Pool, applyPatch, seatings, type JobSpec, type Patch } from './jobs';
+import { Pool, applyPatch, cardsKey, seatings, type JobSpec, type Patch } from './jobs';
 import { ARCHETYPES, ARCHETYPE_LABEL, ARCHETYPE_NAMES, type BotParams } from './params';
 import { writeReport } from './report';
 import { addGame, emptyAgg, type Agg } from './stats';
@@ -268,7 +268,7 @@ async function select(pool: Pool) {
     }
   }
   const rounds = (previous?.meta.rounds ?? 1) + (previous ? 1 : 0);
-  save('selected', { meta: { games, rounds, date: new Date().toISOString(), seconds: (Date.now() - t0) / 1000, patch, rules }, choice });
+  save('selected', { meta: { games, rounds, cards: cardsKey(), date: new Date().toISOString(), seconds: (Date.now() - t0) / 1000, patch, rules }, choice });
 }
 
 /** Gewählte Strategie je Fraktion und Einstellung (Strategiewahl), sonst die optimierte */

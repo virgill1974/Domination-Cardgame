@@ -8,71 +8,70 @@ Erzeugt am 29.9.2026 mit dem Balance-Simulator (`npm run sim`, Tools/sim/). Die 
 
 | Fraktion | Stärke | Bereich (95 %) | Einschätzung | Beste Spielweise (Abschnitt 4) | Gewählte Strategien (Anzahl Einstellungen) |
 |---|---|---|---|---|---|
-| Starwing | 0,75 | 0,74–0,77 | **zu schwach** | Festung | optimiert für 30 SP (4), optimiert für ∞ (3), optimiert für 40 SP (1) |
-| Lightforce | 1,02 | 1,01–1,04 | ausgeglichen | Festung | optimiert für 30 SP (4), optimiert für 40 SP (2), optimiert für ∞ (2) |
-| Scaretech | 1,25 | 1,24–1,27 | **zu stark** | Festung | optimiert für ∞ (7), optimiert für 40 SP (1) |
-| Biotec | 0,97 | 0,96–0,99 | ausgeglichen | Blitzangriff | Blitzangriff (3), optimiert für 40 SP (3), optimiert für ∞ (2) |
+| Starwing | 1,03 | 0,96–1,10 | ausgeglichen | Festung | optimiert für 30 SP (4), optimiert für ∞ (3), optimiert für 40 SP (1) |
+| Lightforce | 1,04 | 0,97–1,11 | ausgeglichen | Festung | optimiert für 30 SP (4), optimiert für 40 SP (2), optimiert für ∞ (2) |
+| Scaretech | 1,00 | 0,94–1,07 | ausgeglichen | Festung | optimiert für ∞ (7), optimiert für 40 SP (1) |
+| Biotec | 0,93 | 0,87–1,00 | ausgeglichen | Blitzangriff | Blitzangriff (3), optimiert für 40 SP (3), optimiert für ∞ (2) |
 
 
-- **Stärkste Fraktion: Scaretech** (1,25), **schwächste: Starwing** (0,75).
-- **Wie sicher ist das?** Die Stärke hängt auch davon ab, welche Strategien die anderen spielen. Wählt nur eine Fraktion ihre beste Strategie und die anderen bleiben bei ihren, ergibt sich: Starwing 0,84, Lightforce 1,07, Scaretech 1,27, Biotec 1,13. In beiden Messungen zu stark: **Scaretech**. In beiden Messungen zu schwach: **Starwing**. Bei Biotec liegen die Messungen weit auseinander: Dort entscheidet eher die Spielweise der anderen als das Kartenmaterial.
-- Am deutlichsten ist die Abweichung bei **2 Spielern**: Scaretech gewinnt 78 % der entschiedenen Partien (fair: 50 %).
+- **Stärkste Fraktion: Lightforce** (1,04), **schwächste: Biotec** (0,93).
+- Am deutlichsten ist die Abweichung bei **2 Spielern**: Scaretech gewinnt 67 % der entschiedenen Partien (fair: 50 %).
 - Auffälligste Karte: **Extend** (Biotec, 600 Credits, 3/3/2) mit dem höchsten Kampfwert je Credit im Spiel (1,09 je 1000 Credits, beste Einheit einer anderen Fraktion: Damokles mit 0,77), schon über den Startplaneten Hive zu haben (Abschnitt 8).
-- **Sitzreihenfolge** (mit letzter Runde und Startkapital-Ausgleich): Zu viert gewinnt Platz 1 24 % und Platz 4 24 % (fair: 25 %), zu zweit Platz 1 54 % und Platz 2 46 %. Der Startspieler hat noch einen kleinen Vorteil. (Abschnitt 2)
+- **Sitzreihenfolge** (mit letzter Runde und Startkapital-Ausgleich): Zu viert gewinnt Platz 1 23 % und Platz 4 23 % (fair: 25 %), zu zweit Platz 1 53 % und Platz 2 47 %. Der Startspieler hat noch einen kleinen Vorteil. (Abschnitt 2)
 - **Letzte Runde:** In 4 % der Punktsiege gewann nicht, wer das Siegpunkt-Ziel zuerst erreicht hatte, sondern ein Spieler, der in der letzten Runde noch vorbeizog (Upgrades, Sterne, zerstörte Planeten).
-- **Upgrades** je Partie: Starwing 1,9, Lightforce 1,9, Scaretech 1,9, Biotec 1,8. Selten kaufbar, weil die Voraussetzung selten gebaut wird: Rekonfiguration, Gravitationsboost, Flüstern. Kaufbar, aber selten gekauft (Wirkung für den Preis zu schwach): Präzisionssprung, Feuerschwinge, Effektivierung, Donnerschlag, Schwarzer Schleier, Neuronetz. (Abschnitt 6)
+- **Upgrades** je Partie: Starwing 2,2, Lightforce 1,9, Scaretech 1,7, Biotec 1,8. Selten kaufbar, weil die Voraussetzung selten gebaut wird: Rekonfiguration, Gravitationsboost, Flüstern, Chitinpanzer, Neuronetz, Zellregeneration. Kaufbar, aber selten gekauft (Wirkung für den Preis zu schwach): Präzisionssprung, Feuerschwinge, Effektivierung, Donnerschlag, Schwarzer Schleier. (Abschnitt 6)
 - **Überlastung mit der neuen Regel** (gerettete Energiequelle wird verdeckt neu ausgelegt): Selbst wenn eine Fraktion ihre Energiequelle anfangs in Reihe 2 legt, setzt sie höchstens 1,70 Züge je Partie aus, vorher waren es bis zu 3,9 (Abschnitt 7).
 
 ## 1. Balance mit optimierten Strategien
 
-Jede Fraktion spielt je Spielerzahl und Siegpunkt-Einstellung die beste von acht Strategien (Strategiewahl, Abschnitt 5). Alle Sitzordnungen, 2000 Partien je Sitzordnung und Einstellung. Angegeben ist der Anteil an den entschiedenen Partien mit 95-%-Konfidenzintervall; ▲/▼ = deutlich über/unter fair.
+Jede Fraktion spielt je Spielerzahl und Siegpunkt-Einstellung die beste von acht Strategien (Strategiewahl, Abschnitt 5). Alle Sitzordnungen, 100 Partien je Sitzordnung und Einstellung. Angegeben ist der Anteil an den entschiedenen Partien mit 95-%-Konfidenzintervall; ▲/▼ = deutlich über/unter fair.
 
 ### 2 Spieler (fair: 50 %)
 
 | Fraktion | 40 SP | ∞ |
 |---|---|---|
-| Starwing | 18,9 % (18 %–20 %) ▼ | 32,1 % (31 %–33 %) ▼ |
-| Lightforce | 40,0 % (39 %–41 %) ▼ | 37,8 % (37 %–39 %) ▼ |
-| Scaretech | 72,4 % (72 %–73 %) ▲ | 82,8 % (82 %–83 %) ▲ |
-| Biotec | 68,6 % (68 %–69 %) ▲ | 47,2 % (46 %–48 %) |
+| Starwing | 36,5 % (33 %–40 %) ▼ | 46,7 % (43 %–51 %) |
+| Lightforce | 40,3 % (36 %–44 %) ▼ | 34,3 % (31 %–38 %) ▼ |
+| Scaretech | 59,3 % (55 %–63 %) ▲ | 73,8 % (70 %–77 %) ▲ |
+| Biotec | 63,8 % (60 %–68 %) ▲ | 45,2 % (41 %–49 %) |
 
 |  | 40 SP | ∞ |
 |---|---|---|
-| Partien | 24.000 | 24.000 |
-| Ø Runden | 23,3 | 29,0 |
-| Sieg durch Zentralgestirn | 47,7 % | 99,7 % |
+| Partien | 1.200 | 1.200 |
+| Ø Runden | 24,0 | 31,1 |
+| Sieg durch Zentralgestirn | 36,3 % | 99,8 % |
 | Remis (nach 120 Runden) | 0,0 % | 0,3 % |
 
 ### 3 Spieler (fair: 33 %)
 
 | Fraktion | 30 SP | 40 SP | ∞ |
 |---|---|---|---|
-| Starwing | 32,6 % (32 %–33 %) | 21,6 % (21 %–22 %) ▼ | 22,9 % (22 %–23 %) ▼ |
-| Lightforce | 40,8 % (40 %–41 %) ▲ | 30,9 % (30 %–31 %) | 18,3 % (18 %–19 %) ▼ |
-| Scaretech | 41,2 % (41 %–42 %) ▲ | 51,3 % (51 %–52 %) ▲ | 41,6 % (41 %–42 %) ▲ |
-| Biotec | 18,7 % (18 %–19 %) ▼ | 29,5 % (29 %–30 %) ▼ | 50,6 % (50 %–51 %) ▲ |
+| Starwing | 48,7 % (46 %–51 %) ▲ | 31,8 % (30 %–34 %) | 23,0 % (21 %–25 %) ▼ |
+| Lightforce | 42,4 % (40 %–45 %) ▲ | 34,7 % (33 %–37 %) | 18,8 % (17 %–21 %) ▼ |
+| Scaretech | 26,3 % (24 %–28 %) ▼ | 38,3 % (36 %–41 %) ▲ | 40,6 % (38 %–43 %) ▲ |
+| Biotec | 15,9 % (14 %–18 %) ▼ | 28,6 % (27 %–31 %) ▼ | 50,9 % (49 %–53 %) ▲ |
 
 |  | 30 SP | 40 SP | ∞ |
 |---|---|---|---|
-| Partien | 48.000 | 48.000 | 48.000 |
-| Ø Runden | 17,3 | 21,0 | 30,4 |
-| Sieg durch Zentralgestirn | 17,7 % | 46,3 % | 99,8 % |
-| Remis (nach 120 Runden) | 0,0 % | 0,0 % | 0,2 % |
+| Partien | 2.400 | 2.400 | 2.400 |
+| Ø Runden | 17,0 | 21,0 | 29,9 |
+| Sieg durch Zentralgestirn | 13,3 % | 40,5 % | 99,9 % |
+| Remis (nach 120 Runden) | 0,0 % | 0,0 % | 0,1 % |
 
 ### 4 Spieler (fair: 25 %)
 
 | Fraktion | 30 SP | 40 SP | ∞ |
 |---|---|---|---|
-| Starwing | 24,8 % (24 %–25 %) | 29,0 % (29 %–29 %) ▲ | 13,7 % (13 %–14 %) ▼ |
-| Lightforce | 34,4 % (34 %–35 %) ▲ | 46,7 % (46 %–47 %) ▲ | 17,1 % (17 %–17 %) ▼ |
-| Scaretech | 28,7 % (28 %–29 %) ▲ | 15,5 % (15 %–16 %) ▼ | 27,8 % (27 %–28 %) ▲ |
-| Biotec | 12,1 % (12 %–12 %) ▼ | 8,8 % (9 %–9 %) ▼ | 41,5 % (41 %–42 %) ▲ |
+| Starwing | 35,7 % (34 %–38 %) ▲ | 34,2 % (32 %–36 %) ▲ | 16,5 % (15 %–18 %) ▼ |
+| Lightforce | 34,3 % (32 %–36 %) ▲ | 42,3 % (40 %–44 %) ▲ | 22,0 % (20 %–24 %) |
+| Scaretech | 18,7 % (17 %–20 %) ▼ | 15,9 % (14 %–17 %) ▼ | 20,1 % (19 %–22 %) ▼ |
+| Biotec | 11,3 % (10 %–13 %) ▼ | 7,6 % (7 %–9 %) ▼ | 41,3 % (39 %–43 %) ▲ |
 
 |  | 30 SP | 40 SP | ∞ |
 |---|---|---|---|
-| Partien | 48.000 | 48.000 | 48.000 |
-| Ø Runden | 17,0 | 17,9 | 28,9 |
-| Sieg durch Zentralgestirn | 25,9 % | 77,5 % | 100,0 % |
+| Partien | 2.400 | 2.400 | 2.400 |
+| Ø Runden | 16,7 | 18,1 | 26,9 |
+| Sieg durch Zentralgestirn | 18,4 % | 77,8 % | 100,0 % |
 | Remis (nach 120 Runden) | 0,0 % | 0,0 % | 0,0 % |
 
 ## 2. Vorteil durch die Sitzreihenfolge
@@ -81,9 +80,9 @@ Anteil an den entschiedenen Partien nach Platz in der Zugreihenfolge (Platz 1 be
 
 | Spieler | Platz 1 | Platz 2 | Platz 3 | Platz 4 | fair |
 |---|---|---|---|---|---|
-| 2 | 54,2 % | 45,8 % |  |  | 50 % |
-| 3 | 31,7 % | 35,2 % | 33,1 % |  | 33 % |
-| 4 | 23,6 % | 27,1 % | 25,8 % | 23,6 % | 25 % |
+| 2 | 52,9 % | 47,1 % |  |  | 50 % |
+| 3 | 30,1 % | 35,8 % | 34,1 % |  | 33 % |
+| 4 | 22,6 % | 26,6 % | 27,8 % | 23,1 % | 25 % |
 
 ## 3. Wenn alle dieselbe Spielweise wählen
 
@@ -205,54 +204,54 @@ Der Optimierer (Evolutionsstrategie, 12 Generationen) hat je Fraktion die Einste
 ### Starwing
 
 - **Schwerpunkte gegenüber „Ausgewogen“:** starke Verteidigung, volle 1. Reihe, sammelt Siegpunkte (Planeten, Upgrades), repariert viel, greift nur bei klarem Vorteil an.
-- **So gewinnt sie:** Ø 8,7 Planeten, 2,5 Upgrades, 13,8 Sterne, 1,1 Münzen; 57 % der Siege durch ein zerstörtes Zentralgestirn.
-- **Angriffe:** der erste im Schnitt in Runde 8,0; 13,9 Angriffe je Partie.
+- **So gewinnt sie:** Ø 8,9 Planeten, 2,9 Upgrades, 14,4 Sterne, 1,2 Münzen; 46 % der Siege durch ein zerstörtes Zentralgestirn.
+- **Angriffe:** der erste im Schnitt in Runde 6,7; 15,1 Angriffe je Partie.
 - **Häufigste Eröffnungen** (Käufe der ersten drei Runden, „–“ = gespart; Anteil der Partien, Siegquote):
-  - R1: Handelssystem · R2: – · R3: Protonenmond (57 %, 25 %)
-  - R1: Handelssystem · R2: Protonenmond · R3: – (13 %, 23 %)
-  - R1: Handelssystem · R2: Auge des Kolumbus · R3: Protonenmond (11 %, 22 %)
-- **Karten, mit denen sie öfter gewinnt:** Feuerschwinge (+31 Pkt.), Präzisionssprung (+26 Pkt.), Planetenschild (+22 Pkt.), Schildgenerator (+22 Pkt.)
-- **Karten, mit denen sie seltener gewinnt:** Aufklärungskomplex (−9 Pkt.), Fährtensucher (−2 Pkt.), Ionenpulsar (−0 Pkt.)
+  - R1: Handelssystem · R2: Protonenmond · R3: – (30 %, 33 %)
+  - R1: Protonenmond, Handelssystem · R2: Auge des Kolumbus · R3: – (24 %, 30 %)
+  - R1: Handelssystem, Auge des Kolumbus · R2: Protonenmond · R3: – (18 %, 36 %)
+- **Karten, mit denen sie öfter gewinnt:** Feuerschwinge (+35 Pkt.), Präzisionssprung (+27 Pkt.), Planetenschild (+26 Pkt.), Schildgenerator (+23 Pkt.)
+- **Karten, mit denen sie seltener gewinnt:** Aufklärungskomplex (−13 Pkt.), Ionenpulsar (−7 Pkt.), Fährtensucher (−6 Pkt.)
   - Das ist ein Zusammenhang, keine Ursache: Wer vorn liegt, kauft andere Karten als wer zurückliegt.
 
 ### Lightforce
 
 - **Schwerpunkte gegenüber „Ausgewogen“:** sammelt Siegpunkte (Planeten, Upgrades), viele Einheiten, hält Credits zurück, greift nur bei klarem Vorteil an, spart auf teure Karten.
-- **So gewinnt sie:** Ø 9,4 Planeten, 2,3 Upgrades, 15,6 Sterne, 1,3 Münzen; 46 % der Siege durch ein zerstörtes Zentralgestirn.
-- **Angriffe:** der erste im Schnitt in Runde 7,1; 17,6 Angriffe je Partie.
+- **So gewinnt sie:** Ø 9,5 Planeten, 2,3 Upgrades, 15,5 Sterne, 1,3 Münzen; 45 % der Siege durch ein zerstörtes Zentralgestirn.
+- **Angriffe:** der erste im Schnitt in Runde 7,0; 17,7 Angriffe je Partie.
 - **Häufigste Eröffnungen** (Käufe der ersten drei Runden, „–“ = gespart; Anteil der Partien, Siegquote):
-  - R1: Handelssektor · R2: Elektronenmond · R3: – (38 %, 30 %)
-  - R1: Handelssektor, Lichtfunke · R2: Elektronenmond · R3: – (17 %, 42 %)
-  - R1: Handelssektor · R2: Strahlenjäger · R3: Elektronenmond (11 %, 37 %)
-- **Karten, mit denen sie öfter gewinnt:** Sonnenkern (+17 Pkt.), Schutzring (+11 Pkt.), Nachtsicht (+9 Pkt.), Lichtkoloss (+7 Pkt.)
-- **Karten, mit denen sie seltener gewinnt:** Supernova (−13 Pkt.), Drohnenkolonie (−11 Pkt.), Lichtpfeil (−6 Pkt.)
+  - R1: Handelssektor · R2: Elektronenmond · R3: – (38 %, 31 %)
+  - R1: Handelssektor, Lichtfunke · R2: Elektronenmond · R3: – (16 %, 44 %)
+  - R1: Handelssektor · R2: Strahlenjäger · R3: Elektronenmond (9 %, 38 %)
+- **Karten, mit denen sie öfter gewinnt:** Sonnenkern (+16 Pkt.), Schutzring (+11 Pkt.), Nachtsicht (+9 Pkt.), Lichtkoloss (+6 Pkt.)
+- **Karten, mit denen sie seltener gewinnt:** Supernova (−10 Pkt.), Drohnenkolonie (−9 Pkt.), Lichtpfeil (−5 Pkt.)
   - Das ist ein Zusammenhang, keine Ursache: Wer vorn liegt, kauft andere Karten als wer zurückliegt.
 
 ### Scaretech
 
 - **Schwerpunkte gegenüber „Ausgewogen“:** hält Credits zurück, starke Verteidigung, viele Einheiten, sammelt Siegpunkte (Planeten, Upgrades), spart auf teure Karten.
-- **So gewinnt sie:** Ø 7,2 Planeten, 2,6 Upgrades, 26,1 Sterne, 1,2 Münzen; 65 % der Siege durch ein zerstörtes Zentralgestirn.
-- **Angriffe:** der erste im Schnitt in Runde 7,3; 31,4 Angriffe je Partie.
-- **Wurmloch** (Aufklärer überspringen Reihe 1): in 13 % der Partien gebaut, Siegquote dann 52 % (sonst insgesamt 37 %).
+- **So gewinnt sie:** Ø 7,3 Planeten, 2,5 Upgrades, 27,6 Sterne, 1,2 Münzen; 68 % der Siege durch ein zerstörtes Zentralgestirn.
+- **Angriffe:** der erste im Schnitt in Runde 7,2; 28,5 Angriffe je Partie.
+- **Wurmloch** (Aufklärer überspringen Reihe 1): in 10 % der Partien gebaut, Siegquote dann 48 % (sonst insgesamt 29 %).
 - **Häufigste Eröffnungen** (Käufe der ersten drei Runden, „–“ = gespart; Anteil der Partien, Siegquote):
-  - R1: Antimaterieminen · R2: – · R3: Antimaterieminen (41 %, 41 %)
-  - R1: Antimaterieminen, Shadow Arm, Shadow Arm · R2: Shadow Arm · R3: – (30 %, 40 %)
-  - R1: Antimaterieminen · R2: Shadow Arm · R3: – (8 %, 20 %)
-- **Karten, mit denen sie öfter gewinnt:** Rauminvasion (+19 Pkt.), Assimilation (+18 Pkt.), Doomhammer (+17 Pkt.), Schwarzer Schleier (+17 Pkt.)
-- **Karten, mit denen sie seltener gewinnt:** Telecluster (−12 Pkt.), Antimaterieminen (+0 Pkt.), Flottenbasis (+0 Pkt.)
+  - R1: Antimaterieminen · R2: – · R3: Antimaterieminen (56 %, 32 %)
+  - R1: Antimaterieminen, Shadow Arm, Shadow Arm · R2: Shadow Arm · R3: – (22 %, 31 %)
+  - R1: Antimaterieminen · R2: Shadow Arm · R3: Shadow Arm (7 %, 14 %)
+- **Karten, mit denen sie öfter gewinnt:** Schwarzer Schleier (+22 Pkt.), Doomhammer (+21 Pkt.), Assimilation (+20 Pkt.), Rage (+19 Pkt.)
+- **Karten, mit denen sie seltener gewinnt:** Telecluster (−10 Pkt.), Antimaterieminen (+0 Pkt.), Flottenbasis (+0 Pkt.)
   - Das ist ein Zusammenhang, keine Ursache: Wer vorn liegt, kauft andere Karten als wer zurückliegt.
 
 ### Biotec
 
 - **Schwerpunkte gegenüber „Ausgewogen“:** hält Credits zurück, greift oft an, strebt die Superwaffe an, starke Verteidigung, volle 1. Reihe.
-- **So gewinnt sie:** Ø 5,7 Planeten, 2,0 Upgrades, 18,3 Sterne, 0,6 Münzen; 85 % der Siege durch ein zerstörtes Zentralgestirn.
-- **Angriffe:** der erste im Schnitt in Runde 5,6; 23,4 Angriffe je Partie.
+- **So gewinnt sie:** Ø 5,8 Planeten, 2,1 Upgrades, 18,4 Sterne, 0,6 Münzen; 84 % der Siege durch ein zerstörtes Zentralgestirn.
+- **Angriffe:** der erste im Schnitt in Runde 5,5; 23,6 Angriffe je Partie.
 - **Häufigste Eröffnungen** (Käufe der ersten drei Runden, „–“ = gespart; Anteil der Partien, Siegquote):
-  - R1: – · R2: Mutant · R3: Abt. Kapital (16 %, 35 %)
-  - R1: – · R2: Abt. Kapital · R3: Tyrant (14 %, 37 %)
-  - R1: Einheit 5 · R2: Abt. Kapital · R3: – (9 %, 25 %)
-- **Karten, mit denen sie öfter gewinnt:** Chitinpanzer (+27 Pkt.), Abt. Forschung (+26 Pkt.), Artillerie Panzer (+26 Pkt.), Agressor Panzer (+18 Pkt.)
-- **Karten, mit denen sie seltener gewinnt:** Hive (−13 Pkt.), Mutant (−0 Pkt.), Extend (+0 Pkt.)
+  - R1: – · R2: Mutant · R3: Abt. Kapital (15 %, 36 %)
+  - R1: – · R2: Abt. Kapital · R3: Tyrant (14 %, 36 %)
+  - R1: Tyrant, Extend, Extend · R2: Mutant, Mutant, Tyrant · R3: – (9 %, 9 %)
+- **Karten, mit denen sie öfter gewinnt:** Artillerie Panzer (+29 Pkt.), Chitinpanzer (+29 Pkt.), Abt. Forschung (+27 Pkt.), Agressor Panzer (+20 Pkt.)
+- **Karten, mit denen sie seltener gewinnt:** Hive (−12 Pkt.), Mutant (−0 Pkt.), Extend (+0 Pkt.)
   - Das ist ein Zusammenhang, keine Ursache: Wer vorn liegt, kauft andere Karten als wer zurückliegt.
 
 ## 6. Upgrades
@@ -261,42 +260,42 @@ Ein Upgrade zählt sofort und dauerhaft als Siegpunkt und wirkt ab dem Kauf. Die
 
 | Fraktion | Ø Upgrades je Partie | 30 SP | 40 SP | ∞ |
 |---|---|---|---|---|
-| Starwing | 1,9 | 2,0 | 2,1 | 1,5 |
+| Starwing | 2,2 | 2,4 | 2,7 | 1,7 |
 | Lightforce | 1,9 | 1,9 | 1,9 | 1,9 |
-| Scaretech | 1,9 | 1,8 | 1,5 | 2,4 |
+| Scaretech | 1,7 | 1,6 | 1,4 | 2,1 |
 | Biotec | 1,8 | 2,0 | 1,2 | 2,2 |
 
 *Kaufbar:* Anteil der Partien, in denen die Voraussetzung mindestens einmal aktiv war. *Gekauft:* Anteil dieser Partien, in denen die Fraktion das Upgrade kaufte. *Siegquote mit/ohne:* Siegquote der Fraktion in Partien mit bzw. ohne das Upgrade, über alle Spielerzahlen. Das ist ein Zusammenhang, keine Ursache: Wer vorn liegt, hat mehr Credits für Upgrades, und Käufe in der letzten Runde zählen mit.
 
 | Fraktion | Upgrade | Preis | Voraussetzung | Wirkung | kaufbar | gekauft | Siegquote mit | ohne |
 |---|---|---|---|---|---|---|---|---|
-| Starwing | Schildgenerator | 1000 | Sternenparlament | Pegasus & Poseidons Fluch: Defensive +1 | 57 % | 28 % | 46 % | 20 % |
-| Starwing | Teilchenbeschleuniger | 800 | Protonenmond | Jeder Protonenmond versorgt 2 Planeten mehr | 100 % | 94 % | 25 % | 10 % |
-| Starwing | Präzisionssprung | 1500 | Hyperraumnebel | Zeus & Nostradamus: Offensive +1 | 98 % | 6 % | 50 % | 22 % |
-| Starwing | Interstellare Macht | 1500 | Hyperraumnebel | Zeus & Nostradamus: Schaden +1 | 98 % | 25 % | 34 % | 21 % |
-| Starwing | Auge des Raumes | 500 | Sternenparlament | Pro Runde eine verdeckte Gegnerkarte aufdecken | 57 % | 68 % | 34 % | 18 % |
-| Starwing | Feuerschwinge | 1200 | Orbitaldock | Phoenix: Offensive +1 | 99 % | 11 % | 55 % | 20 % |
-| Lightforce | Sonnenkern | 1500 | Tribunal des Lichts | Sonnenfaust: Schaden +1 | 62 % | 30 % | 49 % | 28 % |
-| Lightforce | Effektivierung | 2000 | Drohnenkolonie | Glutdrache: Schaden +1 | 100 % | 4 % | 57 % | 31 % |
-| Lightforce | Quantensammler | 1000 | Elektronenmond | Jeder Elektronenmond versorgt 2 Planeten mehr | 100 % | 85 % | 34 % | 22 % |
-| Lightforce | Donnerschlag | 2000 | Tribunal des Lichts | Inferno & Novakanone: Schaden +1 | 62 % | 1 % | 52 % | 32 % |
-| Lightforce | Nachtsicht | 1000 | Tribunal des Lichts | Lichtfunke & Strahlenjäger: Offensive +1 | 62 % | 59 % | 41 % | 27 % |
-| Lightforce | Lichtgeschwindigkeit | 500 | Warpgate | Lichtpfeil: Defensive +1 | 64 % | 71 % | 38 % | 27 % |
-| Scaretech | Künstliche Intelligenz | 1000 | Dunkler Rat | Sternenaxt & Damokles: Schaden +1 | 93 % | 89 % | 44 % | 2 % |
-| Scaretech | Assimilation | 1000 | Flottenbasis | Shadow Arm & Schattenschleuder: Schaden +1 | 100 % | 51 % | 54 % | 19 % |
-| Scaretech | Rekonfiguration | 2000 | Spionagezentrum | Jede Reparatur: Defensive +2 | 2 % | 65 % | 53 % | 37 % |
-| Scaretech | Rauminvasion | 800 | Flottenbasis | Rage: Schaden +1 | 100 % | 35 % | 56 % | 27 % |
-| Scaretech | Gravitationsboost | 1000 | Spionagezentrum | Sternenaxt: Offensive +1 | 2 % | 79 % | 56 % | 36 % |
-| Scaretech | Schwarzer Schleier | 2000 | Dunkler Rat | Einheiten dürfen verdeckt ausgespielt werden | 93 % | 19 % | 54 % | 33 % |
-| Biotec | Mutagen | 1000 | Hive | Einheit 5 & Mutant: Offensive +1 | 100 % | 81 % | 31 % | 20 % |
-| Biotec | Flüstern | 1200 | Helipad | Helicopter wird von Planetenabwehr nicht erfasst | 1 % | 20 % | 57 % | 29 % |
-| Biotec | Perpetuum | 1000 | Plasmareaktor | Jeder Plasmareaktor versorgt 2 Planeten mehr | 100 % | 77 % | 30 % | 23 % |
-| Biotec | Chitinpanzer | 1500 | Abt. Forschung | Agressor & Regenerat. Panzer: Defensive +1 | 15 % | 80 % | 55 % | 25 % |
-| Biotec | Neuronetz | 1000 | Abt. Forschung | Pro Runde 2 eigene Planeten tauschen oder 1 Einheit umsetzen | 15 % | 6 % | 58 % | 28 % |
-| Biotec | Zellregeneration | 2000 | Abt. Forschung | Zu Zugbeginn: beschädigte Einheiten Defensive +1 | 15 % | 33 % | 58 % | 27 % |
+| Starwing | Schildgenerator | 1000 | Sternenparlament | Pegasus & Poseidons Fluch: Defensive +1 | 66 % | 35 % | 55 % | 25 % |
+| Starwing | Teilchenbeschleuniger | 800 | Protonenmond | Jeder Protonenmond versorgt 2 Planeten mehr | 100 % | 97 % | 33 % | 8 % |
+| Starwing | Präzisionssprung | 1500 | Hyperraumnebel | Zeus & Nostradamus: Offensive +1 | 99 % | 9 % | 59 % | 30 % |
+| Starwing | Interstellare Macht | 1500 | Hyperraumnebel | Zeus & Nostradamus: Schaden +1 | 99 % | 30 % | 42 % | 28 % |
+| Starwing | Auge des Raumes | 500 | Sternenparlament | Pro Runde eine verdeckte Gegnerkarte aufdecken | 66 % | 75 % | 40 % | 24 % |
+| Starwing | Feuerschwinge | 1200 | Orbitaldock | Phoenix: Offensive +1 | 99 % | 16 % | 67 % | 26 % |
+| Lightforce | Sonnenkern | 1500 | Tribunal des Lichts | Sonnenfaust: Schaden +1 | 62 % | 32 % | 49 % | 29 % |
+| Lightforce | Effektivierung | 2000 | Drohnenkolonie | Glutdrache: Schaden +1 | 100 % | 4 % | 53 % | 32 % |
+| Lightforce | Quantensammler | 1000 | Elektronenmond | Jeder Elektronenmond versorgt 2 Planeten mehr | 100 % | 85 % | 35 % | 21 % |
+| Lightforce | Donnerschlag | 2000 | Tribunal des Lichts | Inferno & Novakanone: Schaden +1 | 62 % | 1 % | 49 % | 33 % |
+| Lightforce | Nachtsicht | 1000 | Tribunal des Lichts | Lichtfunke & Strahlenjäger: Offensive +1 | 62 % | 60 % | 42 % | 27 % |
+| Lightforce | Lichtgeschwindigkeit | 500 | Warpgate | Lichtpfeil: Defensive +1 | 64 % | 70 % | 39 % | 28 % |
+| Scaretech | Künstliche Intelligenz | 1000 | Dunkler Rat | Sternenaxt & Damokles: Schaden +1 | 92 % | 85 % | 37 % | 2 % |
+| Scaretech | Assimilation | 1000 | Flottenbasis | Shadow Arm & Schattenschleuder: Schaden +1 | 100 % | 44 % | 49 % | 13 % |
+| Scaretech | Rekonfiguration | 2000 | Spionagezentrum | Jede Reparatur: Defensive +2 | 1 % | 67 % | 54 % | 29 % |
+| Scaretech | Rauminvasion | 800 | Flottenbasis | Rage: Schaden +1 | 100 % | 31 % | 47 % | 21 % |
+| Scaretech | Gravitationsboost | 1000 | Spionagezentrum | Sternenaxt: Offensive +1 | 1 % | 82 % | 58 % | 29 % |
+| Scaretech | Schwarzer Schleier | 2000 | Dunkler Rat | Einheiten dürfen verdeckt ausgespielt werden | 92 % | 15 % | 51 % | 26 % |
+| Biotec | Mutagen | 1000 | Hive | Einheit 5 & Mutant: Offensive +1 | 100 % | 81 % | 30 % | 18 % |
+| Biotec | Flüstern | 1200 | Helipad | Helicopter wird von Planetenabwehr nicht erfasst | 1 % | 22 % | 48 % | 28 % |
+| Biotec | Perpetuum | 1000 | Plasmareaktor | Jeder Plasmareaktor versorgt 2 Planeten mehr | 100 % | 77 % | 29 % | 21 % |
+| Biotec | Chitinpanzer | 1500 | Abt. Forschung | Agressor & Regenerat. Panzer: Defensive +1 | 15 % | 79 % | 56 % | 24 % |
+| Biotec | Neuronetz | 1000 | Abt. Forschung | Pro Runde 2 eigene Planeten tauschen oder 1 Einheit umsetzen | 15 % | 7 % | 59 % | 27 % |
+| Biotec | Zellregeneration | 2000 | Abt. Forschung | Zu Zugbeginn: beschädigte Einheiten Defensive +1 | 15 % | 30 % | 57 % | 26 % |
 
-- **Selten kaufbar** (in weniger als 15 % der Partien): Rekonfiguration (Scaretech, 2 %), Gravitationsboost (Scaretech, 2 %), Flüstern (Biotec, 1 %). Hier liegt es am Technologiebaum: Die Bots bauen die Voraussetzung selten.
-- **Kaufbar, aber selten gekauft** (unter 20 %): Präzisionssprung (Starwing, 1500 Credits, 6 %), Feuerschwinge (Starwing, 1200 Credits, 11 %), Effektivierung (Lightforce, 2000 Credits, 4 %), Donnerschlag (Lightforce, 2000 Credits, 1 %), Schwarzer Schleier (Scaretech, 2000 Credits, 19 %), Neuronetz (Biotec, 1000 Credits, 6 %). Für die Bots ist die Wirkung den Preis meist nicht wert.
+- **Selten kaufbar** (in weniger als 15 % der Partien): Rekonfiguration (Scaretech, 1 %), Gravitationsboost (Scaretech, 1 %), Flüstern (Biotec, 1 %), Chitinpanzer (Biotec, 15 %), Neuronetz (Biotec, 15 %), Zellregeneration (Biotec, 15 %). Hier liegt es am Technologiebaum: Die Bots bauen die Voraussetzung selten.
+- **Kaufbar, aber selten gekauft** (unter 20 %): Präzisionssprung (Starwing, 1500 Credits, 9 %), Feuerschwinge (Starwing, 1200 Credits, 16 %), Effektivierung (Lightforce, 2000 Credits, 4 %), Donnerschlag (Lightforce, 2000 Credits, 1 %), Schwarzer Schleier (Scaretech, 2000 Credits, 15 %). Für die Bots ist die Wirkung den Preis meist nicht wert.
 
 ## 7. Regel-Auffälligkeiten
 
@@ -306,14 +305,14 @@ Versuch mit der neuen Regel: Eine Fraktion legt ihre Energiequelle anfangs in Re
 
 | Fraktion | Spieler | Aussetzen je Partie (hinten) | Aussetzen je Partie (Reihe 2) | Siegquote (hinten) | Siegquote (Reihe 2) |
 |---|---|---|---|---|---|
-| Starwing | 2 | 0,28 | 1,41 | 19 % | 44 % |
-| Starwing | 4 | 0,01 | 0,93 | 25 % | 29 % |
-| Lightforce | 2 | 0,09 | 1,09 | 40 % | 58 % |
-| Lightforce | 4 | 0,01 | 0,63 | 34 % | 46 % |
-| Biotec | 2 | 0,20 | 0,20 | 69 % | 74 % |
-| Biotec | 4 | 0,38 | 1,70 | 12 % | 8 % |
+| Starwing | 2 | 0,14 | 1,41 | 37 % | 44 % |
+| Starwing | 4 | 0,00 | 0,93 | 36 % | 29 % |
+| Lightforce | 2 | 0,07 | 1,09 | 40 % | 58 % |
+| Lightforce | 4 | 0,00 | 0,63 | 34 % | 46 % |
+| Biotec | 2 | 0,26 | 0,20 | 64 % | 74 % |
+| Biotec | 4 | 0,33 | 1,70 | 11 % | 8 % |
 
-**„∞“ zu zweit.** Ohne Siegpunkte gewinnt nur, wer das gegnerische Zentralgestirn zerstört. Zu zweit dauerte das im Schnitt 29 Runden; 0 % der Partien hatten nach 120 Runden noch keinen Sieger, am häufigsten mit Lightforce (1 % ihrer Partien) und Starwing (1 %).
+**„∞“ zu zweit.** Ohne Siegpunkte gewinnt nur, wer das gegnerische Zentralgestirn zerstört. Zu zweit dauerte das im Schnitt 31 Runden; 0 % der Partien hatten nach 120 Runden noch keinen Sieger, am häufigsten mit Starwing (1 % ihrer Partien) und Lightforce (0 %).
 
 ## 8. Kampfwert der Einheiten
 
@@ -384,4 +383,4 @@ npm run sim -- final --games 150 --patch werte.json --tag name --label "Text"
 npm run sim -- report
 ```
 
-Umfang dieses Berichts: rund 2.307.000 simulierte Partien.
+Umfang dieses Berichts: rund 1.988.000 simulierte Partien.

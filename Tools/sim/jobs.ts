@@ -44,6 +44,13 @@ export function applyPatch(patch?: Patch) {
   }
 }
 
+/** Kurzer Fingerabdruck der Kartenwerte: Ergebnisse aus Läufen mit anderen Werten erkennen */
+export function cardsKey(): string {
+  let h = 2166136261;
+  for (const ch of JSON.stringify(CARDS)) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+  return (h >>> 0).toString(16);
+}
+
 /** Alle Sitzordnungen mit n der 4 Fraktionen */
 export function seatings(n: number): Faction[][] {
   const out: Faction[][] = [];

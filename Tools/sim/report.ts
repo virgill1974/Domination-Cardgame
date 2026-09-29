@@ -5,6 +5,7 @@ import { CARDS, CARD_OF_EAN, FACTIONS, FACTION_COLORS, SCARETECH, STARTING_EANS,
 import { factionOfCardId, kindOfCardId } from '../../src/engine/cards';
 import { UPGRADE_EFFECTS } from '../../src/ui/cardText';
 import { unitDuel } from './duel';
+import { cardsKey } from './jobs';
 import { ARCHETYPES, ARCHETYPE_LABEL, ARCHETYPE_NAMES, PARAM_KEYS, PARAM_RANGES, type BotParams, type ParamKey } from './params';
 import { markdownToHtml, printPdf, reportPage, writeHtml } from './pdf';
 import { emptyAgg, mergeAgg, wilson, type Agg } from './stats';
@@ -16,7 +17,7 @@ interface Saved {
 }
 
 interface Selected {
-  meta: { games: number; rounds?: number };
+  meta: { games: number; rounds?: number; cards?: string };
   choice: Record<string, { name: string; rates: Record<string, number> }>;
 }
 
@@ -360,7 +361,8 @@ export function writeReport(load: <T>(name: string) => T | null, variantNames: s
     const notes: string[] = [];
     const sorted = [...verdict].sort((a, b) => b.r - a.r);
     notes.push(`**Stärkste Fraktion: ${FACTIONS[sorted[0].f]}** (${num(sorted[0].r, 2)}), **schwächste: ${FACTIONS[sorted[3].f]}** (${num(sorted[3].r, 2)}).`);
-    if (selected) {
+    // Die Siegquoten der Strategiewahl gelten nur für die Kartenwerte, mit denen sie lief
+    if (selected && selected.meta.cards === cardsKey()) {
       const solo = F.map((f) => ({ f, r: soloStrength(selected, f), all: verdict.find((v) => v.f === f)!.r }));
       const strong = solo.filter((x) => x.r >= 1.1 && x.all >= 1.1).map((x) => FACTIONS[x.f]);
       const weak = solo.filter((x) => x.r <= 0.9 && x.all <= 0.9).map((x) => FACTIONS[x.f]);
